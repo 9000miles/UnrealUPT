@@ -1,2 +1,4 @@
 /Intermediate/
 *.sln
+/Saved/
+/.vs/
