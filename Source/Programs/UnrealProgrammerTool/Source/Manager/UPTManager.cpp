@@ -124,14 +124,12 @@ TSharedPtr<FSlateBrush> FUPTManager::GetProjectThumbnail(const FString& ProjectP
 	const FString ProjectDir = FPaths::GetPath(ProjectPath);
 	const FString ProjectName = FPaths::GetBaseFilename(ProjectPath);
 
-	FString Identifier, EngineRootDir;
+	FString Identifier;
 	FDesktopPlatformModule::Get()->GetEngineIdentifierForProject(ProjectPath, Identifier);
-	FDesktopPlatformModule::Get()->GetEngineRootDirFromIdentifier(Identifier, EngineRootDir);
 
 	const FString ProjectThumbnail_TargetImagePath = ProjectDir / FString::Printf(TEXT("%s.png"), *ProjectName);
 	const FString ProjectThumbnail_AutomaticImagePath = ProjectDir / TEXT("Saved/AutoScreenshot.png");
-	EngineRootDir = EngineRootDir.IsEmpty() ? FPaths::ConvertRelativePathToFull(FPaths::EngineDir()) : EngineRootDir;//如果引擎路径为空，则采用UPT引擎路径
-	const FString DefaultProjectThumbnailPath = EngineRootDir / TEXT("Content") / TEXT("Editor") / TEXT("Slate") / TEXT("GameProjectDialog") / TEXT("default_game_thumbnail_192x.png");
+	const FString DefaultProjectThumbnailPath = UPT_RESOURCE_PATH / TEXT("default_game_thumbnail_192x.png");
 
 	FString ImagePath;
 	if (FPaths::FileExists(ProjectThumbnail_TargetImagePath))

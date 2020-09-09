@@ -15,6 +15,7 @@
 #include "UPTManager.h"
 #include "MultiBoxBuilder.h"
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"
+#include "UPTStyle.h"
 
 IMPLEMENT_APPLICATION(UnrealProgrammerTool, "UnrealProgrammerTool");
 
@@ -31,7 +32,7 @@ namespace UPTMeun
 
 void SetProjectDir()
 {
-	const FString ProjectDir = FString::Printf(TEXT("../../../Unreal_UPT/Programs/%s/"), FApp::GetProjectName());
+	const FString ProjectDir = FString::Printf(TEXT("../../../UnrealUPT/Programs/%s/"), FApp::GetProjectName());
 	FPlatformMisc::SetOverrideProjectDir(ProjectDir);
 }
 
@@ -197,6 +198,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance,
 	FModuleManager::LoadModuleChecked<ISlateReflectorModule>("SlateReflector").RegisterTabSpawner(UPTMeun::UPTGroup);
 
 	FEditorStyle::ResetToDefault();
+	FUPTStyle::Initialize();
+	FUPTStyle::ReloadTextures();
 
 	StartupMainFrame();
 
@@ -211,8 +214,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance,
 		FSlateApplication::Get().PumpMessages();
 		FSlateApplication::Get().Tick();
 		FPlatformProcess::Sleep(0);
+
 	}
 
+	FUPTStyle::Shutdown();
 	FCoreDelegates::OnExit.Broadcast();
 	FSlateApplication::Shutdown();
 	FModuleManager::Get().UnloadModulesAtShutdown();

@@ -15,3 +15,7 @@ DEFINE_LOG_CATEGORY_STATIC(UPTLog, Log, All);
 #define PROJECT_THUMBNAIL_HEIGHT 130.0f
 
 #define ENGINE_VERSION_HEIGHT 280.0f
+
+#define UPT_RESOURCE_PATH Get_UPT_Resource()
+
+ const FString Get_UPT_Resource();

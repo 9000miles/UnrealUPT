@@ -6,6 +6,7 @@
 #include "Interfaces/IPluginManager.h"
 #include "IPluginManager.h"
 #include "SlateStyle.h"
+#include "UPTDefine.h"
 
 TSharedPtr< FSlateStyleSet > FUPTStyle::StyleInstance = NULL;
 
@@ -27,7 +28,7 @@ void FUPTStyle::Shutdown()
 
 FName FUPTStyle::GetStyleSetName()
 {
-	static FName StyleSetName(TEXT("SubtitlePluginStyle"));
+	static FName StyleSetName(TEXT("UPTStyle"));
 	return StyleSetName;
 }
 
@@ -43,8 +44,8 @@ const FVector2D Icon40x40(40.0f, 40.0f);
 
 TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 {
-	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("SubtitlePluginStyle"));
-	Style->SetContentRoot(IPluginManager::Get().FindPlugin("SubtitlePlugin")->GetBaseDir() / TEXT("Resources"));
+	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("UPTStyle"));
+	Style->SetContentRoot(UPT_RESOURCE_PATH);
 
 	Style->Set("SubtitlePlugin.PluginAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
 	Style->Set("SubtitlePlugin.PluginAction16", new IMAGE_BRUSH(TEXT("ButtonIcon_16x"), Icon16x16));
