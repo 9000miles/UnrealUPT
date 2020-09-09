@@ -98,6 +98,7 @@ TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
+		.Padding(FMargin(5, 0))
 		[
 			FUPTMenuBar::MakeMenuBar(UPTTabManager.ToSharedRef())
 		]
