@@ -42,6 +42,7 @@ const FVector2D Icon16x16(16.0f, 16.0f);
 const FVector2D Icon20x20(20.0f, 20.0f);
 const FVector2D Icon32x32(32.0f, 32.0f);
 const FVector2D Icon40x40(40.0f, 40.0f);
+const FVector2D Icon64x64(64.0f, 64.0f);
 
 TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 {
@@ -51,6 +52,7 @@ TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 	Style->Set("UPT.Refresh", new IMAGE_BRUSH(TEXT("Refresh"), Icon32x32));
 	Style->Set("UPT.FoldAllArea", new IMAGE_BRUSH(TEXT("FoldAllArea"), Icon32x32));
 	Style->Set("UPT.ExpandAllArea", new IMAGE_BRUSH(TEXT("ExpandAllArea"), Icon32x32));
+	Style->Set("UPT.AppIcon", new IMAGE_BRUSH(TEXT("AppIcon"), Icon32x32));
 
 	return Style;
 }

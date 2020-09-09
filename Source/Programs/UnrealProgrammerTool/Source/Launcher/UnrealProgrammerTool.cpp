@@ -174,6 +174,22 @@ void StartupMainFrame()
 	CreateMainFrameWindow();
 }
 
+void SetAppIcon()
+{
+	//TSharedPtr<FSlateApplication> Slate = FSlateApplication::Create(MakeShareable((FWindowsPlatformApplicationMisc::CreateApplication())));
+	//{
+	//	TSharedRef<FSlateRenderer> SlateRenderer = GetStandardStandaloneRenderer();
+	//	bool bRendererInitialized = Slate->InitializeRenderer(SlateRenderer, true);
+	//	if (!bRendererInitialized)
+	//	{
+	//		FSlateApplication::Shutdown();
+	//		return;
+	//	}
+	//	Slate->SetExitRequestedHandler(FSimpleDelegate::CreateStatic(&OnExit));
+	//}
+	FSlateApplication::Get().SetAppIcon(FUPTStyle::Get().GetBrush("UPT.AppIcon"));
+}
+
 void OnExit()
 {
 	GIsRequestingExit = true;
@@ -207,7 +223,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance,
 #endif
 
 	// set the application name
-	FGlobalTabmanager::Get()->SetApplicationTitle(LOCTEXT("AppTitle", "Unreal Programmer Tool"));
+	FGlobalTabmanager::Get()->SetApplicationTitle(LOCTEXT("AppTitle", "UnrealUPT"));
 	FModuleManager::LoadModuleChecked<ISlateReflectorModule>("SlateReflector").RegisterTabSpawner(UPTMeun::UPTGroup);
 
 	FEditorStyle::ResetToDefault();
@@ -215,6 +231,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance,
 	FUPTStyle::ReloadTextures();
 	FUPTCommands::Register();
 
+	SetAppIcon();
 	StartupMainFrame();
 
 	// loop while the server does the rest
