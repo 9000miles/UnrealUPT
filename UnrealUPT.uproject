@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{8468D830-4D89-E2BA-1919-55AB10CC226D}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "UnrealUPT",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

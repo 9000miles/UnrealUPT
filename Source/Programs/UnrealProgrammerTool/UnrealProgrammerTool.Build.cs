@@ -14,9 +14,9 @@ public class UnrealProgrammerTool : ModuleRules
             {
                 Path.Combine(EngineDirectory, "Source/Runtime/Launch/Public"),
 
-                Path.Combine(ModuleDirectory, "Source/Action"),
+                Path.Combine(ModuleDirectory, "Source/Menu"),
                 Path.Combine(ModuleDirectory, "Source/Classes"),
-                Path.Combine(ModuleDirectory, "Source/Laucher"),
+                Path.Combine(ModuleDirectory, "Source/Launcher"),
                 Path.Combine(ModuleDirectory, "Source/Manager"),
                 Path.Combine(ModuleDirectory, "Source/Slate"),
                 Path.Combine(ModuleDirectory, "Source/Slate/ProjectUnit"),

@@ -16,18 +16,22 @@
 #include "MultiBoxBuilder.h"
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"
 #include "UPTStyle.h"
+#include "UPTMenuBar.h"
+#include "UPTDelegateCenter.h"
+#include "UPTDefine.h"
+#include "../Menu/UPTToolBar.h"
+#include "../Menu/UPTCommands.h"
 
 IMPLEMENT_APPLICATION(UnrealProgrammerTool, "UnrealProgrammerTool");
 
 #define LOCTEXT_NAMESPACE "UnrealProgrammerTool"
 
 static TArray<TSharedPtr<FProjectInfo>> ProjectInfos;
-static TSharedPtr<FTabManager> TestSuite1TabManager;
+static TSharedPtr<FTabManager> UPTTabManager;
 
 namespace UPTMeun
 {
 	TSharedRef<FWorkspaceItem> UPTGroup = FWorkspaceItem::NewGroup(LOCTEXT("UPTGroup", "UPTGroup"));
-	TSharedRef<FWorkspaceItem> UPTMenuRoot = FWorkspaceItem::NewGroup(LOCTEXT("UPTMenuRoot", "UPTMenuRoot"));
 }
 
 void SetProjectDir()
@@ -41,7 +45,7 @@ TSharedRef<SDockTab> SpawnMainTab(const FSpawnTabArgs& Args, FName TabIdentifier
 	if (TabIdentifier == FName(TEXT("UPTWindowTab")))
 	{
 		return SNew(SDockTab)
-			.Label(LOCTEXT("UPTWindowTab", "Layout Example"))
+			.Label(LOCTEXT("UPTWindowTab", "UPT Window"))
 			.ToolTipText(LOCTEXT("UPTWindowTabToolTip", "Switches to the Layout Example tab, which shows off examples of various Slate layout primitives."))
 			.Clipping(EWidgetClipping::ClipToBounds)
 			[
@@ -74,40 +78,43 @@ TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 
 
 
-	TSharedRef<SDockTab> TestSuite1Tab =
+	TSharedRef<SDockTab> UPTTab =
 		SNew(SDockTab)
 		.TabRole(ETabRole::MajorTab)
-		.Label(LOCTEXT("TestSuite1TabLabel", "Test Suite 1"))
-		.ToolTipText(LOCTEXT("TestSuite1TabToolTip", "The App for the first Test Suite."));
+		.Label(LOCTEXT("UPTLabel", "UPT"))
+		.ToolTipText(LOCTEXT("UPTTabToolTip", "A tool that unreal programmers really want to use."));
 
 
-	TestSuite1TabManager = FGlobalTabmanager::Get()->NewTabManager(TestSuite1Tab);
-	TestSuite1TabManager->RegisterTabSpawner("UPTWindowTab", FOnSpawnTab::CreateStatic(&SpawnMainTab, FName("UPTWindowTab")))
-		.SetDisplayName(NSLOCTEXT("TestSuite1", "UPTWindowTab", "Layout Example"))
+	UPTTabManager = FGlobalTabmanager::Get()->NewTabManager(UPTTab);
+	UPTTabManager->RegisterTabSpawner("UPTWindowTab", FOnSpawnTab::CreateStatic(&SpawnMainTab, FName("UPTWindowTab")))
+		.SetDisplayName(LOCTEXT("UPTWindowTab", "UPT Tab"))
 		.SetGroup(UPTMeun::UPTGroup);
-	   
-	FMenuBarBuilder MenuBarBuilder = FMenuBarBuilder(TSharedPtr<FUICommandList>());
-	MenuBarBuilder.AddPullDownMenu(
-		NSLOCTEXT("TestSuite", "WindowMenuLabel", "Window"),
-		FText::GetEmpty(),
-		FNewMenuDelegate::CreateSP(TestSuite1TabManager.ToSharedRef(), &FTabManager::PopulateTabSpawnerMenu, UPTMeun::UPTMenuRoot));
+	
+	FUPTDelegateCenter::OnExit.AddStatic(&OnExit);
 
-	TestSuite1Tab->SetContent
+
+	UPTTab->SetContent
 	(
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		[
-			MenuBarBuilder.MakeWidget()
+			FUPTMenuBar::MakeMenuBar(UPTTabManager.ToSharedRef())
 		]
-	+ SVerticalBox::Slot()
-		.FillHeight(1.0f)
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(FMargin(5))
 		[
-			TestSuite1TabManager->RestoreFrom(Layout, Args.GetOwnerWindow()).ToSharedRef()
+			FUPTToolBar::MakeUPTToolBar()
+		]
+		+ SVerticalBox::Slot()
+		.FillHeight(1.0f)
+			[
+				SNew(SUPTMainFrame, ProjectInfos)
 		]
 	);
 
-	return TestSuite1Tab;
+	return UPTTab;
 
 }
 
@@ -166,6 +173,11 @@ void StartupMainFrame()
 	CreateMainFrameWindow();
 }
 
+void OnExit()
+{
+	GIsRequestingExit = true;
+}
+
 int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR, _In_ int nCmdShow)
 {
 	SetProjectDir();
@@ -200,10 +212,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance,
 	FEditorStyle::ResetToDefault();
 	FUPTStyle::Initialize();
 	FUPTStyle::ReloadTextures();
+	FUPTCommands::Register();
 
 	StartupMainFrame();
-
-	//FGlobalTabmanager::Get()->InvokeTab(FTabId("WidgetReflector"));
 
 	// loop while the server does the rest
 	while (!GIsRequestingExit)
@@ -214,7 +225,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance,
 		FSlateApplication::Get().PumpMessages();
 		FSlateApplication::Get().Tick();
 		FPlatformProcess::Sleep(0);
-
 	}
 
 	FUPTStyle::Shutdown();

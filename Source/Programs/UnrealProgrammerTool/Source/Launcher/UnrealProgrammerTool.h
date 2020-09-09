@@ -7,3 +7,5 @@
 void SetProjectDir();
 TSharedRef<SDockTab> SpawnMainTab(const FSpawnTabArgs& Args, FName TabIdentifier);
 void StartupMainFrame();
+
+void OnExit();

@@ -40,6 +40,7 @@ FName FUPTStyle::GetStyleSetName()
 
 const FVector2D Icon16x16(16.0f, 16.0f);
 const FVector2D Icon20x20(20.0f, 20.0f);
+const FVector2D Icon32x32(32.0f, 32.0f);
 const FVector2D Icon40x40(40.0f, 40.0f);
 
 TSharedRef< FSlateStyleSet > FUPTStyle::Create()
@@ -47,8 +48,9 @@ TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("UPTStyle"));
 	Style->SetContentRoot(UPT_RESOURCE_PATH);
 
-	Style->Set("SubtitlePlugin.PluginAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
-	Style->Set("SubtitlePlugin.PluginAction16", new IMAGE_BRUSH(TEXT("ButtonIcon_16x"), Icon16x16));
+	Style->Set("UPT.Refresh", new IMAGE_BRUSH(TEXT("Refresh"), Icon32x32));
+	Style->Set("UPT.FoldAllArea", new IMAGE_BRUSH(TEXT("FoldAllArea"), Icon32x32));
+	Style->Set("UPT.ExpandAllArea", new IMAGE_BRUSH(TEXT("ExpandAllArea"), Icon32x32));
 
 	return Style;
 }
