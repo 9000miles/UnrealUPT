@@ -54,7 +54,6 @@ TSharedRef<SWidget> SEngineVersionArea::CreateAreaHeader(const FString& Version)
 		.Padding(FMargin(5, 0))
 		[
 			SNew(SHyperlink)
-			//.Style(FEditorStyle::Get(), "Common.GotoNativeCodeHyperlink")
 			.OnNavigate_Lambda([this] { FPlatformProcess::ExploreFolder(*(EnginePath)); })
 			.Text(FText::FromString(EnginePath))
 		]

@@ -12,19 +12,13 @@
 #include "ISourceCodeAccessModule.h"
 #include "ProjectInfo.h"
 #include "SUPTMainFrame.h"
-#include "EPManager.h"
+#include "UPTManager.h"
 #include "MultiBoxBuilder.h"
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"
-//#include "EPManager.h"
-//#include "SUPTMainFrame.h"
-//#include "MultiBoxBuilder.h"
-
-DEFINE_LOG_CATEGORY_STATIC(LogUnrealProgrammerTool, Log, All);
 
 IMPLEMENT_APPLICATION(UnrealProgrammerTool, "UnrealProgrammerTool");
 
 #define LOCTEXT_NAMESPACE "UnrealProgrammerTool"
-
 
 static TArray<TSharedPtr<FProjectInfo>> ProjectInfos;
 static TSharedPtr<FTabManager> TestSuite1TabManager;
@@ -166,8 +160,8 @@ void CreateMainFrameWindow()
 
 void StartupMainFrame()
 {
-	FEPManager::Get()->Initialize();
-	ProjectInfos = FEPManager::Get()->GetAllProjectInfos();
+	FUPTManager::Get()->Initialize();
+	ProjectInfos = FUPTManager::Get()->GetAllProjectInfos();
 	CreateMainFrameWindow();
 }
 

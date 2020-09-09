@@ -7,13 +7,13 @@
 
 struct FProjectInfo;
 
-class FEPManager :public TSharedFromThis<FEPManager>
+class FUPTManager :public TSharedFromThis<FUPTManager>
 {
 public:
-	FEPManager()
+	FUPTManager()
 	{	}
 
-	static TSharedPtr<FEPManager> Get();
+	static TSharedPtr<FUPTManager> Get();
 
 	void Initialize();
 

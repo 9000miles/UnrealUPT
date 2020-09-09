@@ -5,7 +5,7 @@
 #include "STextBlock.h"
 #include "SImage.h"
 #include "SlateBrush.h"
-#include "../Manager/DelegateCenter.h"
+#include "../Manager/UPTDelegateCenter.h"
 #include "SBox.h"
 #include "UPTDefine.h"
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"

@@ -6,7 +6,7 @@
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"
 #include "UIAction.h"
 #include "UPTDefine.h"
-#include "DelegateCenter.h"
+#include "UPTDelegateCenter.h"
 #include "SBorder.h"
 #include "SButton.h"
 
@@ -72,7 +72,7 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 		LOCTEXT("Managed Code Tip", "Managed Code Tip"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
 		FUIAction(
-			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnShowInExplorer.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnManagedCode.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
 			FCanExecuteAction()
 		));
 

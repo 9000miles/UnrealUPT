@@ -1,4 +1,4 @@
-#include "EPManager.h"
+#include "UPTManager.h"
 #include "DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Paths.h"
 #include "FileHelper.h"
@@ -11,7 +11,7 @@
 #include "ISourceCodeAccessModule.h"
 #include "ISourceCodeAccessor.h"
 #include "UPTDefine.h"
-#include "DelegateCenter.h"
+#include "UPTDelegateCenter.h"
 #include "ProjectInfo.h"
 #include "ProjectDescriptor.h"
 #include "PlatformFilemanager.h"
@@ -19,16 +19,17 @@
 #include "Programs/UnrealVersionSelector/Private/PlatformInstallation.h"
 #include "JsonReader.h"
 #include "JsonSerializer.h"
+#include "IPluginManager.h"
 
 #define LOCTEXT_NAMESPACE "FEPManager"
 
-TSharedPtr<FEPManager> FEPManager::Get()
+TSharedPtr<FUPTManager> FUPTManager::Get()
 {
-	static TSharedPtr<FEPManager> Instance = MakeShareable(new FEPManager());
+	static TSharedPtr<FUPTManager> Instance = MakeShareable(new FUPTManager());
 	return Instance;
 }
 
-void FEPManager::Initialize()
+void FUPTManager::Initialize()
 {
 	FUPTDelegateCenter::OnOpenProject.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenProject(Info); });
 	FUPTDelegateCenter::OnOpenIDE.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenCodeIDE(Info); });
@@ -39,7 +40,7 @@ void FEPManager::Initialize()
 
 }
 
-TArray<FString> FEPManager::GetAllEngineRootDir()
+TArray<FString> FUPTManager::GetAllEngineRootDir()
 {
 	TMap<FString, FString> OutInstallations;
 	FDesktopPlatformModule::Get()->EnumerateEngineInstallations(OutInstallations);
@@ -51,7 +52,7 @@ TArray<FString> FEPManager::GetAllEngineRootDir()
 	return RootDirs;
 }
 
-void FEPManager::GetEngineVersion(TArray<FString>& EngineDirs, TArray<FString>& Versions)
+void FUPTManager::GetEngineVersion(TArray<FString>& EngineDirs, TArray<FString>& Versions)
 {
 	for (const FString RootDir : EngineDirs)
 	{
@@ -61,7 +62,7 @@ void FEPManager::GetEngineVersion(TArray<FString>& EngineDirs, TArray<FString>& 
 	}
 }
 
-TArray<FString> FEPManager::GetProjectPathsByEngineRootDir(const FString& RootDir)
+TArray<FString> FUPTManager::GetProjectPathsByEngineRootDir(const FString& RootDir)
 {
 	FString Identifer;
 	FDesktopPlatformModule::Get()->GetEngineIdentifierFromRootDir(RootDir, Identifer);
@@ -78,7 +79,7 @@ TArray<FString> FEPManager::GetProjectPathsByEngineRootDir(const FString& RootDi
 	return OutProjectFileNames;
 }
 
-void FEPManager::GetProjectNames(TArray<FString>& ProjectPaths, TArray<FString>& ProjectNames)
+void FUPTManager::GetProjectNames(TArray<FString>& ProjectPaths, TArray<FString>& ProjectNames)
 {
 	for (const FString ProjectPath : ProjectPaths)
 	{
@@ -87,7 +88,7 @@ void FEPManager::GetProjectNames(TArray<FString>& ProjectPaths, TArray<FString>&
 	}
 }
 
-TArray<TSharedPtr<FProjectInfo>> FEPManager::GetAllProjectInfos()
+TArray<TSharedPtr<FProjectInfo>> FUPTManager::GetAllProjectInfos()
 {
 	TArray<TSharedPtr<FProjectInfo>> Result;
 	TArray<FString> AllEngineRootDir = GetAllEngineRootDir();
@@ -115,7 +116,7 @@ TArray<TSharedPtr<FProjectInfo>> FEPManager::GetAllProjectInfos()
 	return Result;
 }
 
-TSharedPtr<FSlateBrush> FEPManager::GetProjectThumbnail(const FString& ProjectPath)
+TSharedPtr<FSlateBrush> FUPTManager::GetProjectThumbnail(const FString& ProjectPath)
 {
 	TSharedPtr<FSlateDynamicImageBrush> Brush = nullptr;
 	bool bSucceeded = false;
@@ -129,6 +130,7 @@ TSharedPtr<FSlateBrush> FEPManager::GetProjectThumbnail(const FString& ProjectPa
 
 	const FString ProjectThumbnail_TargetImagePath = ProjectDir / FString::Printf(TEXT("%s.png"), *ProjectName);
 	const FString ProjectThumbnail_AutomaticImagePath = ProjectDir / TEXT("Saved/AutoScreenshot.png");
+	EngineRootDir = EngineRootDir.IsEmpty() ? FPaths::ConvertRelativePathToFull(FPaths::EngineDir()) : EngineRootDir;//如果引擎路径为空，则采用UPT引擎路径
 	const FString DefaultProjectThumbnailPath = EngineRootDir / TEXT("Content") / TEXT("Editor") / TEXT("Slate") / TEXT("GameProjectDialog") / TEXT("default_game_thumbnail_192x.png");
 
 	FString ImagePath;
@@ -181,7 +183,7 @@ TSharedPtr<FSlateBrush> FEPManager::GetProjectThumbnail(const FString& ProjectPa
 	return Brush;
 }
 
-bool FEPManager::OpenProject(TSharedRef<FProjectInfo> Info)
+bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 {
 	FString EngineDir = Info->GetEnginePath();
 	FString ProjectFile = Info->GetProjectPath();
@@ -219,7 +221,7 @@ bool FEPManager::OpenProject(TSharedRef<FProjectInfo> Info)
 	return true;
 }
 
-bool FEPManager::OpenCodeIDE(TSharedRef<FProjectInfo> Info)
+bool FUPTManager::OpenCodeIDE(TSharedRef<FProjectInfo> Info)
 {
 	FString ProjectFile = Info->GetProjectPath();
 	FText OutFailReason;
@@ -260,7 +262,7 @@ bool FEPManager::OpenCodeIDE(TSharedRef<FProjectInfo> Info)
 	return true;
 }
 
-bool FEPManager::GenerateSolution(TSharedRef<FProjectInfo> Info)
+bool FUPTManager::GenerateSolution(TSharedRef<FProjectInfo> Info)
 {
 	FString ProjectFileName = Info->GetProjectPath();
 
@@ -297,7 +299,7 @@ bool FEPManager::GenerateSolution(TSharedRef<FProjectInfo> Info)
 	return true;
 }
 
-bool FEPManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
+bool FUPTManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
 {
 	if (!Info->GetProjectPath().IsEmpty())
 	{
@@ -308,17 +310,17 @@ bool FEPManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
 	return false;
 }
 
-void FEPManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
+void FUPTManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
 {
 
 }
 
-void FEPManager::OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info)
+void FUPTManager::OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info)
 {
 
 }
 
-TSharedPtr<FJsonObject> FEPManager::LoadProjectFile(const FString &FileName)
+TSharedPtr<FJsonObject> FUPTManager::LoadProjectFile(const FString &FileName)
 {
 	FString FileContents;
 

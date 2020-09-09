@@ -3,12 +3,12 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class Unreal_UPTEditorTarget : TargetRules
+public class UnrealUPTEditorTarget : TargetRules
 {
-	public Unreal_UPTEditorTarget(TargetInfo Target) : base(Target)
+	public UnrealUPTEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 
-		ExtraModuleNames.AddRange( new string[] { "Unreal_UPT" } );
+		ExtraModuleNames.AddRange( new string[] { "UnrealUPT" } );
 	}
 }

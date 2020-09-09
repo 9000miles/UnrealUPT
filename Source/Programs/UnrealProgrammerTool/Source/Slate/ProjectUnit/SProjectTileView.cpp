@@ -41,6 +41,9 @@ void SProjectTileView::Refresh(TArray<TSharedPtr<FProjectInfo>> Infos)
 
 void SProjectTileView::CreateUnits(TArray<TSharedPtr<FProjectInfo>> Infos)
 {
+	//工程根据名字排序
+	Infos.Sort([](const TSharedPtr<FProjectInfo>& A, const TSharedPtr<FProjectInfo>& B) -> bool { return A->GetProjectName() < B->GetProjectName(); });
+
 	for (TSharedPtr<FProjectInfo> Info : Infos)
 	{
 		check(Info.IsValid());
