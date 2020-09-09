@@ -15,6 +15,7 @@ public:
 
 public:
 	void Construct(const FArguments& InArgs, const FString& Version, TArray<TSharedPtr<FProjectInfo>>& Projects);
+	const FString GetEngineVersion() { return EngineVersion; }
 
 private:
 	TSharedRef<SWidget> CreateAreaHeader(const FString& Version);
@@ -22,4 +23,6 @@ private:
 
 private:
 	FString EngineVersion;
+	FString EnginePath;
+	int32 ProjectCount;
 };

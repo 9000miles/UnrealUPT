@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "ProjectInfo.h"
 
-class FDelegateCenter
+class FUPTDelegateCenter
 {
 public:
 	DECLARE_DELEGATE_OneParam(FOnProjectOperation, TSharedRef<FProjectInfo> /*ProjectInfo*/);
@@ -14,5 +14,7 @@ public:
 	static FOnProjectOperation OnOpenIDE;
 	static FOnProjectOperation OnGenerateSolution;
 	static FOnProjectOperation OnShowInExplorer;
+	static FOnProjectOperation OnClearSolution;
+	static FOnProjectOperation OnManagedCode;
 
 };

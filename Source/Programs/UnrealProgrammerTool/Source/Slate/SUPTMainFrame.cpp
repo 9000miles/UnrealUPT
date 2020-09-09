@@ -1,8 +1,9 @@
 #include "SUPTMainFrame.h"
 #include "SBoxPanel.h"
-#include "../Classes/ProjectInfo.h"
+#include "ProjectInfo.h"
 #include "SEngineVersionArea.h"
 #include "SScrollBox.h"
+#include "UPTDefine.h"
 
 void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& AllProjects)
 {
@@ -31,13 +32,17 @@ void SUPTMainFrame::CreateAllProjects(TSharedRef<SVerticalBox>& VerticalBox, TAr
 			Map.Add(Version, { Info });
 	}
 
+	//根据引擎版本排序
+	Map.KeySort([](const FString& A, const FString& B) -> bool	{ return A < B; });
+
+	//创建引擎版本对应的工程区块
 	for (auto It = Map.CreateConstIterator(); It; ++It)
 	{
 		FString Version = (&It)->Key();
 		TArray<TSharedPtr<FProjectInfo>> Infos = (&It)->Value();
 		VerticalBox->AddSlot()
 		.AutoHeight()
-		.MaxHeight(500)
+		.MaxHeight(ENGINE_VERSION_HEIGHT)
 		.Padding(FMargin(5))
 		[
 			SNew(SEngineVersionArea, Version, Infos)

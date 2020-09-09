@@ -1,10 +1,14 @@
 #include "DelegateCenter.h"
 
-FDelegateCenter::FOnProjectOperation FDelegateCenter::OnOpenProject;
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnOpenProject;
 
-FDelegateCenter::FOnProjectOperation FDelegateCenter::OnOpenIDE;
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnOpenIDE;
 
-FDelegateCenter::FOnProjectOperation FDelegateCenter::OnGenerateSolution;
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnGenerateSolution;
 
-FDelegateCenter::FOnProjectOperation FDelegateCenter::OnShowInExplorer;
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnShowInExplorer;
+
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnClearSolution;
+
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnManagedCode;
 

@@ -84,9 +84,9 @@ void SProjectUnit::OnDoubleClicked()
 	if (!ProjectInfo.IsValid())
 		return;
 
-	if (FDelegateCenter::OnOpenProject.IsBound())
+	if (FUPTDelegateCenter::OnOpenProject.IsBound())
 	{
-		FDelegateCenter::OnOpenProject.ExecuteIfBound(ProjectInfo.ToSharedRef());
+		FUPTDelegateCenter::OnOpenProject.ExecuteIfBound(ProjectInfo.ToSharedRef());
 	}
 }
 

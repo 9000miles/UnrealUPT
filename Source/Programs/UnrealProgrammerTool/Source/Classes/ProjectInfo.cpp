@@ -12,9 +12,9 @@ FProjectInfo::FProjectInfo(const FString& InProjectPath, const TSharedPtr<FSlate
 	FDesktopPlatformModule::Get()->GetEngineIdentifierForProject(ProjectPath, Identifier);
 	FDesktopPlatformModule::Get()->GetEngineRootDirFromIdentifier(Identifier, EnginePath);
 
-	FEngineVersion Version;
-	FDesktopPlatformModule::Get()->TryGetEngineVersion(EnginePath, Version);
-	EngineVersion = Version.ToString();
+	//FEngineVersion Version = Identifier;
+	//FDesktopPlatformModule::Get()->TryGetEngineVersion(EnginePath, Version);
+	EngineVersion = Identifier;
 
 	Thumbnail = InThumbnail;
 }

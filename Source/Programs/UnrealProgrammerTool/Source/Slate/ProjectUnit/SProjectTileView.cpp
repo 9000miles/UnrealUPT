@@ -12,6 +12,7 @@ void SProjectTileView::Construct(const FArguments& InArgs, TArray<TSharedPtr<FPr
 	ChildSlot
 	[
 		SNew(SBorder)
+		.Padding(FMargin(10))
 		[
 			SAssignNew(TileView, STileView<TSharedPtr<SProjectUnit>>)
 			.ItemWidth(PROJECT_UNIT_WIDTH)

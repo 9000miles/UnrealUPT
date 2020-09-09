@@ -17,6 +17,8 @@
 #include "PlatformFilemanager.h"
 #include "CommandLine.h"
 #include "Programs/UnrealVersionSelector/Private/PlatformInstallation.h"
+#include "JsonReader.h"
+#include "JsonSerializer.h"
 
 #define LOCTEXT_NAMESPACE "FEPManager"
 
@@ -28,10 +30,12 @@ TSharedPtr<FEPManager> FEPManager::Get()
 
 void FEPManager::Initialize()
 {
-	FDelegateCenter::OnOpenProject.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenProject(Info); });
-	FDelegateCenter::OnOpenIDE.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenCodeIDE(Info); });
-	FDelegateCenter::OnGenerateSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { GenerateSolution(Info); });
-	FDelegateCenter::OnShowInExplorer.BindLambda([this](TSharedRef<FProjectInfo> Info) { ShowInExplorer(Info); });
+	FUPTDelegateCenter::OnOpenProject.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenProject(Info); });
+	FUPTDelegateCenter::OnOpenIDE.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenCodeIDE(Info); });
+	FUPTDelegateCenter::OnGenerateSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { GenerateSolution(Info); });
+	FUPTDelegateCenter::OnShowInExplorer.BindLambda([this](TSharedRef<FProjectInfo> Info) { ShowInExplorer(Info); });
+	FUPTDelegateCenter::OnClearSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenClearSolutionWindow(Info); });
+	FUPTDelegateCenter::OnManagedCode.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenManagedCodeWindow(Info); });
 
 }
 
@@ -62,8 +66,14 @@ TArray<FString> FEPManager::GetProjectPathsByEngineRootDir(const FString& RootDi
 	FString Identifer;
 	FDesktopPlatformModule::Get()->GetEngineIdentifierFromRootDir(RootDir, Identifer);
 
-	TArray<FString> OutProjectFileNames;
+	TArray<FString> OutProjectFileNames, TempProjectFiles;
+
 	FDesktopPlatformModule::Get()->EnumerateProjectsKnownByEngine(Identifer, false, OutProjectFileNames);
+
+	OutProjectFileNames.RemoveAll([](const FString& ProjectFileName)
+	{
+		return !FPlatformFileManager::Get().GetPlatformFile().FileExists(*ProjectFileName);
+	});
 
 	return OutProjectFileNames;
 }
@@ -75,6 +85,34 @@ void FEPManager::GetProjectNames(TArray<FString>& ProjectPaths, TArray<FString>&
 		FString Name = FPaths::GetBaseFilename(ProjectPath);
 		ProjectNames.Add(Name);
 	}
+}
+
+TArray<TSharedPtr<FProjectInfo>> FEPManager::GetAllProjectInfos()
+{
+	TArray<TSharedPtr<FProjectInfo>> Result;
+	TArray<FString> AllEngineRootDir = GetAllEngineRootDir();
+
+	TArray<FString> TempProjects;
+	for (const FString RootDir : AllEngineRootDir)
+	{
+		TArray<FString> Projects = GetProjectPathsByEngineRootDir(RootDir);
+		for (const FString Project : Projects)
+		{
+			TempProjects.Add(Project);
+		}
+	}
+
+	//数组去重
+	TSet<FString> ArrayToTeavy(TempProjects);
+
+	for (const FString Project : ArrayToTeavy)
+	{
+		TSharedPtr<FSlateBrush> Thumbnail = GetProjectThumbnail(Project);
+		TSharedPtr<FProjectInfo> Info = MakeShareable(new FProjectInfo(Project, Thumbnail));
+		Result.Add(Info);
+	}
+
+	return Result;
 }
 
 TSharedPtr<FSlateBrush> FEPManager::GetProjectThumbnail(const FString& ProjectPath)
@@ -268,6 +306,35 @@ bool FEPManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
 	}
 
 	return false;
+}
+
+void FEPManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
+{
+
+}
+
+void FEPManager::OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info)
+{
+
+}
+
+TSharedPtr<FJsonObject> FEPManager::LoadProjectFile(const FString &FileName)
+{
+	FString FileContents;
+
+	if (!FFileHelper::LoadFileToString(FileContents, *FileName))
+	{
+		return TSharedPtr<FJsonObject>(NULL);
+	}
+
+	TSharedPtr< FJsonObject > JsonObject;
+	TSharedRef< TJsonReader<> > Reader = TJsonReaderFactory<>::Create(FileContents);
+	if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid())
+	{
+		return TSharedPtr<FJsonObject>(NULL);
+	}
+
+	return JsonObject;
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -21,5 +21,6 @@ private:
 	void CreateAllProjects(TSharedRef<SVerticalBox>& VerticalBox, TArray<TSharedPtr<FProjectInfo>>& AllProjects);
 
 private:
+	//Key：引擎路径，Value：工程信息
 	TMap<FString, TArray<TSharedPtr<FProjectInfo>>> Map;
 };

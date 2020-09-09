@@ -32,6 +32,8 @@ public:
 
 	void GetProjectNames(TArray<FString>& ProjectPaths, TArray<FString>& ProjectNames);
 
+	TArray<TSharedPtr<FProjectInfo>> GetAllProjectInfos();
+
 	/*
 	*	根据工程路径获取项目缩略图
 	*/
@@ -41,6 +43,11 @@ public:
 	bool OpenCodeIDE(TSharedRef<FProjectInfo> Info);
 	bool GenerateSolution(TSharedRef<FProjectInfo> Info);
 	bool ShowInExplorer(TSharedRef<FProjectInfo> Info);
+	//弹出清理Binares和Immediate文件夹窗口
+	void OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info);
+
+	void OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info);
 
 private:
+	TSharedPtr<FJsonObject> LoadProjectFile(const FString &FileName);
 };

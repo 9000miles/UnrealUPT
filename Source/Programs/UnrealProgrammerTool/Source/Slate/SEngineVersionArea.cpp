@@ -9,10 +9,18 @@
 #include "ProjectUnit/SProjectTileView.h"
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"
 #include "SScrollBox.h"
+#include "SHyperlink.h"
+#include "SlateApplication.h"
 
 void SEngineVersionArea::Construct(const FArguments& InArgs, const FString& Version, TArray<TSharedPtr<FProjectInfo>>& Projects)
 {
 	EngineVersion = Version;
+
+	ProjectCount = Projects.Num();
+	if (Projects.Num() > 0)
+	{
+		EnginePath = Projects[0]->GetEnginePath();
+	}
 
 	ChildSlot
 		[
@@ -40,6 +48,23 @@ TSharedRef<SWidget> SEngineVersionArea::CreateAreaHeader(const FString& Version)
 		[	
 			SNew(STextBlock)
 			.Text(FText::FromString(Version))
+		]
+		+ SHorizontalBox::Slot()
+		.HAlign(HAlign_Right)
+		.Padding(FMargin(5, 0))
+		[
+			SNew(SHyperlink)
+			//.Style(FEditorStyle::Get(), "Common.GotoNativeCodeHyperlink")
+			.OnNavigate_Lambda([this] { FPlatformProcess::ExploreFolder(*(EnginePath)); })
+			.Text(FText::FromString(EnginePath))
+		]
+		+ SHorizontalBox::Slot()
+		.HAlign(HAlign_Right)
+		.Padding(FMargin(5, 0))
+		.AutoWidth()
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString(FString::FromInt(ProjectCount)))
 		]
 	]
 	;

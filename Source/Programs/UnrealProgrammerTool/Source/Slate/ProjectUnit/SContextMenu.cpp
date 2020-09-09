@@ -27,7 +27,7 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 		LOCTEXT("OpenProjectTip", "Open Project"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
 		FUIAction(
-			FExecuteAction::CreateLambda([this]() { FDelegateCenter::OnOpenProject.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnOpenProject.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
 			FCanExecuteAction()
 		));
 
@@ -36,7 +36,7 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 		LOCTEXT("Generate SolutionTip", "Generate Solution Tip"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
 		FUIAction(
-			FExecuteAction::CreateLambda([this]() { FDelegateCenter::OnGenerateSolution.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnGenerateSolution.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
 			FCanExecuteAction()
 		));
 
@@ -45,7 +45,16 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 		LOCTEXT("OpenIdeTip", "Open IDE"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
 		FUIAction(
-			FExecuteAction::CreateLambda([this]() { FDelegateCenter::OnOpenIDE.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnOpenIDE.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FCanExecuteAction()
+		));
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Clear Solution", "Clear Solution"),
+		LOCTEXT("Clear SolutionTip", "Clear Solution"),
+		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
+		FUIAction(
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnClearSolution.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
 			FCanExecuteAction()
 		));
 
@@ -54,7 +63,16 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 		LOCTEXT("Show In ExplorerTip", "Show In Explorer Tip"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
 		FUIAction(
-			FExecuteAction::CreateLambda([this]() { FDelegateCenter::OnShowInExplorer.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnShowInExplorer.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FCanExecuteAction()
+		));
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Managed Code", "Managed Code"),
+		LOCTEXT("Managed Code Tip", "Managed Code Tip"),
+		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
+		FUIAction(
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnShowInExplorer.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
 			FCanExecuteAction()
 		));
 

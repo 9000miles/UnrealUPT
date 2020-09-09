@@ -166,23 +166,9 @@ void CreateMainFrameWindow()
 
 void StartupMainFrame()
 {
-
-
-	TArray<FString> AllEngineRootDir = FEPManager::Get()->GetAllEngineRootDir();
-	for (const FString RootDir : AllEngineRootDir)
-	{
-		TArray<FString> Projects = FEPManager::Get()->GetProjectPathsByEngineRootDir(RootDir);
-		for (const FString Project : Projects)
-		{
-			TSharedPtr<FSlateBrush> Thumbnail = FEPManager::Get()->GetProjectThumbnail(Project);
-			TSharedPtr<FProjectInfo> Info = MakeShareable(new FProjectInfo(Project, Thumbnail));
-			ProjectInfos.Add(Info);
-		}
-	}
-
-	CreateMainFrameWindow();
-
 	FEPManager::Get()->Initialize();
+	ProjectInfos = FEPManager::Get()->GetAllProjectInfos();
+	CreateMainFrameWindow();
 }
 
 int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR, _In_ int nCmdShow)
