@@ -1,4 +1,4 @@
-#include "SEngineVersionArea.h"
+#include "SEngineProjects.h"
 #include "SExpandableArea.h"
 #include "../Classes/ProjectInfo.h"
 #include "SProjectUnit.h"
@@ -12,43 +12,46 @@
 #include "SHyperlink.h"
 #include "SlateApplication.h"
 
-void SEngineVersionArea::Construct(const FArguments& InArgs, const FString& Version, TArray<TSharedPtr<FProjectInfo>>& Projects)
+void SEngineProjects::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& Projects)
 {
-	EngineVersion = Version;
-
-	ProjectCount = Projects.Num();
-	if (Projects.Num() > 0)
-	{
-		EnginePath = Projects[0]->GetEnginePath();
-	}
+	Init(Projects);
 
 	ChildSlot
 		[
-			SNew(SExpandableArea)
-			.InitiallyCollapsed(false)
-			.HeaderContent()
+			SNew(SVerticalBox)
+			+SVerticalBox::Slot()
 			[
-				CreateAreaHeader(Version)
+				CreateAreaHeader()
 			]
-			.BodyContent()
+			+SVerticalBox::Slot()
 			[
 				CreateAreaBody(Projects)
 			]
 		];
 }
 
-TSharedRef<SWidget> SEngineVersionArea::CreateAreaHeader(const FString& Version)
+void SEngineProjects::Refresh(TArray<TSharedPtr<FProjectInfo>>& Projects)
+{
+	Init(Projects);
+	ProjectTileView->Refresh(Projects);
+}
+
+void SEngineProjects::Init(TArray<TSharedPtr<FProjectInfo>> &Projects)
+{
+	ProjectCount = Projects.Num();
+	if (Projects.Num() > 0)
+	{
+		EnginePath = Projects[0]->GetEnginePath();
+	}
+}
+
+TSharedRef<SWidget> SEngineProjects::CreateAreaHeader()
 {
 	return
 	SNew(SBorder)
 	.BorderImage(FEditorStyle::GetBrush("NoBorder"))
 	[
 		SNew(SHorizontalBox)
-		+SHorizontalBox::Slot()
-		[	
-			SNew(STextBlock)
-			.Text(FText::FromString(Version))
-		]
 		+ SHorizontalBox::Slot()
 		.HAlign(HAlign_Right)
 		.Padding(FMargin(5, 0))
@@ -65,18 +68,15 @@ TSharedRef<SWidget> SEngineVersionArea::CreateAreaHeader(const FString& Version)
 			SNew(STextBlock)
 			.Text(FText::FromString(FString::FromInt(ProjectCount)))
 		]
-	]
-	;
+	];
 }
 
-
-TSharedRef<SWidget> SEngineVersionArea::CreateAreaBody(TArray<TSharedPtr<FProjectInfo>>& Projects)
+TSharedRef<SWidget> SEngineProjects::CreateAreaBody(TArray<TSharedPtr<FProjectInfo>>& Projects)
 {
 	return
 	SNew(SScrollBox)
 	+SScrollBox::Slot()
 	[
-		SNew(SProjectTileView, Projects)
-	]
-	;
+		SAssignNew(ProjectTileView, SProjectTileView, Projects)
+	];
 }

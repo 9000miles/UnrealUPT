@@ -4,13 +4,13 @@ using UnrealBuildTool;
 using System.Collections.Generic;
 
 [SupportedPlatforms(UnrealPlatformClass.Desktop)]
-public class UnrealProgrammerToolTarget : TargetRules
+public class UPTTarget : TargetRules
 {
-    public UnrealProgrammerToolTarget(TargetInfo Target) : base(Target)
+    public UPTTarget(TargetInfo Target) : base(Target)
     {
         Type = TargetType.Program;
         LinkType = TargetLinkType.Monolithic;
-        LaunchModuleName = "UnrealProgrammerTool";
+        LaunchModuleName = "UPT";
         ExtraModuleNames.Add("EditorStyle");
 
         // Lean and mean

@@ -22,7 +22,7 @@
 #include "../Menu/UPTToolBar.h"
 #include "../Menu/UPTCommands.h"
 
-IMPLEMENT_APPLICATION(UnrealProgrammerTool, "UnrealProgrammerTool");
+IMPLEMENT_APPLICATION(UPT, "UnrealProgrammerTool");
 
 #define LOCTEXT_NAMESPACE "UnrealProgrammerTool"
 

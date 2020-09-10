@@ -39,6 +39,11 @@ public:
 	*/
 	TSharedPtr<FSlateBrush> GetProjectThumbnail(const FString& ProjectPath);
 
+	/*
+	*	引擎是否是源码版，返回true
+	*/
+	const bool EngineIsDistribution(const FString& RootDir);
+
 	bool OpenProject(TSharedRef<FProjectInfo> Info);
 	bool OpenCodeIDE(TSharedRef<FProjectInfo> Info);
 	bool GenerateSolution(TSharedRef<FProjectInfo> Info);

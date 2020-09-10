@@ -181,6 +181,11 @@ TSharedPtr<FSlateBrush> FUPTManager::GetProjectThumbnail(const FString& ProjectP
 	return Brush;
 }
 
+const bool FUPTManager::EngineIsDistribution(const FString& RootDir)
+{
+	return FDesktopPlatformModule::Get()->IsSourceDistribution(RootDir);
+}
+
 bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 {
 	FString EngineDir = Info->GetEnginePath();
