@@ -64,7 +64,10 @@ TSharedRef<ITableRow> SProjectTileView::OnGenerateProjectTile(TSharedPtr<SProjec
 
 TSharedPtr<SWidget> SProjectTileView::MakeProjectContextMenu()
 {
-	return SNew(SContextMenu, CurSelectedUnit->GetProjectInfo());
+	if (CurSelectedUnit.IsValid())
+		return SNew(SContextMenu, CurSelectedUnit->GetProjectInfo());
+
+	return SNullWidget::NullWidget;
 }
 
 
