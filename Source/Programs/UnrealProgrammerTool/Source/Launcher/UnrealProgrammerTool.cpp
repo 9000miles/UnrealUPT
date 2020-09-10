@@ -98,20 +98,20 @@ TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
-		.Padding(FMargin(5, 0))
+		.Padding(FMargin(2, 0))
 		[
 			FUPTMenuBar::MakeMenuBar(UPTTabManager.ToSharedRef())
 		]
 		+ SVerticalBox::Slot()
 		.AutoHeight()
-		.Padding(FMargin(5))
+		.Padding(FMargin(2, 2))
 		[
 			FUPTToolBar::MakeUPTToolBar()
 		]
 		+ SVerticalBox::Slot()
 		.FillHeight(1.0f)
-			[
-				SNew(SUPTMainFrame, ProjectInfos)
+		[
+			SNew(SUPTMainFrame, ProjectInfos)
 		]
 	);
 
@@ -123,10 +123,7 @@ void CreateMainFrameWindow()
 {
 	// Need to load this module so we have the widget reflector tab available
 	FModuleManager::LoadModuleChecked<ISlateReflectorModule>("SlateReflector");
-
-	//FTestStyle::ResetToDefault();
-	//TSharedPtr<SUPTMainFrame> MainFrame = SNew(SUPTMainFrame, ProjectInfos);
-
+	
 	FGlobalTabmanager::Get()->RegisterTabSpawner("UPTMainWindow", FOnSpawnTab::CreateStatic(&SpawnMainWindown));
 
 	TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout("UPT_Layout")

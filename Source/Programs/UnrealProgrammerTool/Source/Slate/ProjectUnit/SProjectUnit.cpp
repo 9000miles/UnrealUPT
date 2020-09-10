@@ -15,7 +15,7 @@ void SProjectThumbnail::Construct(const FArguments& InArgs, const FSlateBrush* B
 {
 	OnDoubleClick = InArgs._OnDoubleClick;
 
-	Image.Set(Brush);
+	SImage::Construct(SImage::FArguments().Image(Brush));
 }
 
 FReply SProjectThumbnail::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
@@ -61,8 +61,6 @@ void SProjectUnit::Construct(const FArguments& InArgs, const TSharedRef<FProject
 					[
 						SNew(SProjectThumbnail, GetThumbnail())
 						.OnDoubleClick(this, &SProjectUnit::OnDoubleClicked)
-						//SNew(SImage)
-						//.Image(GetThumbnail())
 					]
 				]
 				+ SVerticalBox::Slot()

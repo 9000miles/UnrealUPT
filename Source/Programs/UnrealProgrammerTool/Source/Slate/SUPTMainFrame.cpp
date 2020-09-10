@@ -43,7 +43,7 @@ void SUPTMainFrame::CreateAllProjects(TSharedRef<SVerticalBox>& VerticalBox, TAr
 		VerticalBox->AddSlot()
 		.AutoHeight()
 		.MaxHeight(ENGINE_VERSION_HEIGHT)
-		.Padding(FMargin(5, 2))
+		.Padding(FMargin(2, 2))
 		[
 			SNew(SEngineVersionArea, Version, Infos)
 		];

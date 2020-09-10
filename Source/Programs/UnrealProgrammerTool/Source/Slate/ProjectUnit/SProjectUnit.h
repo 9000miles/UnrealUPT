@@ -24,8 +24,6 @@ private:
 	FSimpleDelegate OnDoubleClick;
 };
 
-DECLARE_DELEGATE_OneParam(FOnRightClick, const FString& /*ProjectPath*/);
-
 struct FProjectInfo;
 struct FSlateBrush;
 
