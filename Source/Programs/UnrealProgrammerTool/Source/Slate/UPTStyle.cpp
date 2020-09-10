@@ -54,6 +54,9 @@ TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 	Style->Set("UPT.ExpandAllArea", new IMAGE_BRUSH(TEXT("ExpandAllArea"), Icon32x32));
 	Style->Set("UPT.AppIcon", new IMAGE_BRUSH(TEXT("AppIcon"), Icon32x32));
 
+	Style->Set("UPT.Tab.Source", new IMAGE_BRUSH(TEXT("Source"), Icon16x16));
+	Style->Set("UPT.Tab.Binary", new IMAGE_BRUSH(TEXT("Binary"), Icon16x16));
+
 	return Style;
 }
 

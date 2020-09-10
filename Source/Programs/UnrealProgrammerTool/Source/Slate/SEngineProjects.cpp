@@ -12,20 +12,20 @@
 #include "SHyperlink.h"
 #include "SlateApplication.h"
 
-void SEngineProjects::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& Projects)
+void SEngineProjects::Construct(const FArguments& InArgs)
 {
-	Init(Projects);
-
 	ChildSlot
 		[
 			SNew(SVerticalBox)
 			+SVerticalBox::Slot()
+			.AutoHeight()
 			[
 				CreateAreaHeader()
 			]
 			+SVerticalBox::Slot()
+			.VAlign(VAlign_Fill)
 			[
-				CreateAreaBody(Projects)
+				CreateAreaBody()
 			]
 		];
 }
@@ -49,16 +49,17 @@ TSharedRef<SWidget> SEngineProjects::CreateAreaHeader()
 {
 	return
 	SNew(SBorder)
-	.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+	.Padding(FMargin(5))
+	.BorderImage(FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
 	[
 		SNew(SHorizontalBox)
 		+ SHorizontalBox::Slot()
 		.HAlign(HAlign_Right)
 		.Padding(FMargin(5, 0))
 		[
-			SNew(SHyperlink)
+			SAssignNew(Hyperlink, SHyperlink)
 			.OnNavigate_Lambda([this] { FPlatformProcess::ExploreFolder(*(EnginePath)); })
-			.Text(FText::FromString(EnginePath))
+			.Text(this, &SEngineProjects::GetEnginePath)
 		]
 		+ SHorizontalBox::Slot()
 		.HAlign(HAlign_Right)
@@ -66,17 +67,29 @@ TSharedRef<SWidget> SEngineProjects::CreateAreaHeader()
 		.AutoWidth()
 		[
 			SNew(STextBlock)
-			.Text(FText::FromString(FString::FromInt(ProjectCount)))
+			.Text(this, &SEngineProjects::GetProjectCount)
 		]
 	];
 }
 
-TSharedRef<SWidget> SEngineProjects::CreateAreaBody(TArray<TSharedPtr<FProjectInfo>>& Projects)
+TSharedRef<SWidget> SEngineProjects::CreateAreaBody()
 {
+	TArray<TSharedPtr<FProjectInfo>> Projects;
+
 	return
 	SNew(SScrollBox)
 	+SScrollBox::Slot()
 	[
 		SAssignNew(ProjectTileView, SProjectTileView, Projects)
 	];
+}
+
+FText SEngineProjects::GetEnginePath() const
+{
+	return FText::FromString(EnginePath);
+}
+
+FText SEngineProjects::GetProjectCount() const
+{
+	return FText::FromString(FString::FromInt(ProjectCount));
 }

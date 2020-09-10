@@ -15,18 +15,24 @@ public:
 	SLATE_END_ARGS()
 
 public:
-	void Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& Projects);
+	void Construct(const FArguments& InArgs);
 	void Refresh(TArray<TSharedPtr<FProjectInfo>>& Projects);
 
 
 private:
 	void Init(TArray<TSharedPtr<FProjectInfo>> &Projects);
 	TSharedRef<SWidget> CreateAreaHeader();
-	TSharedRef<SWidget> CreateAreaBody(TArray<TSharedPtr<FProjectInfo>>& Projects);
+	TSharedRef<SWidget> CreateAreaBody();
+
+	FText GetEnginePath() const;
+	FText GetProjectCount() const;
+
 
 private:
 	FString EnginePath;
 	int32 ProjectCount;
 
+	TSharedPtr<SHyperlink> Hyperlink;
+	TSharedPtr<STextBlock> CountText;
 	TSharedPtr<SProjectTileView> ProjectTileView;
 };

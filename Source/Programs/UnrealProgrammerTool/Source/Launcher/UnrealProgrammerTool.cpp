@@ -58,23 +58,23 @@ TSharedRef<SDockTab> SpawnMainTab(const FSpawnTabArgs& Args, FName TabIdentifier
 
 TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 {
-	TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout("UPTMainWindow_Layout")
-		->AddArea
-		(
-			// The primary area will be restored and returned as a widget.
-			// Unlike other areas it will not get its own window.
-			// This allows the caller to explicitly place the primary area somewhere in the widget hierarchy.
-			FTabManager::NewPrimaryArea()
-			->Split
-			(
-				//The first cell in the primary area will be occupied by a stack of tabs.
-				// They are all opened.
-				FTabManager::NewStack()
-				->SetSizeCoefficient(0.35f)
-				->AddTab("UPTWindowTab", ETabState::OpenedTab)
-			)
-		)
-		;
+	//TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout("UPTMainWindow_Layout")
+	//	->AddArea
+	//	(
+	//		// The primary area will be restored and returned as a widget.
+	//		// Unlike other areas it will not get its own window.
+	//		// This allows the caller to explicitly place the primary area somewhere in the widget hierarchy.
+	//		FTabManager::NewPrimaryArea()
+	//		->Split
+	//		(
+	//			//The first cell in the primary area will be occupied by a stack of tabs.
+	//			// They are all opened.
+	//			FTabManager::NewStack()
+	//			->SetSizeCoefficient(0.35f)
+	//			->AddTab("UPTWindowTab", ETabState::OpenedTab)
+	//		)
+	//	)
+	//	;
 
 
 
@@ -86,9 +86,9 @@ TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 
 
 	UPTTabManager = FGlobalTabmanager::Get()->NewTabManager(UPTTab);
-	UPTTabManager->RegisterTabSpawner("UPTWindowTab", FOnSpawnTab::CreateStatic(&SpawnMainTab, FName("UPTWindowTab")))
-		.SetDisplayName(LOCTEXT("UPTWindowTab", "UPT Tab"))
-		.SetGroup(UPTMeun::UPTGroup);
+	//UPTTabManager->RegisterTabSpawner("UPTWindowTab", FOnSpawnTab::CreateStatic(&SpawnMainTab, FName("UPTWindowTab")))
+		//.SetDisplayName(LOCTEXT("UPTWindowTab", "UPT Tab"))
+		//.SetGroup(UPTMeun::UPTGroup);
 	
 	FUPTDelegateCenter::OnExit.AddStatic(&OnExit);
 
@@ -121,8 +121,6 @@ TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 
 void CreateMainFrameWindow()
 {
-	// Need to load this module so we have the widget reflector tab available
-	FModuleManager::LoadModuleChecked<ISlateReflectorModule>("SlateReflector");
 	
 	FGlobalTabmanager::Get()->RegisterTabSpawner("UPTMainWindow", FOnSpawnTab::CreateStatic(&SpawnMainWindown));
 
@@ -133,7 +131,8 @@ void CreateMainFrameWindow()
 #if PLATFORM_MAC
 			->SetWindow(FVector2D(420, 32), false)
 #else
-			->SetWindow(FVector2D(420, 10), false)
+			->SetWindow(FVector2D(420, 200), false)
+			->SetOrientation(Orient_Horizontal)
 #endif
 			->Split
 			(
@@ -141,23 +140,6 @@ void CreateMainFrameWindow()
 				->AddTab("UPTMainWindow", ETabState::OpenedTab)
 			)
 		)
-#if PLATFORM_SUPPORTS_MULTIPLE_NATIVE_WINDOWS
-		->AddArea
-		(
-			// This area will get a 400x600 window at 10,10
-			FTabManager::NewArea(400, 600)
-#if PLATFORM_MAC
-			->SetWindow(FVector2D(10, 32), false)
-#else
-			->SetWindow(FVector2D(10, 10), false)
-#endif
-			->Split
-			(
-				// The area contains a single tab with the widget reflector.
-				FTabManager::NewStack()->AddTab("WidgetReflector", ETabState::OpenedTab)
-			)
-		)
-#endif
 		;
 
 

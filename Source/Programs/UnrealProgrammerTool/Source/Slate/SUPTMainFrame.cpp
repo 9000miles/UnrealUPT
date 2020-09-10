@@ -12,35 +12,40 @@
 #include "STextBlock.h"
 #include "SImage.h"
 #include "UPTStyle.h"
+#include "SEngineTab.h"
+#include "UPTManager.h"
+
+#define LOCTEXT_NAMESPACE "SUPTMainFrame"
 
 void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& AllProjects)
 {
-	ChildSlot
-		[
-			SNew(SSplitter)
-			.Orientation(Orient_Horizontal)
-			+SSplitter::Slot()
-			.Value(0.3f)
-			[
-				SNew(SBorder)
-				[
-					SNew(SScrollBox)
-					+SScrollBox::Slot()
-					[
-						SAssignNew(EngineBox, SVerticalBox)
-					]
-				]
-			]
-			+SSplitter::Slot()
-			[
-				SNew(SEngineProjects)
-			]
-		];
+	InitEngineProjects(AllProjects);
 
-	CreateAllProjects(EngineBox->AsShared(), AllProjects);
+	TArray<FString> EngineVersions;
+	Map.GenerateKeyArray(EngineVersions);
+	
+	ChildSlot
+	.Padding(FMargin(2))
+	[
+		SNew(SSplitter)
+		.Orientation(Orient_Horizontal)
+		+SSplitter::Slot()
+		.Value(0.3f)
+		[
+			SNew(SEngineTab)
+			.TabNames(EngineVersions)
+			.OnTabActive(this, &SUPTMainFrame::OnEngineTabChanged)
+			.OnGetTabBrush(this, &SUPTMainFrame::GetSourceOrBinaryImage)
+			.OnGetToolTipText(this, &SUPTMainFrame::OnGetEngineDir)
+		]
+		+SSplitter::Slot()
+		[
+			SAssignNew(EngineProjects, SEngineProjects)
+		]
+	];
 }
 
-void SUPTMainFrame::CreateAllProjects(TSharedRef<SVerticalBox>& VerticalBox, TArray<TSharedPtr<FProjectInfo>>& AllProjects)
+void SUPTMainFrame::InitEngineProjects(TArray<TSharedPtr<FProjectInfo>>& AllProjects)
 {
 	for (TSharedPtr<FProjectInfo> Info : AllProjects)
 	{
@@ -53,99 +58,36 @@ void SUPTMainFrame::CreateAllProjects(TSharedRef<SVerticalBox>& VerticalBox, TAr
 
 	//根据引擎版本排序
 	Map.KeySort([](const FString& A, const FString& B) -> bool	{ return A < B; });
-
-	//创建引擎版本对应的工程区块
-	for (auto It = Map.CreateConstIterator(); It; ++It)
-	{
-		FString Version = (&It)->Key();
-		TArray<TSharedPtr<FProjectInfo>> Infos = (&It)->Value();
-		VerticalBox->AddSlot()
-		.AutoHeight()
-		.MaxHeight(ENGINE_VERSION_HEIGHT)
-		.Padding(FMargin(2, 2))
-		[
-			CreateTab(Version)
-		];
-	}
 }
 
-TSharedRef<SWidget> SUPTMainFrame::CreateTab(FString Version)
-{
-	return 			
-		SNew(SCheckBox)
-		//.Style(FEditorStyle::Get(), "PlacementBrowser.Tab")
-		.OnCheckStateChanged(this, &SUPTMainFrame::OnEngineTabChanged, Version)
-		.IsChecked(this, &SUPTMainFrame::GetEngineTabCheckedState, Version)
-		[
-			SNew(SOverlay)
-			+ SOverlay::Slot()
-			.VAlign(VAlign_Center)
-			[
-				SNew(SSpacer)
-				.Size(FVector2D(1, 30))
-			]
-			+ SOverlay::Slot()
-			.Padding(FMargin(6, 0, 15, 0))
-			.VAlign(VAlign_Center)
-			[
-				SNew(STextBlock)
-				.Text(Version)
-			]
-			+ SOverlay::Slot()
-			.VAlign(VAlign_Fill)
-			.HAlign(HAlign_Left)
-			[
-				SNew(SImage)
-				.Image(this, &SUPTMainFrame::GetActiveTabIamge, Version)
-			]
-			+ SOverlay::Slot()
-			.VAlign(VAlign_Fill)
-			.HAlign(HAlign_Left)
-			[
-				SNew(SImage)
-				.Image(this, &SUPTMainFrame::GetSourceOrBinaryImage, Version)
-			]
-			+ SOverlay::Slot()
-			.Padding(FMargin(6, 0, 15, 0))
-			.VAlign(VAlign_Center)
-			.HAlign(HAlign_Right)
-			[
-				SNew(STextBlock)
-				.Text(Version)
-			]
-		]
-	;
-}
 
-void SUPTMainFrame::OnEngineTabChanged(ECheckBoxState NewState, const FString& EngineVersion)
+void SUPTMainFrame::OnEngineTabChanged(const FString& EngineVersion)
 {
-	if (NewState == ECheckBoxState::Checked)
+	TArray<TSharedPtr<FProjectInfo>> ProjectInfos;
+	if (Map.Contains(EngineVersion))
 	{
-		ActiveEngineTab = EngineVersion;
+		ProjectInfos = Map[EngineVersion];
 	}
-}
 
-ECheckBoxState SUPTMainFrame::GetEngineTabCheckedState(const FString& EngineVersion)
-{
-	return ActiveEngineTab == EngineVersion ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
-}
-
-const FSlateBrush* SUPTMainFrame::GetActiveTabIamge(const FString& EngineVersion)
-{
-	if (ActiveEngineTab == EngineVersion)
-	{
-		static FName PlacementBrowserActiveTabBarBrush("PlacementBrowser.ActiveTabBar");
-		return FEditorStyle::GetBrush(PlacementBrowserActiveTabBarBrush);
-	}
-	else
-	{
-		return nullptr;
-	}
+	EngineProjects->Refresh(ProjectInfos);
 }
 
 const FSlateBrush* SUPTMainFrame::GetSourceOrBinaryImage(const FString& EngineVersion)
 {
-	const bool bEngineIsSource = true;
-	static FName BrushName = bEngineIsSource ? "UPT.Source" : "UPT.Binary";
+	const bool bEngineIsSource = FUPTManager::Get()->EngineIsDistribution(EngineVersion);
+	static FName BrushName = bEngineIsSource ? "UPT.Tab.Source" : "UPT.Tab.Binary";
 	return FUPTStyle::Get().GetBrush(BrushName);
 }
+
+const FText SUPTMainFrame::OnGetEngineDir(const FString& EngineVersion)
+{
+	if (Map.Contains(EngineVersion))
+	{
+		if (Map[EngineVersion].Num() > 0)
+		{
+			return FText::FromString(Map[EngineVersion][0]->GetEnginePath());
+		}
+	}
+	return LOCTEXT("not found engine","not found engine");
+}
+#undef LOCTEXT_NAMESPACE

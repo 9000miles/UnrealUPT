@@ -4,6 +4,7 @@
 #include "SContextMenu.h"
 #include "ProjectInfo.h"
 #include "UPTDefine.h"
+#include "EditorStyleSet.h"
 
 #define LOCTEXT_NAMESPACE "SProjectTileView"
 
@@ -13,6 +14,7 @@ void SProjectTileView::Construct(const FArguments& InArgs, TArray<TSharedPtr<FPr
 	[
 		SNew(SBorder)
 		.Padding(FMargin(10))
+		.BorderImage(FEditorStyle::GetBrush("NoBorder"))
 		[
 			SAssignNew(TileView, STileView<TSharedPtr<SProjectUnit>>)
 			.ItemWidth(PROJECT_UNIT_WIDTH)
