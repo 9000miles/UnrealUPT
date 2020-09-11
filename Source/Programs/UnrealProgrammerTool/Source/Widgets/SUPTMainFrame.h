@@ -23,7 +23,7 @@ private:
 	void InitEngineProjects(TArray<TSharedPtr<FProjectInfo>>& AllProjects);
 
 	void OnEngineTabChanged(const FString& EngineVersion);
-	const FSlateBrush* GetSourceOrBinaryImage(const FString& EngineVersion);
+	const FSlateBrush* GetSourceOrBinaryImage(const FString& EngineVersion, bool& bSource);
 	const FText OnGetEngineDir(const FString& EngineVersion);
 
 private:

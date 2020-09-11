@@ -55,20 +55,19 @@ TSharedRef<SWidget> SEngineProjects::CreateProjectsHeader()
 	[
 		SNew(SHorizontalBox)
 		+ SHorizontalBox::Slot()
+		.Padding(FMargin(5, 0))
+		.HAlign(HAlign_Fill)
+		[
+			SNew(STextBlock)
+			.Text(this, &SEngineProjects::GetProjectCount)
+		]
+		+ SHorizontalBox::Slot()
 		.HAlign(HAlign_Right)
 		.Padding(FMargin(5, 0))
 		[
 			SAssignNew(Hyperlink, SHyperlink)
 			.OnNavigate_Lambda([this] { FPlatformProcess::ExploreFolder(*(EnginePath)); })
 			.Text(this, &SEngineProjects::GetEnginePath)
-		]
-		+ SHorizontalBox::Slot()
-		.HAlign(HAlign_Right)
-		.Padding(FMargin(5, 0))
-		.AutoWidth()
-		[
-			SNew(STextBlock)
-			.Text(this, &SEngineProjects::GetProjectCount)
 		]
 	];
 }
@@ -92,6 +91,6 @@ FText SEngineProjects::GetEnginePath() const
 
 FText SEngineProjects::GetProjectCount() const
 {
-	return FText::FromString(FString::FromInt(ProjectCount));
+	return FText::Format(LOCTEXT("ProjectCount", "Projects Count : {0}"), FText::AsNumber(ProjectCount));
 }
 #undef LOCTEXT_NAMESPACE

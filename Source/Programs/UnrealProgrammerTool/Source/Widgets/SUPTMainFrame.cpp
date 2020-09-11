@@ -90,7 +90,7 @@ void SUPTMainFrame::OnEngineTabChanged(const FString& EngineVersion)
 	EngineProjects->Refresh(ProjectInfos);
 }
 
-const FSlateBrush* SUPTMainFrame::GetSourceOrBinaryImage(const FString& EngineVersion)
+const FSlateBrush* SUPTMainFrame::GetSourceOrBinaryImage(const FString& EngineVersion, bool& bSource)
 {
 	if (Map.Contains(EngineVersion))
 	{
@@ -101,8 +101,8 @@ const FSlateBrush* SUPTMainFrame::GetSourceOrBinaryImage(const FString& EngineVe
 		}
 	}
 
-	const bool bEngineIsSource = FUPTManager::Get()->EngineIsDistribution(EngineVersion);
-	FName BrushName = bEngineIsSource ? FName("UPT.Tab.Source") : FName("UPT.Tab.Binary");
+	bSource = FUPTManager::Get()->EngineIsDistribution(EngineVersion);
+	FName BrushName = bSource ? FName("UPT.Tab.Source") : FName("UPT.Tab.Binary");
 	return FUPTStyle::Get().GetBrush(BrushName);
 }
 

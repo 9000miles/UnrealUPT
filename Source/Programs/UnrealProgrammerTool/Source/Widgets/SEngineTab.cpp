@@ -58,13 +58,14 @@ void SEngineTab::SetActiveTab(const FString TabName)
 
 TSharedRef<SWidget> SEngineTab::CreateTab(FString TabName)
 {
-	const FSlateBrush* SourceBinaryBrush = GetSourceOrBinaryImage(TabName);
+	bool bSourceEngine;
+	const FSlateBrush* SourceBinaryBrush = GetSourceOrBinaryImage(TabName, bSourceEngine);
 	return
 		SNew(SCheckBox)
 		.Style(FEditorStyle::Get(), "PlacementBrowser.Tab")
 		.OnCheckStateChanged(this, &SEngineTab::OnEngineTabChanged, TabName)
 		.IsChecked(this, &SEngineTab::GetEngineTabCheckedState, TabName)
-		.ToolTipText(this, &SEngineTab::TabToolTipText, TabName)
+		.ToolTipText(this, &SEngineTab::TabToolTipText, TabName, bSourceEngine)
 		[
 			SNew(SHorizontalBox)
 			+ SHorizontalBox::Slot()
@@ -124,22 +125,26 @@ const FSlateBrush* SEngineTab::GetActiveTabIamge(FString EngineVersion) const
 	}
 }
 
-const FSlateBrush* SEngineTab::GetSourceOrBinaryImage(FString EngineVersion) const
+const FSlateBrush* SEngineTab::GetSourceOrBinaryImage(FString EngineVersion, bool& bSource) const
 {
 	if (OnGetTabBrush.IsBound())
 	{
-		return OnGetTabBrush.Execute(EngineVersion);
+		return OnGetTabBrush.Execute(EngineVersion, bSource);
 	}
 
 	return nullptr;
 }
 
-FText SEngineTab::TabToolTipText(FString EngineVersion) const
+FText SEngineTab::TabToolTipText(FString EngineVersion, bool bSource) const
 {
 	FText TipText;
 	if (OnGetToolTipText.IsBound())
 	{
+		FText EngienType = bSource ? LOCTEXT("Source Engine", "Source Engine  -  {0}") : LOCTEXT("Binary Engine", "Binary Engine  -  {0}");
 		TipText = OnGetToolTipText.Execute(EngineVersion);
+
+		if (!TipText.IsEmpty())
+			return FText::Format(EngienType, TipText);
 	}
 
 	return TipText.IsEmpty() ? LOCTEXT("NotFound", "Not found engine directory") : TipText;

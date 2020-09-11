@@ -8,7 +8,7 @@ struct FProjectInfo;
 class SVerticalBox;
 
 DECLARE_DELEGATE_OneParam(FOnTabActive, const FString& /*TabName*/);
-DECLARE_DELEGATE_RetVal_OneParam(const FSlateBrush*, FOnGetTabBrush, const FString& /*TabName*/);
+DECLARE_DELEGATE_RetVal_TwoParams(const FSlateBrush*, FOnGetTabBrush, const FString& /*TabName*/, bool& /*bSourceEngien*/);
 DECLARE_DELEGATE_RetVal_OneParam(const FText, FOnGetToolTipText, const FString& /*TabName*/);
 
 class SEngineTab :public SCompoundWidget
@@ -33,9 +33,9 @@ private:
 	void OnEngineTabChanged(ECheckBoxState NewState, FString EngineVersion);
 	ECheckBoxState GetEngineTabCheckedState(FString EngineVersion) const;
 	const FSlateBrush* GetActiveTabIamge(FString EngineVersion) const;
-	const FSlateBrush* GetSourceOrBinaryImage(FString EngineVersion) const;
+	const FSlateBrush* GetSourceOrBinaryImage(FString EngineVersion, bool& bSource) const;
 
-	FText TabToolTipText(FString EngineVersion) const;
+	FText TabToolTipText(FString EngineVersion, bool bSource) const;
 
 private:
 	FString ActiveEngineTab;
