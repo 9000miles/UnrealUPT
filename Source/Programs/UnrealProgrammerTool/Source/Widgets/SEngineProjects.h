@@ -21,8 +21,8 @@ public:
 
 private:
 	void Init(TArray<TSharedPtr<FProjectInfo>> &Projects);
-	TSharedRef<SWidget> CreateAreaHeader();
-	TSharedRef<SWidget> CreateAreaBody();
+	TSharedRef<SWidget> CreateProjectsHeader();
+	TSharedRef<SWidget> CreateProjectsBody();
 
 	FText GetEnginePath() const;
 	FText GetProjectCount() const;

@@ -19,10 +19,13 @@
 
 void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& AllProjects)
 {
-	InitEngineProjects(AllProjects);
+	TArray<FString> Tabs;
 
-	TArray<FString> EngineVersions;
-	Map.GenerateKeyArray(EngineVersions);
+	SAssignNew(EngineTab, SEngineTab)
+		.TabNames(Tabs)
+		.OnTabActive(this, &SUPTMainFrame::OnEngineTabChanged)
+		.OnGetTabBrush(this, &SUPTMainFrame::GetSourceOrBinaryImage)
+		.OnGetToolTipText(this, &SUPTMainFrame::OnGetEngineDir);
 	
 	ChildSlot
 	.Padding(FMargin(2))
@@ -32,17 +35,32 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 		+SSplitter::Slot()
 		.Value(0.3f)
 		[
-			SNew(SEngineTab)
-			.TabNames(EngineVersions)
-			.OnTabActive(this, &SUPTMainFrame::OnEngineTabChanged)
-			.OnGetTabBrush(this, &SUPTMainFrame::GetSourceOrBinaryImage)
-			.OnGetToolTipText(this, &SUPTMainFrame::OnGetEngineDir)
+			EngineTab->AsShared()
 		]
 		+SSplitter::Slot()
 		[
 			SAssignNew(EngineProjects, SEngineProjects)
 		]
 	];
+
+	RequestRefresh(AllProjects);
+}
+
+void SUPTMainFrame::RequestRefresh(TArray<TSharedPtr<FProjectInfo>>& AllProjects)
+{
+	Map.Empty();
+
+	InitEngineProjects(AllProjects);
+
+	TArray<FString> EngineVersions;
+	Map.GenerateKeyArray(EngineVersions);
+
+	EngineTab->Refresh(EngineVersions);
+
+	if (EngineVersions.Num() > 0)
+	{
+		EngineTab->SetActiveTab(EngineVersions[0]);
+	}
 }
 
 void SUPTMainFrame::InitEngineProjects(TArray<TSharedPtr<FProjectInfo>>& AllProjects)
@@ -74,8 +92,17 @@ void SUPTMainFrame::OnEngineTabChanged(const FString& EngineVersion)
 
 const FSlateBrush* SUPTMainFrame::GetSourceOrBinaryImage(const FString& EngineVersion)
 {
+	if (Map.Contains(EngineVersion))
+	{
+		if (Map[EngineVersion].Num() > 0)
+		{
+			if (Map[EngineVersion][0]->GetEnginePath().IsEmpty())
+				return FUPTStyle::Get().GetBrush(FName("UPT.Tab.NotFound"));
+		}
+	}
+
 	const bool bEngineIsSource = FUPTManager::Get()->EngineIsDistribution(EngineVersion);
-	static FName BrushName = bEngineIsSource ? "UPT.Tab.Source" : "UPT.Tab.Binary";
+	FName BrushName = bEngineIsSource ? FName("UPT.Tab.Source") : FName("UPT.Tab.Binary");
 	return FUPTStyle::Get().GetBrush(BrushName);
 }
 

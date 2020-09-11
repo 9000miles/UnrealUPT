@@ -12,5 +12,7 @@ FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnClearSolution;
 
 FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnManagedCode;
 
+FSimpleDelegate FUPTDelegateCenter::OnRefresh;
+
 FSimpleMulticastDelegate FUPTDelegateCenter::OnExit;
 

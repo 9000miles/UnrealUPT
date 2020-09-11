@@ -12,6 +12,7 @@
 #include "SHyperlink.h"
 #include "SlateApplication.h"
 
+#define LOCTEXT_NAMESPACE "SEngineProjects"
 void SEngineProjects::Construct(const FArguments& InArgs)
 {
 	ChildSlot
@@ -20,12 +21,12 @@ void SEngineProjects::Construct(const FArguments& InArgs)
 			+SVerticalBox::Slot()
 			.AutoHeight()
 			[
-				CreateAreaHeader()
+				CreateProjectsHeader()
 			]
 			+SVerticalBox::Slot()
 			.VAlign(VAlign_Fill)
 			[
-				CreateAreaBody()
+				CreateProjectsBody()
 			]
 		];
 }
@@ -45,7 +46,7 @@ void SEngineProjects::Init(TArray<TSharedPtr<FProjectInfo>> &Projects)
 	}
 }
 
-TSharedRef<SWidget> SEngineProjects::CreateAreaHeader()
+TSharedRef<SWidget> SEngineProjects::CreateProjectsHeader()
 {
 	return
 	SNew(SBorder)
@@ -72,7 +73,7 @@ TSharedRef<SWidget> SEngineProjects::CreateAreaHeader()
 	];
 }
 
-TSharedRef<SWidget> SEngineProjects::CreateAreaBody()
+TSharedRef<SWidget> SEngineProjects::CreateProjectsBody()
 {
 	TArray<TSharedPtr<FProjectInfo>> Projects;
 
@@ -86,10 +87,11 @@ TSharedRef<SWidget> SEngineProjects::CreateAreaBody()
 
 FText SEngineProjects::GetEnginePath() const
 {
-	return FText::FromString(EnginePath);
+	return EnginePath.IsEmpty() ? LOCTEXT("NotFound", "Not found engine directory") : FText::FromString(EnginePath);
 }
 
 FText SEngineProjects::GetProjectCount() const
 {
 	return FText::FromString(FString::FromInt(ProjectCount));
 }
+#undef LOCTEXT_NAMESPACE

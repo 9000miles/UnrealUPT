@@ -53,7 +53,10 @@ void FUPTMenuBar::FillRecentProjectsSubMenu(FMenuBuilder& MenuBuilder)
 
 void FUPTMenuBar::OnRefresh()
 {
-
+	if (FUPTDelegateCenter::OnRefresh.IsBound())
+	{
+		FUPTDelegateCenter::OnRefresh.ExecuteIfBound();
+	}
 }
 
 void FUPTMenuBar::OnExit()

@@ -38,7 +38,7 @@ void SEngineTab::Refresh(TArray<FString> Names)
 {
 	TabBox->ClearChildren();
 
-	for (const FString TabName : TabNames)
+	for (const FString TabName : Names)
 	{
 		TabBox->AddSlot()
 		.HAlign(HAlign_Fill)
@@ -48,8 +48,17 @@ void SEngineTab::Refresh(TArray<FString> Names)
 	}
 }
 
+void SEngineTab::SetActiveTab(const FString TabName)
+{
+	ActiveEngineTab = TabName;
+
+	if (OnTabActive.IsBound())
+		OnTabActive.ExecuteIfBound(ActiveEngineTab);
+}
+
 TSharedRef<SWidget> SEngineTab::CreateTab(FString TabName)
 {
+	const FSlateBrush* SourceBinaryBrush = GetSourceOrBinaryImage(TabName);
 	return
 		SNew(SCheckBox)
 		.Style(FEditorStyle::Get(), "PlacementBrowser.Tab")
@@ -71,7 +80,7 @@ TSharedRef<SWidget> SEngineTab::CreateTab(FString TabName)
 			.AutoWidth()
 			[
 				SNew(SImage)
-				.Image(this, &SEngineTab::GetSourceOrBinaryImage, TabName)
+				.Image(SourceBinaryBrush)
 			]
 			+ SHorizontalBox::Slot()
 			.Padding(FMargin(6, 0, 15, 0))
@@ -127,12 +136,13 @@ const FSlateBrush* SEngineTab::GetSourceOrBinaryImage(FString EngineVersion) con
 
 FText SEngineTab::TabToolTipText(FString EngineVersion) const
 {
+	FText TipText;
 	if (OnGetToolTipText.IsBound())
 	{
-		return OnGetToolTipText.Execute(EngineVersion);
+		TipText = OnGetToolTipText.Execute(EngineVersion);
 	}
 
-	return LOCTEXT("Tab Tool Tip Text", "Tab Tool Tip Text");
+	return TipText.IsEmpty() ? LOCTEXT("NotFound", "Not found engine directory") : TipText;
 }
 #undef LOCTEXT_NAMESPACE
 

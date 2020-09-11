@@ -17,5 +17,7 @@ public:
 	static FOnProjectOperation OnClearSolution;
 	static FOnProjectOperation OnManagedCode;
 
+	static FSimpleDelegate OnRefresh;
+
 	static FSimpleMulticastDelegate OnExit;
 };

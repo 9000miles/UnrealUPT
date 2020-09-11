@@ -37,7 +37,6 @@ void FUPTManager::Initialize()
 	FUPTDelegateCenter::OnShowInExplorer.BindLambda([this](TSharedRef<FProjectInfo> Info) { ShowInExplorer(Info); });
 	FUPTDelegateCenter::OnClearSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenClearSolutionWindow(Info); });
 	FUPTDelegateCenter::OnManagedCode.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenManagedCodeWindow(Info); });
-
 }
 
 TArray<FString> FUPTManager::GetAllEngineRootDir()
@@ -181,9 +180,11 @@ TSharedPtr<FSlateBrush> FUPTManager::GetProjectThumbnail(const FString& ProjectP
 	return Brush;
 }
 
-const bool FUPTManager::EngineIsDistribution(const FString& RootDir)
+const bool FUPTManager::EngineIsDistribution(const FString& Identifer)
 {
-	return FDesktopPlatformModule::Get()->IsSourceDistribution(RootDir);
+	FString EngineDir;
+	FDesktopPlatformModule::Get()->GetEngineRootDirFromIdentifier(Identifer, EngineDir);
+	return FDesktopPlatformModule::Get()->IsSourceDistribution(EngineDir);
 }
 
 bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)

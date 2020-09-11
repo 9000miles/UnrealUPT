@@ -42,7 +42,7 @@ public:
 	/*
 	*	引擎是否是源码版，返回true
 	*/
-	const bool EngineIsDistribution(const FString& RootDir);
+	const bool EngineIsDistribution(const FString& Identifer);
 
 	bool OpenProject(TSharedRef<FProjectInfo> Info);
 	bool OpenCodeIDE(TSharedRef<FProjectInfo> Info);

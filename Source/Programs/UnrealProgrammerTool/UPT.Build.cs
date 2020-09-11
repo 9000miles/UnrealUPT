@@ -8,6 +8,7 @@ public class UPT : ModuleRules
     public UPT(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        OptimizeCode = CodeOptimization.InShippingBuildsOnly;
 
         PublicIncludePaths.AddRange(
             new string[]
@@ -18,8 +19,8 @@ public class UPT : ModuleRules
                 Path.Combine(ModuleDirectory, "Source/Classes"),
                 Path.Combine(ModuleDirectory, "Source/Launcher"),
                 Path.Combine(ModuleDirectory, "Source/Manager"),
-                Path.Combine(ModuleDirectory, "Source/Slate"),
-                Path.Combine(ModuleDirectory, "Source/Slate/ProjectUnit"),
+                Path.Combine(ModuleDirectory, "Source/Widgets"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/ProjectUnit"),
                 Path.Combine(ModuleDirectory, "Source/Utility"),
             }
             );

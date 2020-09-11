@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 struct FProjectInfo;
+class SEngineTab;
 class SEngineProjects;
 
 class SUPTMainFrame :public SCompoundWidget
@@ -16,6 +17,7 @@ public:
 
 public:
 	void Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& AllProjects);
+	void RequestRefresh(TArray<TSharedPtr<FProjectInfo>>& AllProjects);
 
 private:
 	void InitEngineProjects(TArray<TSharedPtr<FProjectInfo>>& AllProjects);
@@ -25,9 +27,7 @@ private:
 	const FText OnGetEngineDir(const FString& EngineVersion);
 
 private:
-	FString ActiveEngineTab;
-
-	TSharedPtr<SVerticalBox> EngineBox;
+	TSharedPtr<SEngineTab> EngineTab;
 	TSharedPtr<SEngineProjects> EngineProjects;
 
 	//Key：引擎路径，Value：工程信息

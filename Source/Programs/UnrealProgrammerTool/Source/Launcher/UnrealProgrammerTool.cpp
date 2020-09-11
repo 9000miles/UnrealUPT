@@ -19,15 +19,12 @@
 #include "UPTMenuBar.h"
 #include "UPTDelegateCenter.h"
 #include "UPTDefine.h"
-#include "../Menu/UPTToolBar.h"
-#include "../Menu/UPTCommands.h"
+#include "UPTToolBar.h"
+#include "UPTCommands.h"
 
 IMPLEMENT_APPLICATION(UPT, "UnrealProgrammerTool");
 
 #define LOCTEXT_NAMESPACE "UnrealProgrammerTool"
-
-static TArray<TSharedPtr<FProjectInfo>> ProjectInfos;
-static TSharedPtr<FTabManager> UPTTabManager;
 
 namespace UPTMeun
 {
@@ -58,40 +55,13 @@ TSharedRef<SDockTab> SpawnMainTab(const FSpawnTabArgs& Args, FName TabIdentifier
 
 TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 {
-	//TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout("UPTMainWindow_Layout")
-	//	->AddArea
-	//	(
-	//		// The primary area will be restored and returned as a widget.
-	//		// Unlike other areas it will not get its own window.
-	//		// This allows the caller to explicitly place the primary area somewhere in the widget hierarchy.
-	//		FTabManager::NewPrimaryArea()
-	//		->Split
-	//		(
-	//			//The first cell in the primary area will be occupied by a stack of tabs.
-	//			// They are all opened.
-	//			FTabManager::NewStack()
-	//			->SetSizeCoefficient(0.35f)
-	//			->AddTab("UPTWindowTab", ETabState::OpenedTab)
-	//		)
-	//	)
-	//	;
-
-
-
 	TSharedRef<SDockTab> UPTTab =
 		SNew(SDockTab)
 		.TabRole(ETabRole::MajorTab)
 		.Label(LOCTEXT("UPTLabel", "UPT"))
 		.ToolTipText(LOCTEXT("UPTTabToolTip", "A tool that unreal programmers really want to use."));
 
-
 	UPTTabManager = FGlobalTabmanager::Get()->NewTabManager(UPTTab);
-	//UPTTabManager->RegisterTabSpawner("UPTWindowTab", FOnSpawnTab::CreateStatic(&SpawnMainTab, FName("UPTWindowTab")))
-		//.SetDisplayName(LOCTEXT("UPTWindowTab", "UPT Tab"))
-		//.SetGroup(UPTMeun::UPTGroup);
-	
-	FUPTDelegateCenter::OnExit.AddStatic(&OnExit);
-
 
 	UPTTab->SetContent
 	(
@@ -111,12 +81,21 @@ TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 		+ SVerticalBox::Slot()
 		.FillHeight(1.0f)
 		[
-			SNew(SUPTMainFrame, ProjectInfos)
+			SAssignNew(UPTMainFrame, SUPTMainFrame, ProjectInfos)
 		]
 	);
 
 	return UPTTab;
+}
 
+void OnRefreshMainFrame()
+{
+	check(UPTMainFrame.IsValid());
+
+	ProjectInfos.Empty();
+	ProjectInfos = FUPTManager::Get()->GetAllProjectInfos();
+
+	UPTMainFrame->RequestRefresh(ProjectInfos);
 }
 
 void CreateMainFrameWindow()
@@ -151,21 +130,13 @@ void StartupMainFrame()
 	FUPTManager::Get()->Initialize();
 	ProjectInfos = FUPTManager::Get()->GetAllProjectInfos();
 	CreateMainFrameWindow();
+
+	FUPTDelegateCenter::OnRefresh.BindStatic(&OnRefreshMainFrame);
+	FUPTDelegateCenter::OnExit.AddStatic(&OnExit);
 }
 
 void SetAppIcon()
 {
-	//TSharedPtr<FSlateApplication> Slate = FSlateApplication::Create(MakeShareable((FWindowsPlatformApplicationMisc::CreateApplication())));
-	//{
-	//	TSharedRef<FSlateRenderer> SlateRenderer = GetStandardStandaloneRenderer();
-	//	bool bRendererInitialized = Slate->InitializeRenderer(SlateRenderer, true);
-	//	if (!bRendererInitialized)
-	//	{
-	//		FSlateApplication::Shutdown();
-	//		return;
-	//	}
-	//	Slate->SetExitRequestedHandler(FSimpleDelegate::CreateStatic(&OnExit));
-	//}
 	FSlateApplication::Get().SetAppIcon(FUPTStyle::Get().GetBrush("UPT.AppIcon"));
 }
 

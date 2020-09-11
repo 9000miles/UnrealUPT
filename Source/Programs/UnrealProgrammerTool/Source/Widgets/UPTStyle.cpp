@@ -49,13 +49,15 @@ TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("UPTStyle"));
 	Style->SetContentRoot(UPT_RESOURCE_PATH);
 
-	Style->Set("UPT.Refresh", new IMAGE_BRUSH(TEXT("Refresh"), Icon32x32));
-	Style->Set("UPT.FoldAllArea", new IMAGE_BRUSH(TEXT("FoldAllArea"), Icon32x32));
-	Style->Set("UPT.ExpandAllArea", new IMAGE_BRUSH(TEXT("ExpandAllArea"), Icon32x32));
+	Style->Set("UPT.ToolBar.Refresh", new IMAGE_BRUSH(TEXT("Refresh"), Icon32x32));
+	Style->Set("UPT.ToolBar.FoldAllArea", new IMAGE_BRUSH(TEXT("FoldAllArea"), Icon32x32));
+	Style->Set("UPT.ToolBar.ExpandAllArea", new IMAGE_BRUSH(TEXT("ExpandAllArea"), Icon32x32));
+
 	Style->Set("UPT.AppIcon", new IMAGE_BRUSH(TEXT("AppIcon"), Icon32x32));
 
 	Style->Set("UPT.Tab.Source", new IMAGE_BRUSH(TEXT("Source"), Icon16x16));
 	Style->Set("UPT.Tab.Binary", new IMAGE_BRUSH(TEXT("Binary"), Icon16x16));
+	Style->Set("UPT.Tab.NotFound", new IMAGE_BRUSH(TEXT("NotFound"), Icon16x16));
 
 	return Style;
 }

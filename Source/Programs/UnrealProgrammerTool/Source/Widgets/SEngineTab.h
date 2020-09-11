@@ -25,6 +25,7 @@ public:
 public:
 	void Construct(const FArguments& InArgs);
 	void Refresh(TArray<FString> Names);
+	void SetActiveTab(const FString TabName);
 
 private:
 	TSharedRef<SWidget> CreateTab(FString Version);
