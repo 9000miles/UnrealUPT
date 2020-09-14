@@ -1,4 +1,4 @@
-#include "SEngineTab.h"
+#include "SCommonTab.h"
 #include "SCheckBox.h"
 #include "SBorder.h"
 #include "SScrollBox.h"
@@ -10,7 +10,7 @@
 #include "EditorStyleSet.h"
 
 #define LOCTEXT_NAMESPACE "SEngineTab"
-void SEngineTab::Construct(const FArguments& InArgs)
+void SCommonTab::Construct(const FArguments& InArgs)
 {
 	TabNames = InArgs._TabNames;
 	OnTabActive = InArgs._OnTabActive;
@@ -34,7 +34,7 @@ void SEngineTab::Construct(const FArguments& InArgs)
 	Refresh(TabNames);
 }
 
-void SEngineTab::Refresh(TArray<FString> Names)
+void SCommonTab::Refresh(TArray<FString> Names)
 {
 	TabBox->ClearChildren();
 
@@ -48,7 +48,7 @@ void SEngineTab::Refresh(TArray<FString> Names)
 	}
 }
 
-void SEngineTab::SetActiveTab(const FString TabName)
+void SCommonTab::SetActiveTab(const FString TabName)
 {
 	ActiveEngineTab = TabName;
 
@@ -56,16 +56,16 @@ void SEngineTab::SetActiveTab(const FString TabName)
 		OnTabActive.ExecuteIfBound(ActiveEngineTab);
 }
 
-TSharedRef<SWidget> SEngineTab::CreateTab(FString TabName)
+TSharedRef<SWidget> SCommonTab::CreateTab(FString TabName)
 {
 	bool bSourceEngine;
 	const FSlateBrush* SourceBinaryBrush = GetSourceOrBinaryImage(TabName, bSourceEngine);
 	return
 		SNew(SCheckBox)
 		.Style(FEditorStyle::Get(), "PlacementBrowser.Tab")
-		.OnCheckStateChanged(this, &SEngineTab::OnEngineTabChanged, TabName)
-		.IsChecked(this, &SEngineTab::GetEngineTabCheckedState, TabName)
-		.ToolTipText(this, &SEngineTab::TabToolTipText, TabName, bSourceEngine)
+		.OnCheckStateChanged(this, &SCommonTab::OnEngineTabChanged, TabName)
+		.IsChecked(this, &SCommonTab::GetEngineTabCheckedState, TabName)
+		.ToolTipText(this, &SCommonTab::TabToolTipText, TabName, bSourceEngine)
 		[
 			SNew(SHorizontalBox)
 			+ SHorizontalBox::Slot()
@@ -74,7 +74,7 @@ TSharedRef<SWidget> SEngineTab::CreateTab(FString TabName)
 			.AutoWidth()
 			[
 				SNew(SImage)
-				.Image(this, &SEngineTab::GetActiveTabIamge, TabName)
+				.Image(this, &SCommonTab::GetActiveTabIamge, TabName)
 			]
 			+ SHorizontalBox::Slot()
 			.Padding(FMargin(5, 0))
@@ -95,7 +95,7 @@ TSharedRef<SWidget> SEngineTab::CreateTab(FString TabName)
 	;
 }
 
-void SEngineTab::OnEngineTabChanged(ECheckBoxState NewState, FString EngineVersion)
+void SCommonTab::OnEngineTabChanged(ECheckBoxState NewState, FString EngineVersion)
 {
 	if (NewState == ECheckBoxState::Checked)
 	{
@@ -107,12 +107,12 @@ void SEngineTab::OnEngineTabChanged(ECheckBoxState NewState, FString EngineVersi
 	}
 }
 
-ECheckBoxState SEngineTab::GetEngineTabCheckedState(FString EngineVersion) const
+ECheckBoxState SCommonTab::GetEngineTabCheckedState(FString EngineVersion) const
 {
 	return ActiveEngineTab == EngineVersion ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 }
 
-const FSlateBrush* SEngineTab::GetActiveTabIamge(FString EngineVersion) const
+const FSlateBrush* SCommonTab::GetActiveTabIamge(FString EngineVersion) const
 {
 	if (ActiveEngineTab == EngineVersion)
 	{
@@ -125,7 +125,7 @@ const FSlateBrush* SEngineTab::GetActiveTabIamge(FString EngineVersion) const
 	}
 }
 
-const FSlateBrush* SEngineTab::GetSourceOrBinaryImage(FString EngineVersion, bool& bSource) const
+const FSlateBrush* SCommonTab::GetSourceOrBinaryImage(FString EngineVersion, bool& bSource) const
 {
 	if (OnGetTabBrush.IsBound())
 	{
@@ -135,7 +135,7 @@ const FSlateBrush* SEngineTab::GetSourceOrBinaryImage(FString EngineVersion, boo
 	return nullptr;
 }
 
-FText SEngineTab::TabToolTipText(FString EngineVersion, bool bSource) const
+FText SCommonTab::TabToolTipText(FString EngineVersion, bool bSource) const
 {
 	FText TipText;
 	if (OnGetToolTipText.IsBound())

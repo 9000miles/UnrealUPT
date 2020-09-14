@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 struct FProjectInfo;
-class SEngineTab;
+class SCommonTab;
 class SEngineProjects;
 
 class SUPTMainFrame :public SCompoundWidget
@@ -27,7 +27,7 @@ private:
 	const FText OnGetEngineDir(const FString& EngineVersion);
 
 private:
-	TSharedPtr<SEngineTab> EngineTab;
+	TSharedPtr<SCommonTab> EngineTab;
 	TSharedPtr<SEngineProjects> EngineProjects;
 
 	//Key：引擎路径，Value：工程信息

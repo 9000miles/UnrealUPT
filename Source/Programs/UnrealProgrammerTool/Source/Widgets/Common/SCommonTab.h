@@ -11,10 +11,10 @@ DECLARE_DELEGATE_OneParam(FOnTabActive, const FString& /*TabName*/);
 DECLARE_DELEGATE_RetVal_TwoParams(const FSlateBrush*, FOnGetTabBrush, const FString& /*TabName*/, bool& /*bSourceEngien*/);
 DECLARE_DELEGATE_RetVal_OneParam(const FText, FOnGetToolTipText, const FString& /*TabName*/);
 
-class SEngineTab :public SCompoundWidget
+class SCommonTab :public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(SEngineTab)
+	SLATE_BEGIN_ARGS(SCommonTab)
 	{	}
 	SLATE_ARGUMENT(TArray<FString>, TabNames);
 	SLATE_EVENT(FOnTabActive, OnTabActive);

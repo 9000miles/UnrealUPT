@@ -21,7 +21,7 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 {
 	TArray<FString> Tabs;
 
-	SAssignNew(EngineTab, SEngineTab)
+	SAssignNew(EngineTab, SCommonTab)
 		.TabNames(Tabs)
 		.OnTabActive(this, &SUPTMainFrame::OnEngineTabChanged)
 		.OnGetTabBrush(this, &SUPTMainFrame::GetSourceOrBinaryImage)

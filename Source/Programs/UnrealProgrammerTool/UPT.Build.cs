@@ -19,9 +19,14 @@ public class UPT : ModuleRules
                 Path.Combine(ModuleDirectory, "Source/Classes"),
                 Path.Combine(ModuleDirectory, "Source/Launcher"),
                 Path.Combine(ModuleDirectory, "Source/Manager"),
-                Path.Combine(ModuleDirectory, "Source/Widgets"),
-                Path.Combine(ModuleDirectory, "Source/Widgets/ProjectUnit"),
                 Path.Combine(ModuleDirectory, "Source/Utility"),
+
+                Path.Combine(ModuleDirectory, "Source/Widgets"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/Common"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/MainFrame"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/ProjectUnit"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/Settings"),
             }
             );
 
