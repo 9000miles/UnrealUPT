@@ -6,9 +6,10 @@
 #include "GenericPlatformFile.h"
 #include "Paths.h"
 #include "PlatformFilemanager.h"
+#include "Private/ProjectManager.h"
 
 #define LOCTEXT_NAMESPACE "TestDemo"
-
+#pragma optimize("",off)
 IMPLEMENT_CODE_TEST_OBJECT(FTeDemo, "FTeDemo.Test1", UTestDemo);
 void FTeDemo::RunTest()
 {
@@ -151,23 +152,28 @@ void FProjectTest::RunTest()
 	PRINT_LOG("GameProjectUtils::ProjectHasCodeFiles()" << GameProjectUtils::ProjectHasCodeFiles());
 }
 
-IMPLEMENT_CODE_TEST_OBJECT(FModuleSourceFileTest, "FProjectTest", UProjectTestSettings);
+IMPLEMENT_CODE_TEST_OBJECT(FModuleSourceFileTest, "FModuleSourceFileTest", UProjectTestSettings);
 void FModuleSourceFileTest::RunTest()
 {
 	UProjectTestSettings* Settings = GetObject<UProjectTestSettings>();
-	FPlatformMisc::SetOverrideProjectDir(Settings->ProjectPath);
-
-	TArray<FModuleContextInfo> Modules = GameProjectUtils::GetCurrentProjectModules();
-	for (FModuleContextInfo Module : Modules)
+	FString ProjectPath = Settings->ProjectPath;
+	if (!ProjectPath.IsEmpty())
 	{
-		PRINT_LOG("ProjectModules : "<<Module.ModuleName << "   " << Module.ModuleSourcePath << "   " << Module.ModuleType);
+		FPlatformMisc::SetOverrideProjectDir(ProjectPath);
+		FProjectManager::Get().LoadProjectFile(ProjectPath);
 	}
 
-	TArray<FModuleContextInfo> Modules = GameProjectUtils::GetCurrentProjectPluginModules();
-	for (FModuleContextInfo Module : Modules)
+	TArray<FModuleContextInfo> ProjectModules = GameProjectUtils::GetCurrentProjectModules();
+	for (FModuleContextInfo Module : ProjectModules)
 	{
-		PRINT_LOG("PluginsModules : "<<Module.ModuleName << "   " << Module.ModuleSourcePath << "   " << Module.ModuleType);
+		PRINT_LOG("ProjectModules : " << Module.ModuleName << "   " << Module.ModuleSourcePath << "   " << Module.ModuleType);
+	}
+
+	TArray<FModuleContextInfo> PluginsModules = GameProjectUtils::GetCurrentProjectPluginModules();
+	for (FModuleContextInfo Module : PluginsModules)
+	{
+		PRINT_LOG("PluginsModules : " << Module.ModuleName << "   " << Module.ModuleSourcePath << "   " << Module.ModuleType);
 	}
 }
-
+#pragma optimize("",on)
 #undef LOCTEXT_NAMESPACE

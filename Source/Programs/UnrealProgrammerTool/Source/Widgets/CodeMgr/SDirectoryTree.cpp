@@ -1,6 +1,6 @@
 #include "SDirectoryTree.h"
 
-void SDirectoryTree::Construct(const FArgumets& InArgs)
+void SDirectoryTree::Construct(const FArguments& InArgs)
 {
 
 }

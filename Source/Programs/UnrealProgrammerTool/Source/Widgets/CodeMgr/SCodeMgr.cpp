@@ -1,6 +1,6 @@
 #include "SCodeMgr.h"
 
-void SCodeMgr::Construct(const FArgumets& InArgs)
+void SCodeMgr::Construct(const FArguments& InArgs)
 {
 
 }

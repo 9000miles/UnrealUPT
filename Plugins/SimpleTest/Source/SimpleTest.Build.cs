@@ -6,6 +6,7 @@ public class SimpleTest : ModuleRules
 {
     public SimpleTest(ReadOnlyTargetRules Target) : base(Target)
     {
+        //OptimizeCode = CodeOptimization.Never;
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicIncludePaths.AddRange(

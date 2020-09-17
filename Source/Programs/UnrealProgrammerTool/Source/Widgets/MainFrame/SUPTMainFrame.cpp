@@ -12,7 +12,7 @@
 #include "STextBlock.h"
 #include "SImage.h"
 #include "UPTStyle.h"
-#include "SEngineTab.h"
+#include "SCommonTab.h"
 #include "UPTManager.h"
 
 #define LOCTEXT_NAMESPACE "SUPTMainFrame"

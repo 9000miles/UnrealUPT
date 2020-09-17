@@ -3,9 +3,9 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class UPT : ModuleRules
+public class UnrealUPT : ModuleRules
 {
-    public UPT(ReadOnlyTargetRules Target) : base(Target)
+    public UnrealUPT(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
         OptimizeCode = CodeOptimization.InShippingBuildsOnly;

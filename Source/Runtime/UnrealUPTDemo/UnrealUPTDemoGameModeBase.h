@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "UnrealUPTGameModeBase.generated.h"
+#include "UnrealUPTDemoGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UNREALUPT_API AUnrealUPTGameModeBase : public AGameModeBase
+class UNREALUPTDEMO_API AUnrealUPTDemoGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
