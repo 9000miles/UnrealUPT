@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 
-class SPreviewViewport : public SCompoundWidget
+class SCodeDetails : public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(SPreviewViewport)
+	SLATE_BEGIN_ARGS(SCodeDetails)
 	{ }
 	SLATE_END_ARGS()
 
-	void Construct(const FArgumets& InArgs);
+	void Construct(const FArguments& InArgs);
 
 private:
 };

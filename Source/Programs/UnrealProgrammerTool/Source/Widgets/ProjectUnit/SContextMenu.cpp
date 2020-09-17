@@ -72,7 +72,7 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 		LOCTEXT("Managed Code Tip", "Managed Code Tip"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
 		FUIAction(
-			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnManagedCode.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnOpenCodeMgrWindow.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
 			FCanExecuteAction()
 		));
 

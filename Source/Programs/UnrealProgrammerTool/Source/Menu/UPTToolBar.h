@@ -10,6 +10,7 @@ class FUPTToolBar:public TCommands<FUPTToolBar>
 {
 public:
 	static TSharedRef<SWidget> MakeUPTToolBar();
+	static void OnOpenCodeMgrWindow();
 
 private:
 	static TSharedPtr<FUICommandList> UPTCommandList;

@@ -20,8 +20,13 @@
 #include "JsonReader.h"
 #include "JsonSerializer.h"
 #include "IPluginManager.h"
+#include "TabManager.h"
+#include "SCodeMgr.h"
+#include "SDockTab.h"
 
 #define LOCTEXT_NAMESPACE "FEPManager"
+
+static const FName CodeMgrWindow("CodeMgrWindow");
 
 TSharedPtr<FUPTManager> FUPTManager::Get()
 {
@@ -36,7 +41,11 @@ void FUPTManager::Initialize()
 	FUPTDelegateCenter::OnGenerateSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { GenerateSolution(Info); });
 	FUPTDelegateCenter::OnShowInExplorer.BindLambda([this](TSharedRef<FProjectInfo> Info) { ShowInExplorer(Info); });
 	FUPTDelegateCenter::OnClearSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenClearSolutionWindow(Info); });
-	FUPTDelegateCenter::OnManagedCode.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenManagedCodeWindow(Info); });
+	FUPTDelegateCenter::OnOpenCodeMgrWindow.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenManagedCodeWindow(Info); });
+
+	FGlobalTabmanager::Get()->RegisterTabSpawner(CodeMgrWindow, FOnSpawnTab::CreateRaw(this, &FUPTManager::SpawnCodeMgrWindow, CodeMgrWindow))
+		.SetDisplayName((LOCTEXT("CodeMgrTabTile", "Code Mgr")))
+		;
 }
 
 TArray<FString> FUPTManager::GetAllEngineRootDir()
@@ -319,9 +328,23 @@ void FUPTManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
 
 }
 
+TSharedRef<SDockTab> FUPTManager::SpawnCodeMgrWindow(const FSpawnTabArgs& Args, FName TabIdentifier)
+{
+	if (TabIdentifier == CodeMgrWindow)
+	{
+		const TSharedRef<SDockTab> DockTab = SNew(SDockTab)
+			.TabRole(ETabRole::PanelTab);
+
+		DockTab->SetContent(SNew(SCodeMgr, DockTab, Args.GetOwnerWindow()));
+		return DockTab;
+	}
+
+	return  SNew(SDockTab);
+}
+
 void FUPTManager::OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info)
 {
-
+	FGlobalTabmanager::Get()->InvokeTab(CodeMgrWindow);
 }
 
 TSharedPtr<FJsonObject> FUPTManager::LoadProjectFile(const FString &FileName)

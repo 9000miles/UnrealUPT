@@ -5,6 +5,7 @@
 #include "ProjectInfo.h"
 #include "UPTDefine.h"
 #include "EditorStyleSet.h"
+#include "UPTManager.h"
 
 #define LOCTEXT_NAMESPACE "SProjectTileView"
 
@@ -76,6 +77,11 @@ TSharedPtr<SWidget> SProjectTileView::MakeProjectContextMenu()
 void SProjectTileView::OnSelectionChanged(TSharedPtr<SProjectUnit> Unit, ESelectInfo::Type Type)
 {
 	CurSelectedUnit = Unit;
+
+	if (Unit.IsValid())
+	{
+		FUPTManager::Get()->SetCurrentSelectedProject(Unit->GetProjectInfo());
+	}
 }
 
 #undef LOCTEXT_NAMESPCE

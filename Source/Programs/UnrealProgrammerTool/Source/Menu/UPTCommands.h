@@ -25,4 +25,5 @@ public:
 	TSharedPtr< FUICommandInfo > Refresh;
 	TSharedPtr< FUICommandInfo > FoldAllArea;
 	TSharedPtr< FUICommandInfo > ExpandAllArea;
+	TSharedPtr< FUICommandInfo > OpenCodeMgr;
 };

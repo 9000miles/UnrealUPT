@@ -51,8 +51,22 @@ public:
 	//弹出清理Binares和Immediate文件夹窗口
 	void OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info);
 
+	void SetCurrentSelectedProject(TSharedPtr<FProjectInfo> Info)
+	{
+		CurrentSelectedProject = Info;
+	}
+
+	TSharedPtr<FProjectInfo> GetCurrentSelectedProject()
+	{
+		return CurrentSelectedProject.Pin();
+	}
+
+	TSharedRef<SDockTab> SpawnCodeMgrWindow(const FSpawnTabArgs& Args, FName TabIdentifier);
 	void OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info);
 
 private:
 	TSharedPtr<FJsonObject> LoadProjectFile(const FString &FileName);
+
+private:
+	TWeakPtr<FProjectInfo> CurrentSelectedProject;
 };
