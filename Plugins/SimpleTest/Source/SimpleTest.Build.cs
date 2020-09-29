@@ -55,5 +55,7 @@ public class SimpleTest : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
             );
+
+        System.Console.Write("-------------         SimpleTest [ System.Console.Write ]         -------------\n");
     }
 }

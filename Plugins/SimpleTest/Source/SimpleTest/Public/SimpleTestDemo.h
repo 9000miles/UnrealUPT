@@ -45,3 +45,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "TestSettings")
 		FString ProjectPath;
 };
+
+UCLASS(BlueprintType, Blueprintable)
+class UFileManagerTestSettings : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, Category = "TestSettings")
+		FString ProjectPath;
+	UPROPERTY(EditAnywhere, Category = "TestSettings")
+		FString FileExtension;
+};

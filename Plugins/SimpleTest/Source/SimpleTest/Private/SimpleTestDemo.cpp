@@ -7,6 +7,8 @@
 #include "Paths.h"
 #include "PlatformFilemanager.h"
 #include "Private/ProjectManager.h"
+#include "App.h"
+#include "FileHelper.h"
 
 #define LOCTEXT_NAMESPACE "TestDemo"
 #pragma optimize("",off)
@@ -174,6 +176,36 @@ void FModuleSourceFileTest::RunTest()
 	{
 		PRINT_LOG("PluginsModules : " << Module.ModuleName << "   " << Module.ModuleSourcePath << "   " << Module.ModuleType);
 	}
+}
+
+IMPLEMENT_CODE_TEST_OBJECT(FFileManagerTest, "FFileManagerTest", UFileManagerTestSettings);
+void FFileManagerTest::RunTest()
+{
+	UFileManagerTestSettings* Settings = GetObject<UFileManagerTestSettings>();
+	FString ProjectPath = Settings->ProjectPath;
+	FString FileExtension = Settings->FileExtension;
+	if (ProjectPath.IsEmpty())
+	{
+		return;
+	}
+
+	PRINT_LOG("Start Time : " << FDateTime::Now().ToString());
+	TArray<FString> OutFiles;
+	FPlatformFileManager::Get().GetPlatformFile().FindFilesRecursively(OutFiles, *ProjectPath, *FileExtension);
+	PRINT_LOG("FindFilesRecursively Time : " << FDateTime::Now().ToString());
+
+	int32 Count = 0;
+	int64 TotalLineCount = 0;
+	//for (FString FileName : OutFiles)
+	//{
+	//	TArray<FString> LineArray;
+	//	FFileHelper::LoadFileToStringArray(LineArray, *FileName);
+	//	int32 LineCount = LineArray.Num();
+	//	TotalLineCount += LineCount;
+	//	//PRINT_LOG(++Count << "  " << "FileCount : " << LineCount << "   " << FileName);
+	//}
+	PRINT_LOG(" ====  TotalLineCount : " << TotalLineCount);
+	PRINT_LOG("PRINT_LOG Time : " << FDateTime::Now().ToString());
 }
 #pragma optimize("",on)
 #undef LOCTEXT_NAMESPACE
