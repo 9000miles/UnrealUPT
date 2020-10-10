@@ -18,7 +18,7 @@ private:
 
 private:
 	TSharedPtr<class FTabManager> TabManager;
-	TSharedPtr<class SDirectoryTree> DirectoryTree;
+	TSharedPtr<class SDirectoryView> DirectoryTree;
 	TSharedPtr<class SFileViewport> FileViewport;
 	TSharedPtr<class SCodeDetails> CodeDetails;
 	TSharedPtr<class SCodeMgrState> CodeMgrState;

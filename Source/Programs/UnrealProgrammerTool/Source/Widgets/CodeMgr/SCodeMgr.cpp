@@ -5,7 +5,7 @@
 #include "WorkspaceItem.h"
 #include "EditorStyleSet.h"
 #include "SDockTab.h"
-#include "SDirectoryTree.h"
+#include "SDirectoryView.h"
 #include "SFileViewport.h"
 #include "SCodeDetails.h"
 #include "SCodeMgrState.h"
@@ -105,7 +105,7 @@ TSharedRef<SDockTab> SCodeMgr::HandleTabManagerSpawnTab(const FSpawnTabArgs& Arg
 
 	if (TabIdentifier == DirectoryTreeTabID)
 	{
-		SAssignNew(DirectoryTree, SDirectoryTree);
+		SAssignNew(DirectoryTree, SDirectoryView);
 		TabWidget = DirectoryTree;
 	}
 	else if (TabIdentifier == FileViewportTabID)
