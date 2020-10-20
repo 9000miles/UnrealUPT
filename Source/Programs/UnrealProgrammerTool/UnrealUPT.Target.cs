@@ -12,6 +12,7 @@ public class UnrealUPTTarget : TargetRules
         LinkType = TargetLinkType.Monolithic;
         LaunchModuleName = "UnrealUPT";
         ExtraModuleNames.Add("EditorStyle");
+        //SolutionDirectory = "UnrealUPT";
 
         // Lean and mean
         bBuildDeveloperTools = true;
