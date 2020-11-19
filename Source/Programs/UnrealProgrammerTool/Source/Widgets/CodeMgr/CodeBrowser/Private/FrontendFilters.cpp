@@ -17,9 +17,9 @@
 #include "AssetRegistryModule.h"
 #include "SAssetView.h"
 #include "Modules/ModuleManager.h"
-#include "ContentBrowserModule.h"
+#include "CodeBrowserModule.h"
 #include "MRUFavoritesList.h"
-#include "Settings/ContentBrowserSettings.h"
+#include "Settings/CodeBrowserSettings.h"
 #include "HAL/FileManager.h"
 
 /** Helper functions for frontend filters */
@@ -33,10 +33,10 @@ namespace FrontendFilterHelper
 	 */
 	void GetDependencies(const FARFilter& InAssetRegistryFilter, const IAssetRegistry& AssetRegistry, TSet<FName>& OutDependencySet)
 	{
-		TArray<FAssetData> FoundAssets;
+		TArray<FFileData> FoundAssets;
 		AssetRegistry.GetAssets(InAssetRegistryFilter, FoundAssets);
 
-		for (const FAssetData& AssetData : FoundAssets)
+		for (const FFileData& AssetData : FoundAssets)
 		{
 			// Store all the dependencies of all the levels
 			TArray<FAssetIdentifier> AssetDependencies;
@@ -64,7 +64,7 @@ public:
 	}
 
 	/** Get the source tag for the given asset data and alias, or none if there is no match */
-	FName GetSourceTagFromAlias(const FAssetData& InAssetData, const FName InAlias)
+	FName GetSourceTagFromAlias(const FFileData& InAssetData, const FName InAlias)
 	{
 		TSharedPtr<TMap<FName, FName>>& AliasToSourceTagMapping = ClassToAliasTagsMapping.FindOrAdd(InAssetData.AssetClass);
 
@@ -921,7 +921,7 @@ bool FFrontendFilter_ReplicatedBlueprint::PassesFilter(FAssetFilterType InItem) 
 // FFrontendFilter_ArbitraryComparisonOperation
 /////////////////////////////////////////
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 FFrontendFilter_ArbitraryComparisonOperation::FFrontendFilter_ArbitraryComparisonOperation(TSharedPtr<FFrontendFilterCategory> InCategory)
 	: FFrontendFilter(InCategory)
@@ -1340,12 +1340,12 @@ FFrontendFilter_Recent::FFrontendFilter_Recent(TSharedPtr<FFrontendFilterCategor
 	: FFrontendFilter(InCategory)
 	, bIsCurrentlyActive(false)
 {
-	UContentBrowserSettings::OnSettingChanged().AddRaw(this, &FFrontendFilter_Recent::ResetFilter);
+	UCodeBrowserSettings::OnSettingChanged().AddRaw(this, &FFrontendFilter_Recent::ResetFilter);
 }
 
 FFrontendFilter_Recent::~FFrontendFilter_Recent()
 {
-	UContentBrowserSettings::OnSettingChanged().RemoveAll(this);
+	UCodeBrowserSettings::OnSettingChanged().RemoveAll(this);
 }
 
 void FFrontendFilter_Recent::ActiveStateChanged(bool bActive)
@@ -1365,10 +1365,10 @@ void FFrontendFilter_Recent::SetCurrentFilter(const FARFilter& InBaseFilter)
 
 void FFrontendFilter_Recent::RefreshRecentPackagePaths()
 {
-	static const FName ContentBrowserName(TEXT("ContentBrowser"));
+	static const FName CodeBrowserName(TEXT("CodeBrowser"));
 
 	RecentPackagePaths.Reset();
-	FContentBrowserModule& CBModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>(ContentBrowserName);
+	FCodeBrowserModule& CBModule = FModuleManager::LoadModuleChecked<FCodeBrowserModule>(CodeBrowserName);
 	FMainMRUFavoritesList* RecentlyOpenedAssets = CBModule.GetRecentlyOpenedAssets();
 	if (RecentlyOpenedAssets)
 	{
@@ -1382,7 +1382,7 @@ void FFrontendFilter_Recent::RefreshRecentPackagePaths()
 
 void FFrontendFilter_Recent::ResetFilter(FName InName)
 {
-	if (InName == FContentBrowserModule::NumberOfRecentAssetsName)
+	if (InName == FCodeBrowserModule::NumberOfRecentAssetsName)
 	{
 		BroadcastChangedEvent();
 	}

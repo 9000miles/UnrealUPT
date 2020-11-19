@@ -2,8 +2,8 @@
 
 #include "EmptyFolderVisibilityManager.h"
 #include "AssetRegistryModule.h"
-#include "ContentBrowserUtils.h"
-#include "Settings/ContentBrowserSettings.h"
+#include "CodeBrowserUtils.h"
+#include "Settings/CodeBrowserSettings.h"
 #include "Misc/Paths.h"
 
 FEmptyFolderVisibilityManager::FEmptyFolderVisibilityManager()
@@ -18,7 +18,7 @@ FEmptyFolderVisibilityManager::FEmptyFolderVisibilityManager()
 	AssetRegistryModule.Get().GetAllCachedPaths(PathList);
 	for (const FString& Path : PathList)
 	{
-		const bool bPathIsEmpty = ContentBrowserUtils::IsEmptyFolder(Path, true);
+		const bool bPathIsEmpty = CodeBrowserUtils::IsEmptyFolder(Path, true);
 		if (!bPathIsEmpty)
 		{
 			PathsToAlwaysShow.Add(Path);
@@ -39,13 +39,13 @@ FEmptyFolderVisibilityManager::~FEmptyFolderVisibilityManager()
 
 bool FEmptyFolderVisibilityManager::ShouldShowPath(const FString& InPath) const
 {
-	const bool bDisplayEmpty = GetDefault<UContentBrowserSettings>()->DisplayEmptyFolders;
+	const bool bDisplayEmpty = GetDefault<UCodeBrowserSettings>()->DisplayEmptyFolders;
 	if (bDisplayEmpty)
 	{
 		return true;
 	}
 
-	const bool bPathIsEmpty = ContentBrowserUtils::IsEmptyFolder(InPath, true);
+	const bool bPathIsEmpty = CodeBrowserUtils::IsEmptyFolder(InPath, true);
 	return !bPathIsEmpty || PathsToAlwaysShow.Contains(InPath);
 }
 
@@ -79,7 +79,7 @@ void FEmptyFolderVisibilityManager::OnAssetRegistryPathRemoved(const FString& In
 	PathsToAlwaysShow.Remove(InPath);
 }
 
-void FEmptyFolderVisibilityManager::OnAssetRegistryAssetAdded(const FAssetData& InAssetData)
+void FEmptyFolderVisibilityManager::OnAssetRegistryAssetAdded(const FFileData& InAssetData)
 {
 	SetAlwaysShowPath(InAssetData.PackagePath.ToString());
 }

@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Input/Reply.h"
 #include "Widgets/SWidget.h"
-#include "AssetData.h"
-#include "ContentBrowserDelegates.h"
+#include "FileData.h"
+#include "CodeBrowserDelegates.h"
 #include "SourcesData.h"
 
 class FMenuBuilder;
@@ -24,16 +24,16 @@ public:
 	void BindCommands(TSharedPtr< FUICommandList >& Commands);
 
 	/** Makes the context menu widget */
-	TSharedRef<SWidget> MakeContextMenu(const TArray<FAssetData>& SelectedAssets, const FSourcesData& InSourcesData, TSharedPtr< FUICommandList > InCommandList);
+	TSharedRef<SWidget> MakeContextMenu(const TArray<FFileData>& SelectedAssets, const FSourcesData& InSourcesData, TSharedPtr< FUICommandList > InCommandList);
 
 	/** Updates the list of currently selected assets to those passed in */
-	void SetSelectedAssets(const TArray<FAssetData>& InSelectedAssets);
+	void SetSelectedAssets(const TArray<FFileData>& InSelectedAssets);
 
 	/** Delegate for when the context menu requests a rename */
 	void SetOnFindInAssetTreeRequested(const FOnFindInAssetTreeRequested& InOnFindInAssetTreeRequested);
 
 	/** Delegate for when the context menu requests a rename */
-	DECLARE_DELEGATE_OneParam(FOnRenameRequested, const FAssetData& /*AssetToRename*/);
+	DECLARE_DELEGATE_OneParam(FOnRenameRequested, const FFileData& /*AssetToRename*/);
 	void SetOnRenameRequested(const FOnRenameRequested& InOnRenameRequested);
 
 	/** Delegate for when the context menu requests a rename of a folder */
@@ -389,7 +389,7 @@ private:
 	/** Generates a list of selected assets in the content browser */
 	void GetSelectedAssets(TArray<UObject*>& Assets, bool SkipRedirectors) const;
 
-	TArray<FAssetData> SelectedAssets;
+	TArray<FFileData> SelectedAssets;
 	FSourcesData SourcesData;
 
 	/** The asset view this context menu is a part of */

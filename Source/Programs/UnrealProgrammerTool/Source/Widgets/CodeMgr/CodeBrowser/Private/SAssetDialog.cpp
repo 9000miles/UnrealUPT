@@ -14,11 +14,11 @@
 #include "Widgets/Layout/SSplitter.h"
 #include "EditorStyleSet.h"
 #include "AssetRegistryModule.h"
-#include "ContentBrowserSingleton.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserSingleton.h"
+#include "CodeBrowserUtils.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "ContentBrowserCommands.h"
+#include "CodeBrowserCommands.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "SPathPicker.h"
 #include "SAssetPicker.h"
@@ -36,7 +36,7 @@
 #include "SourceCodeNavigation.h"
 #include "Editor.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 SAssetDialog::SAssetDialog()
 	: DialogType(EAssetDialogType::Open)
@@ -120,10 +120,10 @@ void SAssetDialog::Construct(const FArguments& InArgs, const FSharedAssetDialogC
 		ensureMsgf(0, TEXT("AssetDialog type %d is not supported."), DialogType);
 	}
 
-	PathPicker = StaticCastSharedRef<SPathPicker>(FContentBrowserSingleton::Get().CreatePathPicker(PathPickerConfig));
-	AssetPicker = StaticCastSharedRef<SAssetPicker>(FContentBrowserSingleton::Get().CreateAssetPicker(AssetPickerConfig));
+	PathPicker = StaticCastSharedRef<SPathPicker>(FCodeBrowserSingleton::Get().CreatePathPicker(PathPickerConfig));
+	AssetPicker = StaticCastSharedRef<SAssetPicker>(FCodeBrowserSingleton::Get().CreateAssetPicker(AssetPickerConfig));
 
-	FContentBrowserCommands::Register();
+	FCodeBrowserCommands::Register();
 	BindCommands();
 
 	// The root widget in this dialog.
@@ -305,7 +305,7 @@ void SAssetDialog::BindCommands()
 		FCanExecuteAction::CreateSP(this, &SAssetDialog::CanExecuteDelete)
 	));
 
-	Commands->MapAction(FContentBrowserCommands::Get().CreateNewFolder, FUIAction(
+	Commands->MapAction(FCodeBrowserCommands::Get().CreateNewFolder, FUIAction(
 		FExecuteAction::CreateSP(this, &SAssetDialog::ExecuteCreateNewFolder),
 		FCanExecuteAction::CreateSP(this, &SAssetDialog::CanExecuteCreateNewFolder)
 	));
@@ -315,8 +315,8 @@ bool SAssetDialog::CanExecuteRename() const
 {
 	switch (OpenedContextMenuWidget)
 	{
-		case EOpenedContextMenuWidget::AssetView: return ContentBrowserUtils::CanRenameFromAssetView(AssetPicker->GetAssetView());
-		case EOpenedContextMenuWidget::PathView: return ContentBrowserUtils::CanRenameFromPathView(PathPicker->GetPaths());
+		case EOpenedContextMenuWidget::AssetView: return CodeBrowserUtils::CanRenameFromAssetView(AssetPicker->GetAssetView());
+		case EOpenedContextMenuWidget::PathView: return CodeBrowserUtils::CanRenameFromPathView(PathPicker->GetPaths());
 	}
 
 	return false;
@@ -324,7 +324,7 @@ bool SAssetDialog::CanExecuteRename() const
 
 void SAssetDialog::ExecuteRename()
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetPicker->GetAssetView()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetPicker->GetAssetView()->GetSelectedAssets();
 	TArray< FString > SelectedFolders = AssetPicker->GetAssetView()->GetSelectedFolders();
 
 	if (SelectedFolders.Num() > 0 || AssetViewSelectedAssets.Num() > 0)
@@ -357,8 +357,8 @@ bool SAssetDialog::CanExecuteDelete() const
 {
 	switch (OpenedContextMenuWidget)
 	{
-		case EOpenedContextMenuWidget::AssetView: return ContentBrowserUtils::CanDeleteFromAssetView(AssetPicker->GetAssetView());
-		case EOpenedContextMenuWidget::PathView: return ContentBrowserUtils::CanDeleteFromPathView(PathPicker->GetPaths());
+		case EOpenedContextMenuWidget::AssetView: return CodeBrowserUtils::CanDeleteFromAssetView(AssetPicker->GetAssetView());
+		case EOpenedContextMenuWidget::PathView: return CodeBrowserUtils::CanDeleteFromPathView(PathPicker->GetPaths());
 	}
 
 	return false;
@@ -381,7 +381,7 @@ void SAssetDialog::ExecuteDelete()
 	}
 
 	TArray<FString> SelectedFolders = AssetPicker->GetAssetView()->GetSelectedFolders();
-	TArray<FAssetData> SelectedAssets = AssetPicker->GetAssetView()->GetSelectedAssets();
+	TArray<FFileData> SelectedAssets = AssetPicker->GetAssetView()->GetSelectedAssets();
 
 	if (SelectedFolders.Num() == 0)
 	{
@@ -390,7 +390,7 @@ void SAssetDialog::ExecuteDelete()
 
 	if (SelectedAssets.Num() > 0 && OpenedContextMenuWidget == EOpenedContextMenuWidget::AssetView)
 	{
-		TArray<FAssetData> AssetsToDelete;
+		TArray<FFileData> AssetsToDelete;
 		AssetsToDelete.Reserve(SelectedAssets.Num());
 
 		for (auto AssetData : SelectedAssets)
@@ -422,7 +422,7 @@ void SAssetDialog::ExecuteDelete()
 
 		// Spawn a confirmation dialog since this is potentially a highly destructive operation
 		FOnClicked OnYesClicked = FOnClicked::CreateSP(this, &SAssetDialog::ExecuteDeleteFolderConfirmed);
-		ContentBrowserUtils::DisplayConfirmationPopup(Prompt, LOCTEXT("FolderDeleteConfirm_Yes", "Delete"), LOCTEXT("FolderDeleteConfirm_No", "Cancel"), AssetPicker->GetAssetView().ToSharedRef(), OnYesClicked);
+		CodeBrowserUtils::DisplayConfirmationPopup(Prompt, LOCTEXT("FolderDeleteConfirm_Yes", "Delete"), LOCTEXT("FolderDeleteConfirm_No", "Cancel"), AssetPicker->GetAssetView().ToSharedRef(), OnYesClicked);
 	}
 }
 
@@ -432,7 +432,7 @@ FReply SAssetDialog::ExecuteDeleteFolderConfirmed()
 
 	if (SelectedFolders.Num() > 0)
 	{
-		ContentBrowserUtils::DeleteFolders(SelectedFolders);
+		CodeBrowserUtils::DeleteFolders(SelectedFolders);
 	}
 	else
 	{
@@ -440,7 +440,7 @@ FReply SAssetDialog::ExecuteDeleteFolderConfirmed()
 
 		if (SelectedPaths.Num() > 0)
 		{
-			if (ContentBrowserUtils::DeleteFolders(SelectedPaths))
+			if (CodeBrowserUtils::DeleteFolders(SelectedPaths))
 			{
 				// Since the contents of the asset view have just been deleted, set the selected path to the default "/Game"
 				TArray<FString> DefaultSelectedPaths;
@@ -459,7 +459,7 @@ FReply SAssetDialog::ExecuteDeleteFolderConfirmed()
 void SAssetDialog::ExecuteExplore()
 {
 	TArray<FString> SelectedFolders = AssetPicker->GetAssetView()->GetSelectedFolders();
-	TArray<FAssetData> SelectedAssets = AssetPicker->GetAssetView()->GetSelectedAssets();
+	TArray<FFileData> SelectedAssets = AssetPicker->GetAssetView()->GetSelectedAssets();
 
 	if (SelectedFolders.Num() == 0 && SelectedAssets.Num() == 0)
 	{
@@ -475,9 +475,9 @@ void SAssetDialog::ExecuteExplore()
 			const FString& Path = SelectedFolders[PathIdx];
 
 			FString FilePath;
-			if (ContentBrowserUtils::IsClassPath(Path))
+			if (CodeBrowserUtils::IsClassPath(Path))
 			{
-				TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+				TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 				if (NativeClassHierarchy->GetFileSystemPath(Path, FilePath))
 				{
 					FilePath = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*FilePath);
@@ -507,7 +507,7 @@ void SAssetDialog::ExecuteExplore()
 			const UObject* Asset = SelectedAssets[AssetIdx].GetAsset();
 			if (Asset)
 			{
-				FAssetData AssetData(Asset);
+				FFileData AssetData(Asset);
 				const FString PackageName = AssetData.PackageName.ToString();
 				static const TCHAR* ScriptString = TEXT("/Script/");
 
@@ -547,7 +547,7 @@ void SAssetDialog::ExecuteExplore()
 bool SAssetDialog::CanExecuteCreateNewFolder() const
 {	
 	// We can only create folders when we have a single path selected
-	return ContentBrowserUtils::IsValidPathToCreateNewFolder(CurrentlySelectedPath);
+	return CodeBrowserUtils::IsValidPathToCreateNewFolder(CurrentlySelectedPath);
 }
 
 void SAssetDialog::ExecuteCreateNewFolder()
@@ -555,7 +555,7 @@ void SAssetDialog::ExecuteCreateNewFolder()
 	PathPicker->CreateNewFolder(CurrentlySelectedPath, CurrentContextMenuCreateNewFolderDelegate);
 }
 
-TSharedPtr<SWidget> SAssetDialog::OnGetFolderContextMenu(const TArray<FString>& SelectedPaths, FContentBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder)
+TSharedPtr<SWidget> SAssetDialog::OnGetFolderContextMenu(const TArray<FString>& SelectedPaths, FCodeBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder)
 {
 	if (FSlateApplication::Get().HasFocusedDescendants(PathPicker.ToSharedRef()))
 	{
@@ -585,7 +585,7 @@ TSharedPtr<SWidget> SAssetDialog::OnGetFolderContextMenu(const TArray<FString>& 
 	return MenuBuilder.MakeWidget();
 }
 
-TSharedPtr<SWidget> SAssetDialog::OnGetAssetContextMenu(const TArray<FAssetData>& SelectedAssets)
+TSharedPtr<SWidget> SAssetDialog::OnGetAssetContextMenu(const TArray<FFileData>& SelectedAssets)
 {
 	OpenedContextMenuWidget = EOpenedContextMenuWidget::AssetView;
 
@@ -621,17 +621,17 @@ void SAssetDialog::SetupContextMenuContent(FMenuBuilder& MenuBuilder, const TArr
 
 	MenuBuilder.BeginSection("AssetDialogOptions", LOCTEXT("AssetDialogMenuHeading", "Options"));
 
-	MenuBuilder.AddMenuEntry(FContentBrowserCommands::Get().CreateNewFolder, NAME_None, LOCTEXT("NewFolder", "New Folder"), NewFolderToolTip, FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"));
-	MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("RenameFolder", "Rename"), LOCTEXT("RenameFolderTooltip", "Rename the selected folder."), FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Rename"));
+	MenuBuilder.AddMenuEntry(FCodeBrowserCommands::Get().CreateNewFolder, NAME_None, LOCTEXT("NewFolder", "New Folder"), NewFolderToolTip, FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"));
+	MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("RenameFolder", "Rename"), LOCTEXT("RenameFolderTooltip", "Rename the selected folder."), FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Rename"));
 	MenuBuilder.AddMenuEntry(FGenericCommands::Get().Delete, NAME_None, LOCTEXT("DeleteFolder", "Delete"), LOCTEXT("DeleteFolderTooltip", "Removes this folder and all assets it contains."));
 
 	MenuBuilder.EndSection();
 
 	MenuBuilder.BeginSection("AssetDialogExplore", LOCTEXT("AssetDialogExploreHeading", "Explore"));
 
-	MenuBuilder.AddMenuEntry(ContentBrowserUtils::GetExploreFolderText(), 
+	MenuBuilder.AddMenuEntry(CodeBrowserUtils::GetExploreFolderText(), 
 							 LOCTEXT("ExploreTooltip", "Finds this folder on disk."), 
-							 FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInContentBrowser"), 
+							 FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInCodeBrowser"), 
 							 FUIAction(FExecuteAction::CreateSP(this, &SAssetDialog::ExecuteExplore)));
 
 	MenuBuilder.EndSection();
@@ -744,7 +744,7 @@ FReply SAssetDialog::OnConfirmClicked()
 {
 	if ( DialogType == EAssetDialogType::Open )
 	{
-		TArray<FAssetData> SelectedAssets = GetCurrentSelectionDelegate.Execute();
+		TArray<FFileData> SelectedAssets = GetCurrentSelectionDelegate.Execute();
 		if (SelectedAssets.Num() > 0)
 		{
 			ChooseAssetsForOpen(SelectedAssets);
@@ -770,7 +770,7 @@ FReply SAssetDialog::OnCancelClicked()
 	return FReply::Handled();
 }
 
-void SAssetDialog::OnAssetSelected(const FAssetData& AssetData)
+void SAssetDialog::OnAssetSelected(const FFileData& AssetData)
 {
 	CurrentlySelectedAssets = GetCurrentSelectionDelegate.Execute();
 	
@@ -781,7 +781,7 @@ void SAssetDialog::OnAssetSelected(const FAssetData& AssetData)
 	}
 }
 
-void SAssetDialog::OnAssetsActivated(const TArray<FAssetData>& SelectedAssets, EAssetTypeActivationMethod::Type ActivationType)
+void SAssetDialog::OnAssetsActivated(const TArray<FFileData>& SelectedAssets, EAssetTypeActivationMethod::Type ActivationType)
 {
 	const bool bCorrectActivationMethod = (ActivationType == EAssetTypeActivationMethod::DoubleClicked || ActivationType == EAssetTypeActivationMethod::Opened);
 	if (SelectedAssets.Num() > 0 && bCorrectActivationMethod)
@@ -792,7 +792,7 @@ void SAssetDialog::OnAssetsActivated(const TArray<FAssetData>& SelectedAssets, E
 		}
 		else if ( DialogType == EAssetDialogType::Save )
 		{
-			const FAssetData& AssetData = SelectedAssets[0];
+			const FFileData& AssetData = SelectedAssets[0];
 			SetCurrentlySelectedPath(AssetData.PackagePath.ToString());
 			SetCurrentlyEnteredAssetName(AssetData.AssetName.ToString());
 			CommitObjectPathForSave();
@@ -853,7 +853,7 @@ void SAssetDialog::UpdateInputValidity()
 			const FString ObjectPath = GetObjectPathForSave();
 			FText ErrorMessage;
 			const bool bAllowExistingAsset = (ExistingAssetPolicy == ESaveAssetDialogExistingAssetPolicy::AllowButWarn);
-			if ( !ContentBrowserUtils::IsValidObjectPathForCreate(ObjectPath, ErrorMessage, bAllowExistingAsset) )
+			if ( !CodeBrowserUtils::IsValidObjectPathForCreate(ObjectPath, ErrorMessage, bAllowExistingAsset) )
 			{
 				LastInputValidityErrorText = ErrorMessage;
 				bLastInputValidityCheckSuccessful = false;
@@ -862,7 +862,7 @@ void SAssetDialog::UpdateInputValidity()
 	}
 }
 
-void SAssetDialog::ChooseAssetsForOpen(const TArray<FAssetData>& SelectedAssets)
+void SAssetDialog::ChooseAssetsForOpen(const TArray<FFileData>& SelectedAssets)
 {
 	if ( ensure(DialogType == EAssetDialogType::Open) )
 	{
@@ -894,7 +894,7 @@ void SAssetDialog::CommitObjectPathForSave()
 			if ( ExistingAssetPolicy == ESaveAssetDialogExistingAssetPolicy::AllowButWarn )
 			{
 				FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-				FAssetData ExistingAsset = AssetRegistryModule.Get().GetAssetByObjectPath(FName(*ObjectPath));
+				FFileData ExistingAsset = AssetRegistryModule.Get().GetAssetByObjectPath(FName(*ObjectPath));
 				if ( ExistingAsset.IsValid() && AssetClassNames.Contains(ExistingAsset.AssetClass) )
 				{
 					EAppReturnType::Type ShouldReplace = FMessageDialog::Open( EAppMsgType::YesNo, FText::Format(LOCTEXT("ReplaceAssetMessage", "{0} already exists. Do you want to replace it?"), FText::FromString(CurrentlyEnteredAssetName)) );

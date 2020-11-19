@@ -10,9 +10,9 @@
 #include "EditorStyleSet.h"
 
 #include "DragAndDrop/AssetDragDropOp.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserUtils.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 bool DragDropHandler::ValidateDragDropOnAssetFolder(const FGeometry& MyGeometry, const FDragDropEvent& DragDropEvent, const FString& TargetPath, bool& OutIsKnownDragOperation)
 {
@@ -27,21 +27,21 @@ bool DragDropHandler::ValidateDragDropOnAssetFolder(const FGeometry& MyGeometry,
 	bool bIsValidDrag = false;
 	TOptional<EMouseCursor::Type> NewDragCursor;
 
-	const bool bIsAssetPath = !ContentBrowserUtils::IsClassPath(TargetPath);
+	const bool bIsAssetPath = !CodeBrowserUtils::IsClassPath(TargetPath);
 
 	if (Operation->IsOfType<FAssetDragDropOp>())
 	{
 		TSharedPtr<FAssetDragDropOp> DragDropOp = StaticCastSharedPtr<FAssetDragDropOp>(Operation);
-		const TArray<FAssetData>& DroppedAssets = DragDropOp->GetAssets();
+		const TArray<FFileData>& DroppedAssets = DragDropOp->GetAssets();
 		const TArray<FString>& DroppedAssetPaths = DragDropOp->GetAssetPaths();
 
 		OutIsKnownDragOperation = true;
 
 		int32 NumAssetItems, NumClassItems;
-		ContentBrowserUtils::CountItemTypes(DroppedAssets, NumAssetItems, NumClassItems);
+		CodeBrowserUtils::CountItemTypes(DroppedAssets, NumAssetItems, NumClassItems);
 
 		int32 NumAssetPaths, NumClassPaths;
-		ContentBrowserUtils::CountPathTypes(DroppedAssetPaths, NumAssetPaths, NumClassPaths);
+		CodeBrowserUtils::CountPathTypes(DroppedAssetPaths, NumAssetPaths, NumClassPaths);
 
 		if (DroppedAssetPaths.Num() == 1 && DroppedAssetPaths[0] == TargetPath)
 		{
@@ -97,11 +97,11 @@ bool DragDropHandler::ValidateDragDropOnAssetFolder(const FGeometry& MyGeometry,
 	return bIsValidDrag;
 }
 
-void DragDropHandler::HandleDropOnAssetFolder(const TSharedRef<SWidget>& ParentWidget, const TArray<FAssetData>& AssetList, const TArray<FString>& AssetPaths, const FString& TargetPath, const FText& TargetDisplayName, FExecuteCopyOrMove CopyActionHandler, FExecuteCopyOrMove MoveActionHandler, FExecuteCopyOrMove AdvancedCopyActionHandler)
+void DragDropHandler::HandleDropOnAssetFolder(const TSharedRef<SWidget>& ParentWidget, const TArray<FFileData>& AssetList, const TArray<FString>& AssetPaths, const FString& TargetPath, const FText& TargetDisplayName, FExecuteCopyOrMove CopyActionHandler, FExecuteCopyOrMove MoveActionHandler, FExecuteCopyOrMove AdvancedCopyActionHandler)
 {
 	// Remove any classes from the asset list
-	TArray<FAssetData> FinalAssetList = AssetList;
-	FinalAssetList.RemoveAll([](const FAssetData& AssetData)
+	TArray<FFileData> FinalAssetList = AssetList;
+	FinalAssetList.RemoveAll([](const FFileData& AssetData)
 	{
 		return AssetData.AssetClass == NAME_Class;
 	});
@@ -110,7 +110,7 @@ void DragDropHandler::HandleDropOnAssetFolder(const TSharedRef<SWidget>& ParentW
 	TArray<FString> FinalAssetPaths = AssetPaths;
 	FinalAssetPaths.RemoveAll([](const FString& AssetPath)
 	{
-		return ContentBrowserUtils::IsClassPath(AssetPath);
+		return CodeBrowserUtils::IsClassPath(AssetPath);
 	});
 
 	FMenuBuilder MenuBuilder(/*bInShouldCloseWindowAfterMenuSelection=*/true, nullptr);

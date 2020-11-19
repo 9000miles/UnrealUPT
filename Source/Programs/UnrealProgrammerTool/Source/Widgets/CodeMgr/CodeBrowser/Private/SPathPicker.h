@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SCompoundWidget.h"
-#include "IContentBrowserSingleton.h"
+#include "ICodeBrowserSingleton.h"
 
 class SPathView;
 
@@ -40,7 +40,7 @@ public:
 private:
 
 	/** Handler for the context menu for folder items */
-	TSharedPtr<SWidget> GetFolderContextMenu(const TArray<FString>& SelectedPaths, FContentBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder);
+	TSharedPtr<SWidget> GetFolderContextMenu(const TArray<FString>& SelectedPaths, FCodeBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder);
 
 private:
 

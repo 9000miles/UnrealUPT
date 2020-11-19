@@ -31,7 +31,7 @@ private:
 	void OnAssetRegistryPathRemoved(const FString& InPath);
 
 	/** Handles updating the content browser when an asset is added to the asset registry */
-	void OnAssetRegistryAssetAdded(const FAssetData& InAssetData);
+	void OnAssetRegistryAssetAdded(const FFileData& InAssetData);
 
 	/** Set set of paths that should always be shown, even if they're currently empty */
 	TSet<FString> PathsToAlwaysShow;

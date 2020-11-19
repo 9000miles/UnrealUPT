@@ -3,10 +3,41 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ARFilter.h"
-#include "CollectionManagerTypes.h"
-#include "ICollectionManager.h"
-#include "CollectionManagerModule.h"
+//#include "ARFilter.h"
+//#include "CollectionManagerTypes.h"
+//#include "ICollectionManager.h"
+//#include "CollectionManagerModule.h"
+
+
+/** A name/type pair to uniquely identify a collection */
+struct FCollectionNameType
+{
+	FCollectionNameType(FName InName, ECollectionShareType::Type InType)
+		: Name(InName)
+		, Type(InType)
+	{}
+
+	bool operator==(const FCollectionNameType& Other) const
+	{
+		return Name == Other.Name && Type == Other.Type;
+	}
+
+	bool operator!=(const FCollectionNameType& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	friend inline uint32 GetTypeHash(const FCollectionNameType& Key)
+	{
+		uint32 Hash = 0;
+		Hash = HashCombine(Hash, GetTypeHash(Key.Name));
+		Hash = HashCombine(Hash, GetTypeHash(Key.Type));
+		return Hash;
+	}
+
+	FName Name;
+	ECollectionShareType::Type Type;
+};
 
 struct FSourcesData
 {

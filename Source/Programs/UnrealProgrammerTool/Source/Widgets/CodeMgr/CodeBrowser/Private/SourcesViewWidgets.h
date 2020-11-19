@@ -13,7 +13,7 @@
 #include "AssetData.h"
 #include "CollectionViewTypes.h"
 #include "Widgets/Input/SCheckBox.h"
-#include "Editor/ContentBrowser/Private/SPathView.h"
+#include "Editor/CodeBrowser/Private/SPathView.h"
 
 class SEditableTextBox;
 struct FTreeItem;
@@ -24,7 +24,7 @@ class SAssetTreeItem : public SCompoundWidget
 public:
 	DECLARE_DELEGATE_FourParams( FOnNameChanged, const TSharedPtr<FTreeItem>& /*TreeItem*/, const FString& /*OldPath*/, const FVector2D& /*MessageLocation*/, const ETextCommit::Type /*CommitType*/);
 	DECLARE_DELEGATE_RetVal_ThreeParams( bool, FOnVerifyNameChanged, const FString& /*InName*/, FText& /*OutErrorMessage*/, const FString& /*FolderPath*/);
-	DECLARE_DELEGATE_ThreeParams( FOnAssetsOrPathsDragDropped, const TArray<FAssetData>& /*AssetList*/, const TArray<FString>& /*AssetPaths*/, const TSharedPtr<FTreeItem>& /*TreeItem*/);
+	DECLARE_DELEGATE_ThreeParams( FOnAssetsOrPathsDragDropped, const TArray<FFileData>& /*AssetList*/, const TArray<FString>& /*AssetPaths*/, const TSharedPtr<FTreeItem>& /*TreeItem*/);
 	DECLARE_DELEGATE_TwoParams( FOnFilesDragDropped, const TArray<FString>& /*FileNames*/, const TSharedPtr<FTreeItem>& /*TreeItem*/);
 
 	SLATE_BEGIN_ARGS( SAssetTreeItem )

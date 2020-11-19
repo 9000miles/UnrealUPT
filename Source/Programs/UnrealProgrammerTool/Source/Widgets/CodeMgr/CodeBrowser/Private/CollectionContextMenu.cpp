@@ -14,14 +14,14 @@
 #include "ISourceControlModule.h"
 #include "ICollectionManager.h"
 #include "CollectionManagerModule.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserUtils.h"
 #include "CollectionViewUtils.h"
-#include "ContentBrowserModule.h"
+#include "CodeBrowserModule.h"
 #include "Widgets/Colors/SColorPicker.h"
 #include "Framework/Commands/GenericCommands.h"
-#include "Settings/ContentBrowserSettings.h"
+#include "Settings/CodeBrowserSettings.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 
 FCollectionContextMenu::FCollectionContextMenu(const TWeakPtr<SCollectionView>& InCollectionView)
@@ -41,8 +41,8 @@ void FCollectionContextMenu::BindCommands(TSharedPtr< FUICommandList > InCommand
 TSharedPtr<SWidget> FCollectionContextMenu::MakeCollectionTreeContextMenu(TSharedPtr< FUICommandList > InCommandList)
 {
 	// Get all menu extenders for this context menu from the content browser module
-	FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>( TEXT("ContentBrowser") );
-	TArray<FContentBrowserMenuExtender> MenuExtenderDelegates = ContentBrowserModule.GetAllCollectionListContextMenuExtenders();
+	FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>( TEXT("CodeBrowser") );
+	TArray<FCodeBrowserMenuExtender> MenuExtenderDelegates = CodeBrowserModule.GetAllCollectionListContextMenuExtenders();
 
 	TArray<TSharedPtr<FExtender>> Extenders;
 	for (int32 i = 0; i < MenuExtenderDelegates.Num(); ++i)
@@ -423,10 +423,10 @@ void FCollectionContextMenu::ExecuteNewCollection(ECollectionShareType::Type Col
 		return;
 	}
 
-	if (!GetDefault<UContentBrowserSettings>()->GetDisplayCollections())
+	if (!GetDefault<UCodeBrowserSettings>()->GetDisplayCollections())
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayCollections(true);
-		GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayCollections(true);
+		GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 	}
 
 	CollectionView.Pin()->CreateCollectionItem(CollectionType, StorageMode, InCreationPayload);
@@ -455,10 +455,10 @@ void FCollectionContextMenu::ExecuteSaveDynamicCollection(FCollectionNameType In
 {
 	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
 
-	if (!GetDefault<UContentBrowserSettings>()->GetDisplayCollections())
+	if (!GetDefault<UCodeBrowserSettings>()->GetDisplayCollections())
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayCollections(true);
-		GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayCollections(true);
+		GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 	}
 
 	CollectionManagerModule.Get().SetDynamicQueryText(InCollection.Name, InCollection.Type, InSearchQuery.ToString());
@@ -562,7 +562,7 @@ void FCollectionContextMenu::ExecuteDestroyCollection()
 	}
 
 	FOnClicked OnYesClicked = FOnClicked::CreateSP( this, &FCollectionContextMenu::ExecuteDestroyCollectionConfirmed, SelectedCollections );
-	ContentBrowserUtils::DisplayConfirmationPopup(
+	CodeBrowserUtils::DisplayConfirmationPopup(
 		Prompt,
 		LOCTEXT("CollectionDestroyConfirm_Yes", "Delete"),
 		LOCTEXT("CollectionDestroyConfirm_No", "Cancel"),

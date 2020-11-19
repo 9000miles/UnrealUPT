@@ -14,7 +14,7 @@
 #include "Widgets/Views/STableRow.h"
 #include "Widgets/Views/STreeView.h"
 #include "Misc/TextFilter.h"
-#include "Editor/ContentBrowser/Private/CollectionViewTypes.h"
+#include "CodeBrowser/Private/CollectionViewTypes.h"
 
 class FCollectionAssetManagement;
 class FCollectionContextMenu;
@@ -73,7 +73,7 @@ public:
 	TArray<FCollectionNameType> GetSelectedCollections() const;
 
 	/** Let the collections view know that the list of selected assets has changed, so that it can update the quick asset management check boxes */
-	void SetSelectedAssets(const TArray<FAssetData>& SelectedAssets);
+	void SetSelectedAssets(const TArray<FFileData>& SelectedAssets);
 
 	/** Sets the state of the collection view to the one described by the history data */
 	void ApplyHistoryData ( const FHistoryData& History );

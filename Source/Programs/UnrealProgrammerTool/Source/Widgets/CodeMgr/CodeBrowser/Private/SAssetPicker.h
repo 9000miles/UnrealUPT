@@ -9,8 +9,8 @@
 #include "Widgets/SCompoundWidget.h"
 #include "AssetData.h"
 #include "ARFilter.h"
-#include "IContentBrowserSingleton.h"
-#include "Editor/ContentBrowser/Private/SourcesData.h"
+#include "ICodeBrowserSingleton.h"
+#include "Editor/CodeBrowser/Private/SourcesData.h"
 
 class FFrontendFilter_ShowOtherDevelopers;
 class FFrontendFilter_Text;
@@ -77,16 +77,16 @@ private:
 	FReply OnNoneButtonClicked();
 
 	/** Handle forwarding picking events. We wrap OnAssetSelected here to prevent 'Direct' selections being identified as user actions */
-	void HandleAssetSelectionChanged(const FAssetData& InAssetData, ESelectInfo::Type InSelectInfo);
+	void HandleAssetSelectionChanged(const FFileData& InAssetData, ESelectInfo::Type InSelectInfo);
 
 	/** Handler for when the user double clicks, presses enter, or presses space on an asset */
-	void HandleAssetsActivated(const TArray<FAssetData>& ActivatedAssets, EAssetTypeActivationMethod::Type ActivationMethod);
+	void HandleAssetsActivated(const TArray<FFileData>& ActivatedAssets, EAssetTypeActivationMethod::Type ActivationMethod);
 
 	/** Selects the paths containing the specified assets. */
-	void SyncToAssets(const TArray<FAssetData>& AssetDataList);
+	void SyncToAssets(const TArray<FFileData>& AssetDataList);
 
 	/** @return The currently selected asset */
-	TArray< FAssetData > GetCurrentSelection();
+	TArray< FFileData > GetCurrentSelection();
 
 	/** Forces a refresh */
 	void RefreshAssetView(bool bRefreshSources);

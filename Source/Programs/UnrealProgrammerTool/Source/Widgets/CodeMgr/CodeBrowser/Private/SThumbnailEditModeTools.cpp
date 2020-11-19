@@ -16,7 +16,7 @@
 #include "AssetToolsModule.h"
 #include "AssetThumbnail.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 //////////////////////////////////////////////
 // SThumbnailEditModeTools
@@ -71,7 +71,7 @@ void SThumbnailEditModeTools::Construct( const FArguments& InArgs, const TShared
 			.Content()
 			[
 				SNew(SImage)
-				.Image(FEditorStyle::GetBrush("ContentBrowser.ResetPrimitiveToDefault"))
+				.Image(FEditorStyle::GetBrush("CodeBrowser.ResetPrimitiveToDefault"))
 			]
 		]
 	];
@@ -105,10 +105,10 @@ const FSlateBrush* SThumbnailEditModeTools::GetCurrentPrimitiveBrush() const
 		EThumbnailPrimType PrimType = ThumbnailInfo->bUserModifiedShape ? ThumbnailInfo->PrimitiveType.GetValue() : GetDefaultThumbnailType();
 		switch (PrimType)
 		{
-		case TPT_None: return FEditorStyle::GetBrush("ContentBrowser.PrimitiveCustom");
-		case TPT_Sphere: return FEditorStyle::GetBrush("ContentBrowser.PrimitiveSphere");
-		case TPT_Cube: return FEditorStyle::GetBrush("ContentBrowser.PrimitiveCube");
-		case TPT_Cylinder: return FEditorStyle::GetBrush("ContentBrowser.PrimitiveCylinder");
+		case TPT_None: return FEditorStyle::GetBrush("CodeBrowser.PrimitiveCustom");
+		case TPT_Sphere: return FEditorStyle::GetBrush("CodeBrowser.PrimitiveSphere");
+		case TPT_Cube: return FEditorStyle::GetBrush("CodeBrowser.PrimitiveCube");
+		case TPT_Cylinder: return FEditorStyle::GetBrush("CodeBrowser.PrimitiveCylinder");
 		case TPT_Plane:
 		default:
 			// Fall through and return a plane
@@ -116,7 +116,7 @@ const FSlateBrush* SThumbnailEditModeTools::GetCurrentPrimitiveBrush() const
 		}
 	}
 
-	return FEditorStyle::GetBrush( "ContentBrowser.PrimitivePlane" );
+	return FEditorStyle::GetBrush( "CodeBrowser.PrimitivePlane" );
 }
 
 FReply SThumbnailEditModeTools::ChangePrimitive()
@@ -177,7 +177,7 @@ FReply SThumbnailEditModeTools::OnMouseButtonDown( const FGeometry& MyGeometry, 
 		)
 	{
 		// Load the asset, unless it is in an unloaded map package or already loaded
-		const FAssetData& AssetData = AssetThumbnail.Pin()->GetAssetData();
+		const FFileData& AssetData = AssetThumbnail.Pin()->GetAssetData();
 		
 		// Getting the asset loads it, if it isn't already.
 		UObject* Asset = AssetData.GetAsset();

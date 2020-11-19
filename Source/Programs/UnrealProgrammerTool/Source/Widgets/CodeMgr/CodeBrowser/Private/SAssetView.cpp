@@ -22,22 +22,22 @@
 #include "Widgets/Input/SSlider.h"
 #include "Framework/Docking/TabManager.h"
 #include "EditorStyleSet.h"
-#include "Settings/ContentBrowserSettings.h"
+#include "Settings/CodeBrowserSettings.h"
 #include "Engine/Blueprint.h"
 #include "Editor.h"
 #include "AssetSelection.h"
 #include "AssetRegistryModule.h"
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
-#include "ContentBrowserLog.h"
+#include "CodeBrowserLog.h"
 #include "FrontendFilterBase.h"
-#include "ContentBrowserSingleton.h"
+#include "CodeBrowserSingleton.h"
 #include "EditorWidgetsModule.h"
 #include "AssetViewTypes.h"
 #include "DragAndDrop/AssetDragDropOp.h"
 #include "DragDropHandler.h"
 #include "AssetViewWidgets.h"
-#include "ContentBrowserModule.h"
+#include "CodeBrowserModule.h"
 #include "ObjectTools.h"
 #include "NativeClassHierarchy.h"
 #include "EmptyFolderVisibilityManager.h"
@@ -51,7 +51,7 @@
 #include "AssetRegistryState.h"
 #include "Materials/Material.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 #define MAX_THUMBNAIL_SIZE 4096
 
 namespace
@@ -65,10 +65,10 @@ namespace
 
 namespace AssetViewUtils
 {
-	/** Higher performance version of FAssetData::IsUAsset()
+	/** Higher performance version of FFileData::IsUAsset()
 	 * Returns true if this is the primary asset in a package, true for maps and assets but false for secondary objects like class redirectors
 	 */
-	bool IsUAsset(const FAssetData& Item)
+	bool IsUAsset(const FFileData& Item)
 	{
 		TextFilterUtils::FNameBufferWithNumber AssetNameBuffer(Item.AssetName);
 		TextFilterUtils::FNameBufferWithNumber PackageNameBuffer(Item.PackageName);
@@ -146,7 +146,7 @@ namespace AssetViewUtils
 			}
 		}
 
-		FORCEINLINE bool PassesFilter(const FAssetData& Item) const
+		FORCEINLINE bool PassesFilter(const FFileData& Item) const
 		{
 			if (!PassesRedirectorMainAssetFilter(Item))
 			{
@@ -156,7 +156,7 @@ namespace AssetViewUtils
 			return PassesPackagePathFilter(Item.PackagePath);
 		}
 
-		FORCEINLINE bool PassesRedirectorMainAssetFilter(const FAssetData& Item) const
+		FORCEINLINE bool PassesRedirectorMainAssetFilter(const FFileData& Item) const
 		{
 			// Do not show redirectors if they are not the main asset in the uasset file.
 			if (Item.AssetClass == ObjectRedirectorClassName && !AssetViewUtils::IsUAsset(Item))
@@ -305,19 +305,19 @@ SAssetView::~SAssetView()
 
 	// Unsubscribe from folder population events
 	{
-		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 		EmptyFolderVisibilityManager->OnFolderPopulated().RemoveAll(this);
 	}
 
 	// Unsubscribe from class events
 	if ( bCanShowClasses )
 	{
-		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 		NativeClassHierarchy->OnClassHierarchyUpdated().RemoveAll( this );
 	}
 
 	// Remove the listener for when view settings are changed
-	UContentBrowserSettings::OnSettingChanged().RemoveAll(this);
+	UCodeBrowserSettings::OnSettingChanged().RemoveAll(this);
 
 	if ( FrontendFilters.IsValid() )
 	{
@@ -365,18 +365,18 @@ void SAssetView::Construct( const FArguments& InArgs )
 	// Listen to find out when the available classes are changed, so that we can refresh our paths
 	if ( bCanShowClasses )
 	{
-		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 		NativeClassHierarchy->OnClassHierarchyUpdated().AddSP( this, &SAssetView::OnClassHierarchyUpdated );
 	}
 
 	// Listen to find out when previously empty paths are populated with content
 	{
-		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 		EmptyFolderVisibilityManager->OnFolderPopulated().AddSP(this, &SAssetView::OnFolderPopulated);
 	}
 
 	// Listen for when view settings are changed
-	UContentBrowserSettings::OnSettingChanged().AddSP(this, &SAssetView::HandleSettingChanged);
+	UCodeBrowserSettings::OnSettingChanged().AddSP(this, &SAssetView::HandleSettingChanged);
 
 	// Get desktop metrics
 	FDisplayMetrics DisplayMetrics;
@@ -585,7 +585,7 @@ void SAssetView::Construct( const FArguments& InArgs )
 	[
 		SNew(SBorder)
 		.Visibility( this, &SAssetView::GetEditModeLabelVisibility )
-		.BorderImage( FEditorStyle::GetBrush("ContentBrowser.EditModeLabelBorder") )
+		.BorderImage( FEditorStyle::GetBrush("CodeBrowser.EditModeLabelBorder") )
 		.Content()
 		[
 			SNew( SHorizontalBox )
@@ -597,7 +597,7 @@ void SAssetView::Construct( const FArguments& InArgs )
 			[
 				SNew(STextBlock)
 				.Text(LOCTEXT("ThumbnailEditModeLabel", "Editing Thumbnails. Drag a thumbnail to rotate it if there is a 3D environment."))
-				.TextStyle( FEditorStyle::Get(), "ContentBrowser.EditModeLabelFont" )
+				.TextStyle( FEditorStyle::Get(), "CodeBrowser.EditModeLabelFont" )
 			]
 
 			+SHorizontalBox::Slot()
@@ -670,7 +670,7 @@ void SAssetView::Construct( const FArguments& InArgs )
 	{
 		// sync to the initial item without notifying of selection
 		bShouldNotifyNextAssetSync = false;
-		TArray<FAssetData> AssetsToSync;
+		TArray<FFileData> AssetsToSync;
 		AssetsToSync.Add( InArgs._InitialAssetSelection );
 		SyncToAssets( AssetsToSync );
 	}
@@ -712,7 +712,7 @@ const FSourcesData& SAssetView::GetSourcesData() const
 bool SAssetView::IsAssetPathSelected() const
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SourcesData.PackagePaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SourcesData.PackagePaths, NumAssetPaths, NumClassPaths);
 
 	// Check that only asset paths are selected
 	return NumAssetPaths > 0 && NumClassPaths == 0;
@@ -804,7 +804,7 @@ void SAssetView::DeferredCreateNewAsset()
 		FName AssetName = FName(*DeferredAssetToCreate->DefaultAssetName);
 		FName AssetClassName = DeferredAssetToCreate->AssetClass->GetFName();
 
-		FAssetData NewAssetData(PackageName, PackagePathFName, AssetName, AssetClassName);
+		FFileData NewAssetData(PackageName, PackagePathFName, AssetName, AssetClassName);
 		TSharedPtr<FAssetViewItem> NewItem = MakeShareable(new FAssetViewCreation(NewAssetData, DeferredAssetToCreate->AssetClass, DeferredAssetToCreate->Factory));
 
 		NewItem->bRenameWhenScrolledIntoview = true;
@@ -840,7 +840,7 @@ void SAssetView::DuplicateAsset(const FString& PackagePath, const TWeakObjectPtr
 	FName AssetName = FName(*AssetNameStr);
 	FName AssetClass = OriginalObject->GetClass()->GetFName();
 	
-	FAssetData NewAssetData(PackageName, PackagePathFName, AssetName, AssetClass);
+	FFileData NewAssetData(PackageName, PackagePathFName, AssetName, AssetClass);
 	TSharedPtr<FAssetViewItem> NewItem = MakeShareable(new FAssetViewDuplication(NewAssetData, OriginalObject));
 	NewItem->bRenameWhenScrolledIntoview = true;
 
@@ -852,7 +852,7 @@ void SAssetView::DuplicateAsset(const FString& PackagePath, const TWeakObjectPtr
 	RequestScrollIntoView(NewItem);
 }
 
-void SAssetView::RenameAsset(const FAssetData& ItemToRename)
+void SAssetView::RenameAsset(const FFileData& ItemToRename)
 {
 	for ( auto ItemIt = FilteredAssetItems.CreateConstIterator(); ItemIt; ++ItemIt )
 	{
@@ -892,10 +892,10 @@ void SAssetView::RenameFolder(const FString& FolderToRename)
 	}
 }
 
-void SAssetView::SyncToAssets( const TArray<FAssetData>& AssetDataList, const bool bFocusOnSync )
+void SAssetView::SyncToAssets( const TArray<FFileData>& AssetDataList, const bool bFocusOnSync )
 {
 	PendingSyncItems.Reset();
-	for (const FAssetData& AssetData : AssetDataList)
+	for (const FFileData& AssetData : AssetDataList)
 	{
 		PendingSyncItems.SelectedAssets.Add(AssetData.ObjectPath);
 	}
@@ -911,11 +911,11 @@ void SAssetView::SyncToFolders(const TArray<FString>& FolderList, const bool bFo
 	bPendingFocusOnSync = bFocusOnSync;
 }
 
-void SAssetView::SyncTo(const FContentBrowserSelection& ItemSelection, const bool bFocusOnSync)
+void SAssetView::SyncTo(const FCodeBrowserSelection& ItemSelection, const bool bFocusOnSync)
 {
 	PendingSyncItems.Reset();
 	PendingSyncItems.SelectedFolders = TSet<FString>(ItemSelection.SelectedFolders);
-	for (const FAssetData& AssetData : ItemSelection.SelectedAssets)
+	for (const FFileData& AssetData : ItemSelection.SelectedAssets)
 	{
 		PendingSyncItems.SelectedAssets.Add(AssetData.ObjectPath);
 	}
@@ -966,10 +966,10 @@ TArray<TSharedPtr<FAssetViewItem>> SAssetView::GetSelectedItems() const
 	}
 }
 
-TArray<FAssetData> SAssetView::GetSelectedAssets() const
+TArray<FFileData> SAssetView::GetSelectedAssets() const
 {
 	TArray<TSharedPtr<FAssetViewItem>> SelectedItems = GetSelectedItems();
-	TArray<FAssetData> SelectedAssets;
+	TArray<FFileData> SelectedAssets;
 	for ( auto ItemIt = SelectedItems.CreateConstIterator(); ItemIt; ++ItemIt )
 	{
 		const TSharedPtr<FAssetViewItem>& Item = *ItemIt;
@@ -1112,8 +1112,8 @@ void SAssetView::ProcessRecentlyLoadedOrChangedAssets()
 				
 			// Find the updated version of the asset data from the set
 			// This is the version of the data we should use to update our view
-			FAssetData RecentlyLoadedOrChangedAsset;
-			if (const FAssetData* RecentlyLoadedOrChangedAssetPtr = RecentlyLoadedOrChangedAssets.Find(ItemAsAsset->Data))
+			FFileData RecentlyLoadedOrChangedAsset;
+			if (const FFileData* RecentlyLoadedOrChangedAssetPtr = RecentlyLoadedOrChangedAssets.Find(ItemAsAsset->Data))
 			{
 				RecentlyLoadedOrChangedAsset = *RecentlyLoadedOrChangedAssetPtr;
 				RecentlyLoadedOrChangedAssets.Remove(ItemAsAsset->Data);
@@ -1431,7 +1431,7 @@ void SAssetView::ProcessQueriedItems( const double TickStartTime )
 
 			if ( !IsFrontendFilterActive() || PassesCurrentFrontendFilter(QueriedAssetItems[AssetIndex]))
 			{
-				const FAssetData& AssetData = QueriedAssetItems[AssetIndex];
+				const FFileData& AssetData = QueriedAssetItems[AssetIndex];
 				FilteredAssetItems.Add(MakeShareable(new FAssetViewAsset(AssetData)));
 				ListNeedsRefresh = true;
 				bPendingSortFilteredItems = true;
@@ -1474,8 +1474,8 @@ void SAssetView::OnDragLeave( const FDragDropEvent& DragDropEvent )
 	if (DragDropOp.IsValid())
 	{
 		// Do we have a custom handler for this drag event?
-		FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>("ContentBrowser");
-		const TArray<FAssetViewDragAndDropExtender>& AssetViewDragAndDropExtenders = ContentBrowserModule.GetAssetViewDragAndDropExtenders();
+		FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>("CodeBrowser");
+		const TArray<FAssetViewDragAndDropExtender>& AssetViewDragAndDropExtenders = CodeBrowserModule.GetAssetViewDragAndDropExtenders();
 		for (const auto& AssetViewDragAndDropExtender : AssetViewDragAndDropExtenders)
 		{
 			if (AssetViewDragAndDropExtender.OnDragLeaveDelegate.IsBound() && AssetViewDragAndDropExtender.OnDragLeaveDelegate.Execute(FAssetViewDragAndDropExtender::FPayload(DragDropOp, SourcesData.PackagePaths, SourcesData.Collections)))
@@ -1492,8 +1492,8 @@ FReply SAssetView::OnDragOver( const FGeometry& MyGeometry, const FDragDropEvent
 	if (DragDropOp.IsValid())
 	{
 		// Do we have a custom handler for this drag event?
-		FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>("ContentBrowser");
-		const TArray<FAssetViewDragAndDropExtender>& AssetViewDragAndDropExtenders = ContentBrowserModule.GetAssetViewDragAndDropExtenders();
+		FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>("CodeBrowser");
+		const TArray<FAssetViewDragAndDropExtender>& AssetViewDragAndDropExtenders = CodeBrowserModule.GetAssetViewDragAndDropExtenders();
 		for (const auto& AssetViewDragAndDropExtender : AssetViewDragAndDropExtenders)
 		{
 			if (AssetViewDragAndDropExtender.OnDragOverDelegate.IsBound() && AssetViewDragAndDropExtender.OnDragOverDelegate.Execute(FAssetViewDragAndDropExtender::FPayload(DragDropOp, SourcesData.PackagePaths, SourcesData.Collections)))
@@ -1514,7 +1514,7 @@ FReply SAssetView::OnDragOver( const FGeometry& MyGeometry, const FDragDropEvent
 	}
 	else if (HasSingleCollectionSource())
 	{
-		TArray< FAssetData > AssetDatas = AssetUtil::ExtractAssetDataFromDrag(DragDropEvent);
+		TArray< FFileData > AssetDatas = AssetUtil::ExtractAssetDataFromDrag(DragDropEvent);
 
 		if (AssetDatas.Num() > 0)
 		{
@@ -1560,8 +1560,8 @@ FReply SAssetView::OnDrop( const FGeometry& MyGeometry, const FDragDropEvent& Dr
 	if (DragDropOp.IsValid())
 	{
 		// Do we have a custom handler for this drag event?
-		FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>("ContentBrowser");
-		const TArray<FAssetViewDragAndDropExtender>& AssetViewDragAndDropExtenders = ContentBrowserModule.GetAssetViewDragAndDropExtenders();
+		FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>("CodeBrowser");
+		const TArray<FAssetViewDragAndDropExtender>& AssetViewDragAndDropExtenders = CodeBrowserModule.GetAssetViewDragAndDropExtenders();
 		for (const auto& AssetViewDragAndDropExtender : AssetViewDragAndDropExtenders)
 		{
 			if (AssetViewDragAndDropExtender.OnDropDelegate.IsBound() && AssetViewDragAndDropExtender.OnDropDelegate.Execute(FAssetViewDragAndDropExtender::FPayload(DragDropOp, SourcesData.PackagePaths, SourcesData.Collections)))
@@ -1593,7 +1593,7 @@ FReply SAssetView::OnDrop( const FGeometry& MyGeometry, const FDragDropEvent& Dr
 			TSharedPtr<FAssetDragDropOp> AssetDragDropOp = DragDropEvent.GetOperationAs<FAssetDragDropOp>();
 			if (AssetDragDropOp.IsValid())
 			{
-#pragma region // 屏蔽拖拽资源到ContentBrowser中
+#pragma region // 屏蔽拖拽资源到CodeBrowser中
 				if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == true)
 				{
 					return FReply::Handled();
@@ -1606,7 +1606,7 @@ FReply SAssetView::OnDrop( const FGeometry& MyGeometry, const FDragDropEvent& Dr
 	}
 	else if (HasSingleCollectionSource())
 	{
-		TArray<FAssetData> SelectedAssetDatas = AssetUtil::ExtractAssetDataFromDrag(DragDropEvent);
+		TArray<FFileData> SelectedAssetDatas = AssetUtil::ExtractAssetDataFromDrag(DragDropEvent);
 
 		if (SelectedAssetDatas.Num() > 0)
 		{
@@ -1714,7 +1714,7 @@ FReply SAssetView::OnKeyDown( const FGeometry& MyGeometry, const FKeyEvent& InKe
 
 			if (AssetsToCopy.Num())
 			{
-				ContentBrowserUtils::CopyAssets(AssetsToCopy, SourcesData.PackagePaths[0].ToString());
+				CodeBrowserUtils::CopyAssets(AssetsToCopy, SourcesData.PackagePaths[0].ToString());
 			}
 		}
 
@@ -1884,7 +1884,7 @@ void SAssetView::RefreshSourceItems()
 	RelevantThumbnails.Reset();
 	Folders.Reset();
 
-	TArray<FAssetData>& Items = OnShouldFilterAsset.IsBound() ? QueriedAssetItems : AssetItems;
+	TArray<FFileData>& Items = OnShouldFilterAsset.IsBound() ? QueriedAssetItems : AssetItems;
 
 	const bool bShowAll = SourcesData.IsEmpty() && BackendFilter.IsEmpty();
 
@@ -1906,7 +1906,7 @@ void SAssetView::RefreshSourceItems()
 				}
 
 				int32 Index = Items.Emplace(*ObjIt);
-				const FAssetData& AssetData = Items[Index];
+				const FFileData& AssetData = Items[Index];
 				if (!InitialAssetFilter.PassesRedirectorMainAssetFilter(AssetData))
 				{
 					Items.RemoveAtSwap(Index, 1, false);
@@ -1918,10 +1918,10 @@ void SAssetView::RefreshSourceItems()
 		}
 
 		// Include assets on disk
-		const TMap<FName, const FAssetData*>& AssetDataMap = AssetRegistryModule.Get().GetAssetRegistryState()->GetObjectPathToAssetDataMap();
-		for (const TPair<FName, const FAssetData*>& AssetDataPair : AssetDataMap)
+		const TMap<FName, const FFileData*>& AssetDataMap = AssetRegistryModule.Get().GetAssetRegistryState()->GetObjectPathToAssetDataMap();
+		for (const TPair<FName, const FFileData*>& AssetDataPair : AssetDataMap)
 		{
-			const FAssetData* AssetData = AssetDataPair.Value;
+			const FFileData* AssetData = AssetDataPair.Value;
 			if (AssetData == nullptr)
 			{
 				continue;
@@ -1961,7 +1961,7 @@ void SAssetView::RefreshSourceItems()
 		// Move any class paths into their own array
 		Filter.PackagePaths.RemoveAll([&ClassPathsToShow](const FName& PackagePath) -> bool
 		{
-			if(ContentBrowserUtils::IsClassPath(PackagePath.ToString()))
+			if(CodeBrowserUtils::IsClassPath(PackagePath.ToString()))
 			{
 				ClassPathsToShow.Add(PackagePath);
 				return true;
@@ -2030,7 +2030,7 @@ void SAssetView::RefreshSourceItems()
 	if (bShowClasses)
 	{
 		// Load the native class hierarchy
-		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 
 		FNativeClassHierarchyFilter ClassFilter;
 		ClassFilter.ClassPaths = ClassPathsToShow;
@@ -2041,7 +2041,7 @@ void SAssetView::RefreshSourceItems()
 		NativeClassHierarchy->GetMatchingClasses(ClassFilter, MatchingClasses);
 		for(UClass* CurrentClass : MatchingClasses)
 		{
-			Items.Add(FAssetData(CurrentClass));
+			Items.Add(FFileData(CurrentClass));
 		}
 	}
 }
@@ -2136,7 +2136,7 @@ void SAssetView::RefreshFilteredItems()
 		// Check the frontend filter for every asset and keep track of how many assets were found of each type
 		for (int32 AssetIdx = 0; AssetIdx < AssetItems.Num(); ++AssetIdx)
 		{
-			const FAssetData& AssetData = AssetItems[AssetIdx];
+			const FFileData& AssetData = AssetItems[AssetIdx];
 			if ( PassesCurrentFrontendFilter(AssetData) )
 			{
 				const TSharedPtr< FAssetViewAsset >* AssetItem = ItemToObjectPath.Find( AssetData.ObjectPath );
@@ -2167,7 +2167,7 @@ void SAssetView::RefreshFilteredItems()
 		// Check the frontend filter for every asset and don't worry about asset type counts
 		for (int32 AssetIdx = 0; AssetIdx < AssetItems.Num(); ++AssetIdx)
 		{
-			const FAssetData& AssetData = AssetItems[AssetIdx];
+			const FFileData& AssetData = AssetItems[AssetIdx];
 			if ( PassesCurrentFrontendFilter(AssetData) )
 			{
 				const TSharedPtr< FAssetViewAsset >* AssetItem = ItemToObjectPath.Find( AssetData.ObjectPath );
@@ -2188,7 +2188,7 @@ void SAssetView::RefreshFilteredItems()
 		// Don't need to check the frontend filter for every asset but keep track of how many assets were found of each type
 		for (int32 AssetIdx = 0; AssetIdx < AssetItems.Num(); ++AssetIdx)
 		{
-			const FAssetData& AssetData = AssetItems[AssetIdx];
+			const FFileData& AssetData = AssetItems[AssetIdx];
 			const TSharedPtr< FAssetViewAsset >* AssetItem = ItemToObjectPath.Find( AssetData.ObjectPath );
 
 			if ( AssetItem != NULL )
@@ -2216,7 +2216,7 @@ void SAssetView::RefreshFilteredItems()
 		// Don't check the frontend filter and don't count the number of assets of each type. Just add all assets.
 		for (int32 AssetIdx = 0; AssetIdx < AssetItems.Num(); ++AssetIdx)
 		{
-			const FAssetData& AssetData = AssetItems[AssetIdx];
+			const FFileData& AssetData = AssetItems[AssetIdx];
 			const TSharedPtr< FAssetViewAsset >* AssetItem = ItemToObjectPath.Find( AssetData.ObjectPath );
 
 			if ( AssetItem != NULL )
@@ -2265,8 +2265,8 @@ void SAssetView::HideSpecifiedClassAsset()
 		if (TSharedPtr<FAssetViewAsset> Asset = StaticCastSharedPtr<FAssetViewAsset>(Item))
 		{
 			TArray<FName> HideClasses;
-			FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
-			ContentBrowserModule.GetOnHideSpecifiedClassNames().ExecuteIfBound(HideClasses);
+			FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>(TEXT("CodeBrowser"));
+			CodeBrowserModule.GetOnHideSpecifiedClassNames().ExecuteIfBound(HideClasses);
 			return HideClasses.Contains(Asset->Data.AssetClass);
 		}
 		return false;
@@ -2285,7 +2285,7 @@ void SAssetView::RefreshFolders()
 	TArray<FName> ClassPathsToShow;
 	for(const FName& PackagePath : SourcesData.PackagePaths)
 	{
-		if(ContentBrowserUtils::IsClassPath(PackagePath.ToString()))
+		if(CodeBrowserUtils::IsClassPath(PackagePath.ToString()))
 		{
 			ClassPathsToShow.Add(PackagePath);
 		}
@@ -2297,7 +2297,7 @@ void SAssetView::RefreshFolders()
 
 	TArray<FString> FoldersToAdd;
 
-	TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+	TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 
 	const bool bDisplayEmpty = IsShowingEmptyFolders();
 	const bool bDisplayDev = IsShowingDevelopersContent();
@@ -2317,12 +2317,12 @@ void SAssetView::RefreshFolders()
 					continue;
 				}
 
-				if (!bDisplayDev && ContentBrowserUtils::IsDevelopersFolder(SubPath))
+				if (!bDisplayDev && CodeBrowserUtils::IsDevelopersFolder(SubPath))
 				{
 					continue;
 				}
 
-				if (!bDisplayL10N && ContentBrowserUtils::IsLocalizationFolder(SubPath))
+				if (!bDisplayL10N && CodeBrowserUtils::IsLocalizationFolder(SubPath))
 				{
 					continue;
 				}
@@ -2339,7 +2339,7 @@ void SAssetView::RefreshFolders()
 	if(IsShowingCppContent() && ClassPathsToShow.Num() > 0)
 	{
 		// Load the native class hierarchy
-		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 
 		FNativeClassHierarchyFilter ClassFilter;
 		ClassFilter.ClassPaths = ClassPathsToShow;
@@ -2364,7 +2364,7 @@ void SAssetView::RefreshFolders()
 
 			for(const FCollectionNameType& ChildCollection : ChildCollections)
 			{
-				// Use "Collections" as the root of the path to avoid this being confused with other asset view folders - see ContentBrowserUtils::IsCollectionPath
+				// Use "Collections" as the root of the path to avoid this being confused with other asset view folders - see CodeBrowserUtils::IsCollectionPath
 				FoldersToAdd.Add(FString::Printf(TEXT("/Collections/%s/%s"), ECollectionShareType::ToString(ChildCollection.Type), *ChildCollection.Name.ToString()));
 			}
 		}
@@ -2395,7 +2395,7 @@ void SAssetView::SetMajorityAssetType(FName NewMajorityAssetType)
 
 	if ( NewMajorityAssetType != MajorityAssetType )
 	{
-		UE_LOG(LogContentBrowser, Verbose, TEXT("The majority of assets in the view are of type: %s"), *NewMajorityAssetType.ToString());
+		UE_LOG(LogCodeBrowser, Verbose, TEXT("The majority of assets in the view are of type: %s"), *NewMajorityAssetType.ToString());
 
 		MajorityAssetType = NewMajorityAssetType;
 
@@ -2613,7 +2613,7 @@ void SAssetView::OnAssetsAddedToCollection( const FCollectionNameType& Collectio
 	}
 }
 
-void SAssetView::OnAssetAdded(const FAssetData& AssetData)
+void SAssetView::OnAssetAdded(const FFileData& AssetData)
 {
 	RecentlyAddedAssets.Add(AssetData);
 }
@@ -2650,7 +2650,7 @@ void SAssetView::ProcessRecentlyAddedAssets()
 		int32 AssetIdx = 0;
 		for ( ; AssetIdx < FilteredRecentlyAddedAssets.Num(); ++AssetIdx )
 		{
-			const FAssetData& AssetData = FilteredRecentlyAddedAssets[AssetIdx];
+			const FFileData& AssetData = FilteredRecentlyAddedAssets[AssetIdx];
 			if ( !ExistingObjectPaths.Contains(AssetData.ObjectPath) )
 			{
 				if ( AssetData.AssetClass != UObjectRedirector::StaticClass()->GetFName() || AssetData.IsUAsset() )
@@ -2705,7 +2705,7 @@ void SAssetView::OnAssetsRemovedFromCollection( const FCollectionNameType& Colle
 	}
 }
 
-void SAssetView::OnAssetRemoved(const FAssetData& AssetData)
+void SAssetView::OnAssetRemoved(const FFileData& AssetData)
 {
 	RemoveAssetByPath( AssetData.ObjectPath );
 	RecentlyAddedAssets.RemoveSingleSwap(AssetData);
@@ -2715,15 +2715,15 @@ void SAssetView::OnAssetRegistryPathAdded(const FString& Path)
 {
 	if(IsShowingFolders() && !ShouldFilterRecursively())
 	{
-		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 
 		// If this isn't a developer folder or we want to show them, continue
 		const bool bDisplayEmpty = IsShowingEmptyFolders();
 		const bool bDisplayDev = IsShowingDevelopersContent();
 		const bool bDisplayL10N = IsShowingLocalizedContent();
 		if ((bDisplayEmpty || EmptyFolderVisibilityManager->ShouldShowPath(Path)) &&  
-			(bDisplayDev || !ContentBrowserUtils::IsDevelopersFolder(Path)) && 
-			(bDisplayL10N || !ContentBrowserUtils::IsLocalizationFolder(Path))
+			(bDisplayDev || !CodeBrowserUtils::IsDevelopersFolder(Path)) && 
+			(bDisplayL10N || !CodeBrowserUtils::IsLocalizationFolder(Path))
 			)
 		{
 			for (const FName& SourcePathName : SourcesData.PackagePaths)
@@ -2844,12 +2844,12 @@ void SAssetView::OnCollectionUpdated( const FCollectionNameType& Collection )
 	RequestSlowFullListRefresh();
 }
 
-void SAssetView::OnAssetRenamed(const FAssetData& AssetData, const FString& OldObjectPath)
+void SAssetView::OnAssetRenamed(const FFileData& AssetData, const FString& OldObjectPath)
 {
 	// Remove the old asset, if it exists
 	FName OldObjectPackageName = *OldObjectPath;
 	RemoveAssetByPath( OldObjectPackageName );
-	RecentlyAddedAssets.RemoveAllSwap( [&](const FAssetData& Other) { return Other.ObjectPath == OldObjectPackageName; } );
+	RecentlyAddedAssets.RemoveAllSwap( [&](const FFileData& Other) { return Other.ObjectPath == OldObjectPackageName; } );
 
 	// Add the new asset, if it should be in the cached list
 	OnAssetAdded( AssetData );
@@ -2858,7 +2858,7 @@ void SAssetView::OnAssetRenamed(const FAssetData& AssetData, const FString& OldO
 	RequestAddNewAssetsNextFrame();
 }
 
-void SAssetView::OnAssetUpdated(const FAssetData& AssetData)
+void SAssetView::OnAssetUpdated(const FFileData& AssetData)
 {
 	RecentlyLoadedOrChangedAssets.Add(AssetData);
 }
@@ -2871,7 +2871,7 @@ void SAssetView::OnAssetLoaded(UObject* Asset)
 	}
 
 	FName AssetPathName = FName(*Asset->GetPathName());
-	RecentlyLoadedOrChangedAssets.Add( FAssetData(Asset) );
+	RecentlyLoadedOrChangedAssets.Add( FFileData(Asset) );
 
 	UTexture2D* Texture2D = Cast<UTexture2D>(Asset);
 	UMaterial* Material = Texture2D ? nullptr : Cast<UMaterial>(Asset);
@@ -2909,7 +2909,7 @@ void SAssetView::OnObjectPropertyChanged(UObject* Object, FPropertyChangedEvent&
 {
 	if (Object != nullptr && Object->IsAsset())
 	{
-		RecentlyLoadedOrChangedAssets.Add(FAssetData(Object));
+		RecentlyLoadedOrChangedAssets.Add(FFileData(Object));
 	}
 }
 
@@ -2936,7 +2936,7 @@ bool SAssetView::IsFrontendFilterActive() const
 	return ( FrontendFilters.IsValid() && FrontendFilters->Num() > 0 );
 }
 
-bool SAssetView::PassesCurrentFrontendFilter(const FAssetData& Item) const
+bool SAssetView::PassesCurrentFrontendFilter(const FFileData& Item) const
 {
 	// Check the frontend filters list
 	if ( FrontendFilters.IsValid() && !FrontendFilters->PassesAllFilters(Item) )
@@ -2947,15 +2947,15 @@ bool SAssetView::PassesCurrentFrontendFilter(const FAssetData& Item) const
 	return true;
 }
 
-bool SAssetView::PassesCurrentBackendFilter(const FAssetData& Item) const
+bool SAssetView::PassesCurrentBackendFilter(const FFileData& Item) const
 {
-	TArray<FAssetData> AssetDataList;
+	TArray<FFileData> AssetDataList;
 	AssetDataList.Add(Item);
 	RunAssetsThroughBackendFilter(AssetDataList);
 	return AssetDataList.Num() == 1;
 }
 
-void SAssetView::RunAssetsThroughBackendFilter(TArray<FAssetData>& InOutAssetDataList) const
+void SAssetView::RunAssetsThroughBackendFilter(TArray<FFileData>& InOutAssetDataList) const
 {
 	const bool bRecurse = ShouldFilterRecursively();
 	const bool bUsingFolders = IsShowingFolders();
@@ -2989,7 +2989,7 @@ void SAssetView::RunAssetsThroughBackendFilter(TArray<FAssetData>& InOutAssetDat
 
 			for ( int32 AssetDataIdx = InOutAssetDataList.Num() - 1; AssetDataIdx >= 0; --AssetDataIdx )
 			{
-				const FAssetData& AssetData = InOutAssetDataList[AssetDataIdx];
+				const FFileData& AssetData = InOutAssetDataList[AssetDataIdx];
 
 				if ( !CollectionObjectPaths.Contains( AssetData.ObjectPath ) )
 				{
@@ -3043,8 +3043,8 @@ FSlateColor SAssetView::GetViewButtonForegroundColor() const
 TSharedRef<SWidget> SAssetView::GetViewButtonContent()
 {
 	// Get all menu extenders for this context menu from the content browser module
-	FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>( TEXT("ContentBrowser") );
-	TArray<FContentBrowserMenuExtender> MenuExtenderDelegates = ContentBrowserModule.GetAllAssetViewViewMenuExtenders();
+	FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>( TEXT("CodeBrowser") );
+	TArray<FCodeBrowserMenuExtender> MenuExtenderDelegates = CodeBrowserModule.GetAllAssetViewViewMenuExtenders();
 
 	TArray<TSharedPtr<FExtender>> Extenders;
 	for (int32 i = 0; i < MenuExtenderDelegates.Num(); ++i)
@@ -3352,8 +3352,8 @@ TSharedRef<SWidget> SAssetView::GetViewButtonContent()
 void SAssetView::ToggleShowFolders()
 {
 	check( IsToggleShowFoldersAllowed() );
-	GetMutableDefault<UContentBrowserSettings>()->DisplayFolders = !GetDefault<UContentBrowserSettings>()->DisplayFolders;
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	GetMutableDefault<UCodeBrowserSettings>()->DisplayFolders = !GetDefault<UCodeBrowserSettings>()->DisplayFolders;
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsToggleShowFoldersAllowed() const
@@ -3363,14 +3363,14 @@ bool SAssetView::IsToggleShowFoldersAllowed() const
 
 bool SAssetView::IsShowingFolders() const
 {
-	return IsToggleShowFoldersAllowed() && GetDefault<UContentBrowserSettings>()->DisplayFolders;
+	return IsToggleShowFoldersAllowed() && GetDefault<UCodeBrowserSettings>()->DisplayFolders;
 }
 
 void SAssetView::ToggleShowEmptyFolders()
 {
 	check( IsToggleShowEmptyFoldersAllowed() );
-	GetMutableDefault<UContentBrowserSettings>()->DisplayEmptyFolders = !GetDefault<UContentBrowserSettings>()->DisplayEmptyFolders;
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	GetMutableDefault<UCodeBrowserSettings>()->DisplayEmptyFolders = !GetDefault<UCodeBrowserSettings>()->DisplayEmptyFolders;
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsToggleShowEmptyFoldersAllowed() const
@@ -3380,14 +3380,14 @@ bool SAssetView::IsToggleShowEmptyFoldersAllowed() const
 
 bool SAssetView::IsShowingEmptyFolders() const
 {
-	return IsToggleShowEmptyFoldersAllowed() && GetDefault<UContentBrowserSettings>()->DisplayEmptyFolders;
+	return IsToggleShowEmptyFoldersAllowed() && GetDefault<UCodeBrowserSettings>()->DisplayEmptyFolders;
 }
 
 void SAssetView::ToggleRealTimeThumbnails()
 {
 	check( CanShowRealTimeThumbnails() );
-	GetMutableDefault<UContentBrowserSettings>()->RealTimeThumbnails = !GetDefault<UContentBrowserSettings>()->RealTimeThumbnails;
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	GetMutableDefault<UCodeBrowserSettings>()->RealTimeThumbnails = !GetDefault<UCodeBrowserSettings>()->RealTimeThumbnails;
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::CanShowRealTimeThumbnails() const
@@ -3397,71 +3397,71 @@ bool SAssetView::CanShowRealTimeThumbnails() const
 
 bool SAssetView::IsShowingRealTimeThumbnails() const
 {
-	return CanShowRealTimeThumbnails() && GetDefault<UContentBrowserSettings>()->RealTimeThumbnails;
+	return CanShowRealTimeThumbnails() && GetDefault<UCodeBrowserSettings>()->RealTimeThumbnails;
 }
 
 void SAssetView::ToggleShowPluginContent()
 {
-	bool bDisplayPlugins = GetDefault<UContentBrowserSettings>()->GetDisplayPluginFolders();
-	bool bRawDisplayPlugins = GetDefault<UContentBrowserSettings>()->GetDisplayPluginFolders( true );
+	bool bDisplayPlugins = GetDefault<UCodeBrowserSettings>()->GetDisplayPluginFolders();
+	bool bRawDisplayPlugins = GetDefault<UCodeBrowserSettings>()->GetDisplayPluginFolders( true );
 
 	// Only if both these flags are false when toggling we want to enable the flag, otherwise we're toggling off
 	if ( !bDisplayPlugins && !bRawDisplayPlugins )
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayPluginFolders( true );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayPluginFolders( true );
 	}
 	else
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayPluginFolders( false );
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayPluginFolders( false, true );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayPluginFolders( false );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayPluginFolders( false, true );
 	}	
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsShowingPluginContent() const
 {
-	return GetDefault<UContentBrowserSettings>()->GetDisplayPluginFolders();
+	return GetDefault<UCodeBrowserSettings>()->GetDisplayPluginFolders();
 }
 
 void SAssetView::ToggleShowEngineContent()
 {
-	bool bDisplayEngine = GetDefault<UContentBrowserSettings>()->GetDisplayEngineFolder();
-	bool bRawDisplayEngine = GetDefault<UContentBrowserSettings>()->GetDisplayEngineFolder( true );
+	bool bDisplayEngine = GetDefault<UCodeBrowserSettings>()->GetDisplayEngineFolder();
+	bool bRawDisplayEngine = GetDefault<UCodeBrowserSettings>()->GetDisplayEngineFolder( true );
 
 	// Only if both these flags are false when toggling we want to enable the flag, otherwise we're toggling off
 	if ( !bDisplayEngine && !bRawDisplayEngine )
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayEngineFolder( true );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayEngineFolder( true );
 	}
 	else
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayEngineFolder( false );
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayEngineFolder( false, true );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayEngineFolder( false );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayEngineFolder( false, true );
 	}	
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsShowingEngineContent() const
 {
-	return GetDefault<UContentBrowserSettings>()->GetDisplayEngineFolder();
+	return GetDefault<UCodeBrowserSettings>()->GetDisplayEngineFolder();
 }
 
 void SAssetView::ToggleShowDevelopersContent()
 {
-	bool bDisplayDev = GetDefault<UContentBrowserSettings>()->GetDisplayDevelopersFolder();
-	bool bRawDisplayDev = GetDefault<UContentBrowserSettings>()->GetDisplayDevelopersFolder( true );
+	bool bDisplayDev = GetDefault<UCodeBrowserSettings>()->GetDisplayDevelopersFolder();
+	bool bRawDisplayDev = GetDefault<UCodeBrowserSettings>()->GetDisplayDevelopersFolder( true );
 
 	// Only if both these flags are false when toggling we want to enable the flag, otherwise we're toggling off
 	if ( !bDisplayDev && !bRawDisplayDev )
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayDevelopersFolder( true );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayDevelopersFolder( true );
 	}
 	else
 	{
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayDevelopersFolder( false );
-		GetMutableDefault<UContentBrowserSettings>()->SetDisplayDevelopersFolder( false, true );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayDevelopersFolder( false );
+		GetMutableDefault<UCodeBrowserSettings>()->SetDisplayDevelopersFolder( false, true );
 	}	
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsToggleShowDevelopersContentAllowed() const
@@ -3471,13 +3471,13 @@ bool SAssetView::IsToggleShowDevelopersContentAllowed() const
 
 bool SAssetView::IsShowingDevelopersContent() const
 {
-	return IsToggleShowDevelopersContentAllowed() && GetDefault<UContentBrowserSettings>()->GetDisplayDevelopersFolder();
+	return IsToggleShowDevelopersContentAllowed() && GetDefault<UCodeBrowserSettings>()->GetDisplayDevelopersFolder();
 }
 
 void SAssetView::ToggleShowLocalizedContent()
 {
-	GetMutableDefault<UContentBrowserSettings>()->SetDisplayL10NFolder(!GetDefault<UContentBrowserSettings>()->GetDisplayL10NFolder());
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	GetMutableDefault<UCodeBrowserSettings>()->SetDisplayL10NFolder(!GetDefault<UCodeBrowserSettings>()->GetDisplayL10NFolder());
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsToggleShowLocalizedContentAllowed() const
@@ -3487,14 +3487,14 @@ bool SAssetView::IsToggleShowLocalizedContentAllowed() const
 
 bool SAssetView::IsShowingLocalizedContent() const
 {
-	return IsToggleShowLocalizedContentAllowed() && GetDefault<UContentBrowserSettings>()->GetDisplayL10NFolder();
+	return IsToggleShowLocalizedContentAllowed() && GetDefault<UCodeBrowserSettings>()->GetDisplayL10NFolder();
 }
 
 void SAssetView::ToggleShowCollections()
 {
-	const bool bDisplayCollections = GetDefault<UContentBrowserSettings>()->GetDisplayCollections();
-	GetMutableDefault<UContentBrowserSettings>()->SetDisplayCollections( !bDisplayCollections );
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	const bool bDisplayCollections = GetDefault<UCodeBrowserSettings>()->GetDisplayCollections();
+	GetMutableDefault<UCodeBrowserSettings>()->SetDisplayCollections( !bDisplayCollections );
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsToggleShowCollectionsAllowed() const
@@ -3504,15 +3504,15 @@ bool SAssetView::IsToggleShowCollectionsAllowed() const
 
 bool SAssetView::IsShowingCollections() const
 {
-	return IsToggleShowCollectionsAllowed() && GetDefault<UContentBrowserSettings>()->GetDisplayCollections();
+	return IsToggleShowCollectionsAllowed() && GetDefault<UCodeBrowserSettings>()->GetDisplayCollections();
 }
 
 
 void SAssetView::ToggleShowFavorites()
 {
-	const bool bShowingFavorites = GetDefault<UContentBrowserSettings>()->GetDisplayFavorites();
-	GetMutableDefault<UContentBrowserSettings>()->SetDisplayFavorites(!bShowingFavorites);
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	const bool bShowingFavorites = GetDefault<UCodeBrowserSettings>()->GetDisplayFavorites();
+	GetMutableDefault<UCodeBrowserSettings>()->SetDisplayFavorites(!bShowingFavorites);
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsToggleShowFavoritesAllowed() const
@@ -3522,14 +3522,14 @@ bool SAssetView::IsToggleShowFavoritesAllowed() const
 
 bool SAssetView::IsShowingFavorites() const
 {
-	return IsToggleShowFavoritesAllowed() && GetDefault<UContentBrowserSettings>()->GetDisplayFavorites();
+	return IsToggleShowFavoritesAllowed() && GetDefault<UCodeBrowserSettings>()->GetDisplayFavorites();
 }
 
 void SAssetView::ToggleShowCppContent()
 {
-	const bool bDisplayCppFolders = GetDefault<UContentBrowserSettings>()->GetDisplayCppFolders();
-	GetMutableDefault<UContentBrowserSettings>()->SetDisplayCppFolders(!bDisplayCppFolders);
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	const bool bDisplayCppFolders = GetDefault<UCodeBrowserSettings>()->GetDisplayCppFolders();
+	GetMutableDefault<UCodeBrowserSettings>()->SetDisplayCppFolders(!bDisplayCppFolders);
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 }
 
 bool SAssetView::IsToggleShowCppContentAllowed() const
@@ -3539,14 +3539,14 @@ bool SAssetView::IsToggleShowCppContentAllowed() const
 
 bool SAssetView::IsShowingCppContent() const
 {
-	return IsToggleShowCppContentAllowed() && GetDefault<UContentBrowserSettings>()->GetDisplayCppFolders();
+	return IsToggleShowCppContentAllowed() && GetDefault<UCodeBrowserSettings>()->GetDisplayCppFolders();
 }
 
 void SAssetView::ToggleIncludeClassNames()
 {
-	const bool bIncludeClassNames = GetDefault<UContentBrowserSettings>()->GetIncludeClassNames();
-	GetMutableDefault<UContentBrowserSettings>()->SetIncludeClassNames(!bIncludeClassNames);
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	const bool bIncludeClassNames = GetDefault<UCodeBrowserSettings>()->GetIncludeClassNames();
+	GetMutableDefault<UCodeBrowserSettings>()->SetIncludeClassNames(!bIncludeClassNames);
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 
 	OnSearchOptionsChanged.ExecuteIfBound();
 }
@@ -3558,14 +3558,14 @@ bool SAssetView::IsToggleIncludeClassNamesAllowed() const
 
 bool SAssetView::IsIncludingClassNames() const
 {
-	return IsToggleIncludeClassNamesAllowed() && GetDefault<UContentBrowserSettings>()->GetIncludeClassNames();
+	return IsToggleIncludeClassNamesAllowed() && GetDefault<UCodeBrowserSettings>()->GetIncludeClassNames();
 }
 
 void SAssetView::ToggleIncludeAssetPaths()
 {
-	const bool bIncludeAssetPaths = GetDefault<UContentBrowserSettings>()->GetIncludeAssetPaths();
-	GetMutableDefault<UContentBrowserSettings>()->SetIncludeAssetPaths(!bIncludeAssetPaths);
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	const bool bIncludeAssetPaths = GetDefault<UCodeBrowserSettings>()->GetIncludeAssetPaths();
+	GetMutableDefault<UCodeBrowserSettings>()->SetIncludeAssetPaths(!bIncludeAssetPaths);
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 
 	OnSearchOptionsChanged.ExecuteIfBound();
 }
@@ -3577,14 +3577,14 @@ bool SAssetView::IsToggleIncludeAssetPathsAllowed() const
 
 bool SAssetView::IsIncludingAssetPaths() const
 {
-	return IsToggleIncludeAssetPathsAllowed() && GetDefault<UContentBrowserSettings>()->GetIncludeAssetPaths();
+	return IsToggleIncludeAssetPathsAllowed() && GetDefault<UCodeBrowserSettings>()->GetIncludeAssetPaths();
 }
 
 void SAssetView::ToggleIncludeCollectionNames()
 {
-	const bool bIncludeCollectionNames = GetDefault<UContentBrowserSettings>()->GetIncludeCollectionNames();
-	GetMutableDefault<UContentBrowserSettings>()->SetIncludeCollectionNames(!bIncludeCollectionNames);
-	GetMutableDefault<UContentBrowserSettings>()->PostEditChange();
+	const bool bIncludeCollectionNames = GetDefault<UCodeBrowserSettings>()->GetIncludeCollectionNames();
+	GetMutableDefault<UCodeBrowserSettings>()->SetIncludeCollectionNames(!bIncludeCollectionNames);
+	GetMutableDefault<UCodeBrowserSettings>()->PostEditChange();
 
 	OnSearchOptionsChanged.ExecuteIfBound();
 }
@@ -3596,7 +3596,7 @@ bool SAssetView::IsToggleIncludeCollectionNamesAllowed() const
 
 bool SAssetView::IsIncludingCollectionNames() const
 {
-	return IsToggleIncludeCollectionNamesAllowed() && GetDefault<UContentBrowserSettings>()->GetIncludeCollectionNames();
+	return IsToggleIncludeCollectionNamesAllowed() && GetDefault<UCodeBrowserSettings>()->GetIncludeCollectionNames();
 }
 
 
@@ -3741,7 +3741,7 @@ void SAssetView::RequestScrollIntoView(const TSharedPtr<FAssetViewItem>& Item)
 
 void SAssetView::OnOpenAssetsOrFolders()
 {
-	TArray<FAssetData> SelectedAssets = GetSelectedAssets();
+	TArray<FFileData> SelectedAssets = GetSelectedAssets();
 	TArray<FString> SelectedFolders = GetSelectedFolders();
 	if (SelectedAssets.Num() > 0 && SelectedFolders.Num() == 0)
 	{
@@ -3784,7 +3784,7 @@ TSharedRef<ITableRow> SAssetView::MakeListViewWidget(TSharedPtr<FAssetViewItem> 
 	{
 		TSharedPtr< STableRow<TSharedPtr<FAssetViewItem>> > TableRowWidget;
 		SAssignNew( TableRowWidget, STableRow<TSharedPtr<FAssetViewItem>>, OwnerTable )
-			.Style(FEditorStyle::Get(), "ContentBrowser.AssetListView.TableRow")
+			.Style(FEditorStyle::Get(), "CodeBrowser.AssetListView.TableRow")
 			.Cursor( bAllowDragging ? EMouseCursor::GrabHand : EMouseCursor::Default )
 			.OnDragDetected( this, &SAssetView::OnDraggingAssetItem );
 
@@ -3826,7 +3826,7 @@ TSharedRef<ITableRow> SAssetView::MakeListViewWidget(TSharedPtr<FAssetViewItem> 
 
 		TSharedPtr< STableRow<TSharedPtr<FAssetViewItem>> > TableRowWidget;
 		SAssignNew( TableRowWidget, STableRow<TSharedPtr<FAssetViewItem>>, OwnerTable )
-		.Style(FEditorStyle::Get(), "ContentBrowser.AssetListView.TableRow")
+		.Style(FEditorStyle::Get(), "CodeBrowser.AssetListView.TableRow")
 		.Cursor( bAllowDragging ? EMouseCursor::GrabHand : EMouseCursor::Default )
 		.OnDragDetected( this, &SAssetView::OnDraggingAssetItem );
 
@@ -3872,7 +3872,7 @@ TSharedRef<ITableRow> SAssetView::MakeTileViewWidget(TSharedPtr<FAssetViewItem> 
 	{
 		TSharedPtr< STableRow<TSharedPtr<FAssetViewItem>> > TableRowWidget;
 		SAssignNew( TableRowWidget, STableRow<TSharedPtr<FAssetViewItem>>, OwnerTable )
-			.Style( FEditorStyle::Get(), "ContentBrowser.AssetListView.TableRow" )
+			.Style( FEditorStyle::Get(), "CodeBrowser.AssetListView.TableRow" )
 			.Cursor( bAllowDragging ? EMouseCursor::GrabHand : EMouseCursor::Default )
 			.OnDragDetected( this, &SAssetView::OnDraggingAssetItem );
 
@@ -3914,7 +3914,7 @@ TSharedRef<ITableRow> SAssetView::MakeTileViewWidget(TSharedPtr<FAssetViewItem> 
 
 		TSharedPtr< STableRow<TSharedPtr<FAssetViewItem>> > TableRowWidget;
 		SAssignNew( TableRowWidget, STableRow<TSharedPtr<FAssetViewItem>>, OwnerTable )
-		.Style(FEditorStyle::Get(), "ContentBrowser.AssetListView.TableRow")
+		.Style(FEditorStyle::Get(), "CodeBrowser.AssetListView.TableRow")
 		.Cursor( bAllowDragging ? EMouseCursor::GrabHand : EMouseCursor::Default )
 		.OnDragDetected( this, &SAssetView::OnDraggingAssetItem );
 
@@ -3951,7 +3951,7 @@ TSharedRef<ITableRow> SAssetView::MakeColumnViewWidget(TSharedPtr<FAssetViewItem
 	if ( !ensure(AssetItem.IsValid()) )
 	{
 		return SNew( STableRow<TSharedPtr<FAssetViewItem>>, OwnerTable )
-			.Style(FEditorStyle::Get(), "ContentBrowser.AssetListView.TableRow");
+			.Style(FEditorStyle::Get(), "CodeBrowser.AssetListView.TableRow");
 	}
 
 	// Update the cached custom data
@@ -3998,7 +3998,7 @@ UObject* SAssetView::CreateAssetFromTemporary(FString InName, const TSharedPtr<F
 		if ( AssetClass || Factory )
 		{
 			FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
-			Asset = AssetToolsModule.Get().CreateAsset(InName, PackagePath, AssetClass, Factory, FName("ContentBrowserNewAsset"));
+			Asset = AssetToolsModule.Get().CreateAsset(InName, PackagePath, AssetClass, Factory, FName("CodeBrowserNewAsset"));
 		}
 
 		if ( Asset == NULL )
@@ -4186,8 +4186,8 @@ void SAssetView::AssetSelectionChanged( TSharedPtr< struct FAssetViewItem > Asse
 		}
 		else
 		{
-			OnAssetSelected.ExecuteIfBound(FAssetData());
-			OnAssetSelectionChanged.ExecuteIfBound(FAssetData(), SelectInfo);
+			OnAssetSelected.ExecuteIfBound(FFileData());
+			OnAssetSelectionChanged.ExecuteIfBound(FFileData(), SelectInfo);
 		}
 	}
 }
@@ -4247,7 +4247,7 @@ bool SAssetView::CanOpenContextMenu() const
 		return false;
 	}
 
-	TArray<FAssetData> SelectedAssets = GetSelectedAssets();
+	TArray<FFileData> SelectedAssets = GetSelectedAssets();
 
 	// Detect if at least one temporary item was selected. If there were no valid assets selected and a temporary one was, then deny the context menu.
 	TArray<TSharedPtr<FAssetViewItem>> SelectedItems = GetSelectedItems();
@@ -4286,7 +4286,7 @@ bool SAssetView::CanOpenContextMenu() const
 	{
 		TArray<UObject*> LoadedObjects;
 		const bool bAllowedToPrompt = false;
-		bLoadSuccessful = ContentBrowserUtils::LoadAssetsIfNeeded(ObjectPaths, LoadedObjects, bAllowedToPrompt);
+		bLoadSuccessful = CodeBrowserUtils::LoadAssetsIfNeeded(ObjectPaths, LoadedObjects, bAllowedToPrompt);
 	}
 
 	// Do not show the context menu if the load failed
@@ -4318,7 +4318,7 @@ void SAssetView::OnListMouseButtonDoubleClick(TSharedPtr<FAssetViewItem> AssetIt
 		return;
 	}
 
-	TArray<FAssetData> ActivatedAssets;
+	TArray<FFileData> ActivatedAssets;
 	ActivatedAssets.Add(StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data);
 	OnAssetsActivated.ExecuteIfBound( ActivatedAssets, EAssetTypeActivationMethod::DoubleClicked );
 }
@@ -4328,13 +4328,13 @@ FReply SAssetView::OnDraggingAssetItem( const FGeometry& MyGeometry, const FPoin
 
 	if (bAllowDragging)
 	{
-		TArray<FAssetData> DraggedAssets;
+		TArray<FFileData> DraggedAssets;
 		TArray<FString> DraggedAssetPaths;
 
 		// Work out which assets to drag
 		{
-			TArray<FAssetData> AssetDataList = GetSelectedAssets();
-			for (const FAssetData& AssetData : AssetDataList)
+			TArray<FFileData> AssetDataList = GetSelectedAssets();
+			for (const FFileData& AssetData : AssetDataList)
 			{
 				// Skip invalid assets and redirectors
 				if (AssetData.IsValid() && AssetData.AssetClass != UObjectRedirector::StaticClass()->GetFName())
@@ -4398,13 +4398,13 @@ bool SAssetView::AssetVerifyRenameCommit(const TSharedPtr<FAssetViewItem>& Item,
 	{
 		const TSharedPtr<FAssetViewAsset>& ItemAsAsset = StaticCastSharedPtr<FAssetViewAsset>(Item);
 		const FString NewObjectPath = ItemAsAsset->Data.PackagePath.ToString() / NewNameString + TEXT(".") + NewNameString;
-		return ContentBrowserUtils::IsValidObjectPathForCreate(NewObjectPath, OutErrorMessage);
+		return CodeBrowserUtils::IsValidObjectPathForCreate(NewObjectPath, OutErrorMessage);
 	}
 	else
 	{
 		const TSharedPtr<FAssetViewFolder>& ItemAsFolder = StaticCastSharedPtr<FAssetViewFolder>(Item);
 		const FString FolderPath = FPaths::GetPath(ItemAsFolder->FolderPath);
-		return ContentBrowserUtils::IsValidFolderPathForCreate(FolderPath, NewNameString, OutErrorMessage);
+		return CodeBrowserUtils::IsValidFolderPathForCreate(FolderPath, NewNameString, OutErrorMessage);
 	}
 
 	return true;
@@ -4454,7 +4454,7 @@ void SAssetView::AssetRenameCommit(const TSharedPtr<FAssetViewItem>& Item, const
 		}
 		else
 		{
-			ContentBrowserUtils::RenameAsset(Asset, NewName, ErrorMessage);
+			CodeBrowserUtils::RenameAsset(Asset, NewName, ErrorMessage);
 			bSuccess = true;
 		}
 	}
@@ -4490,8 +4490,8 @@ void SAssetView::AssetRenameCommit(const TSharedPtr<FAssetViewItem>& Item, const
 			{
 				const FString NewPath = FPaths::GetPath(ItemAsFolder->FolderPath) / NewName;
 				FText ErrorText;
-				if( ContentBrowserUtils::IsValidFolderName(NewName, ErrorText) &&
-					!ContentBrowserUtils::DoesFolderExist(NewPath))
+				if( CodeBrowserUtils::IsValidFolderName(NewName, ErrorText) &&
+					!CodeBrowserUtils::DoesFolderExist(NewPath))
 				{
 					// ensure the folder exists on disk
 					FString NewPathOnDisk;
@@ -4499,7 +4499,7 @@ void SAssetView::AssetRenameCommit(const TSharedPtr<FAssetViewItem>& Item, const
 
 					if (bSuccess)
 					{
-						TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+						TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 						EmptyFolderVisibilityManager->SetAlwaysShowPath(NewPath);
 
 						FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
@@ -4524,8 +4524,8 @@ void SAssetView::AssetRenameCommit(const TSharedPtr<FAssetViewItem>& Item, const
 			// first create the new folder
 			const FString NewPath = FPaths::GetPath(ItemAsFolder->FolderPath) / NewName;
 			FText ErrorText;
-			if( ContentBrowserUtils::IsValidFolderName(NewName, ErrorText) &&
-				!ContentBrowserUtils::DoesFolderExist(NewPath))
+			if( CodeBrowserUtils::IsValidFolderName(NewName, ErrorText) &&
+				!CodeBrowserUtils::DoesFolderExist(NewPath))
 			{
 				// ensure the folder exists on disk
 				FString NewPathOnDisk;
@@ -4541,20 +4541,20 @@ void SAssetView::AssetRenameCommit(const TSharedPtr<FAssetViewItem>& Item, const
 			{
 				MovedFolders.Add(FMovedContentFolder(ItemAsFolder->FolderPath, NewPath));
 				// move any assets in our folder
-				TArray<FAssetData> AssetsInFolder;
+				TArray<FFileData> AssetsInFolder;
 				AssetRegistryModule.Get().GetAssetsByPath(*ItemAsFolder->FolderPath, AssetsInFolder, true);
 				TArray<UObject*> ObjectsInFolder;
-				ContentBrowserUtils::GetObjectsInAssetData(AssetsInFolder, ObjectsInFolder);
-				ContentBrowserUtils::MoveAssets(ObjectsInFolder, NewPath, ItemAsFolder->FolderPath);
+				CodeBrowserUtils::GetObjectsInAssetData(AssetsInFolder, ObjectsInFolder);
+				CodeBrowserUtils::MoveAssets(ObjectsInFolder, NewPath, ItemAsFolder->FolderPath);
 
 				// Now check to see if the original folder is empty, if so we can delete it
-				TArray<FAssetData> AssetsInOriginalFolder;
+				TArray<FFileData> AssetsInOriginalFolder;
 				AssetRegistryModule.Get().GetAssetsByPath(*ItemAsFolder->FolderPath, AssetsInOriginalFolder, true);
 				if(AssetsInOriginalFolder.Num() == 0)
 				{
 					TArray<FString> FoldersToDelete;
 					FoldersToDelete.Add(ItemAsFolder->FolderPath);
-					ContentBrowserUtils::DeleteFolders(FoldersToDelete);
+					CodeBrowserUtils::DeleteFolders(FoldersToDelete);
 				}
 			}
 			OnFolderPathChanged.ExecuteIfBound(MovedFolders);
@@ -4595,8 +4595,8 @@ void SAssetView::AssetRenameCommit(const TSharedPtr<FAssetViewItem>& Item, const
 				}
 
 				// Sync to its location
-				TArray<FAssetData> AssetDataList;
-				new(AssetDataList) FAssetData(Asset);
+				TArray<FFileData> AssetDataList;
+				new(AssetDataList) FFileData(Asset);
 
 				if ( OnAssetRenameCommitted.IsBound() && !bUserSearching)
 				{
@@ -4614,7 +4614,7 @@ void SAssetView::AssetRenameCommit(const TSharedPtr<FAssetViewItem>& Item, const
 	else if ( !ErrorMessage.IsEmpty() )
 	{
 		// Prompt the user with the reason the rename/creation failed
-		ContentBrowserUtils::DisplayMessage(ErrorMessage, MessageAnchor, SharedThis(this));
+		CodeBrowserUtils::DisplayMessage(ErrorMessage, MessageAnchor, SharedThis(this));
 	}
 
 	RenamingAsset.Reset();
@@ -4833,9 +4833,9 @@ bool SAssetView::HasSingleCollectionSource() const
 	return ( SourcesData.Collections.Num() == 1 && SourcesData.PackagePaths.Num() == 0 );
 }
 
-void SAssetView::OnAssetsOrPathsDragDropped(const TArray<FAssetData>& AssetList, const TArray<FString>& AssetPaths, const FString& DestinationPath)
+void SAssetView::OnAssetsOrPathsDragDropped(const TArray<FFileData>& AssetList, const TArray<FString>& AssetPaths, const FString& DestinationPath)
 {
-#pragma region // 屏蔽拖拽资源到ContentBrowser中
+#pragma region // 屏蔽拖拽资源到CodeBrowser中
 	if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == true)
 	{
 		return;
@@ -4860,14 +4860,14 @@ void SAssetView::OnFilesDragDropped(const TArray<FString>& AssetList, const FStr
 	AssetToolsModule.Get().ImportAssets( AssetList, DestinationPath );
 }
 
-void SAssetView::ExecuteDropCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
+void SAssetView::ExecuteDropCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
 {
 	int32 NumItemsCopied = 0;
 
 	if (AssetList.Num() > 0)
 	{
 		TArray<UObject*> DroppedObjects;
-		ContentBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
+		CodeBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
 
 		TArray<UObject*> NewObjects;
 		ObjectTools::DuplicateObjects(DroppedObjects, TEXT(""), DestinationPath, /*bOpenDialog=*/false, &NewObjects);
@@ -4877,7 +4877,7 @@ void SAssetView::ExecuteDropCopy(TArray<FAssetData> AssetList, TArray<FString> A
 
 	if (AssetPaths.Num() > 0)
 	{
-		if (ContentBrowserUtils::CopyFolders(AssetPaths, DestinationPath))
+		if (CodeBrowserUtils::CopyFolders(AssetPaths, DestinationPath))
 		{
 			NumItemsCopied += AssetPaths.Num();
 		}
@@ -4889,18 +4889,18 @@ void SAssetView::ExecuteDropCopy(TArray<FAssetData> AssetList, TArray<FString> A
 		const FText Message = FText::Format(LOCTEXT("AssetItemsDroppedCopy", "{0} {0}|plural(one=item,other=items) copied"), NumItemsCopied);
 		const FVector2D& CursorPos = FSlateApplication::Get().GetCursorPos();
 		FSlateRect MessageAnchor(CursorPos.X, CursorPos.Y, CursorPos.X, CursorPos.Y);
-		ContentBrowserUtils::DisplayMessage(Message, MessageAnchor, SharedThis(this));
+		CodeBrowserUtils::DisplayMessage(Message, MessageAnchor, SharedThis(this));
 	}
 }
 
-void SAssetView::ExecuteDropMove(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
+void SAssetView::ExecuteDropMove(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
 {
 	if (AssetList.Num() > 0)
 	{
 		TArray<UObject*> DroppedObjects;
-		ContentBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
+		CodeBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
 
-		ContentBrowserUtils::MoveAssets(DroppedObjects, DestinationPath);
+		CodeBrowserUtils::MoveAssets(DroppedObjects, DestinationPath);
 	}
 
 	// Prepare to fixup any asset paths that are favorites
@@ -4914,16 +4914,16 @@ void SAssetView::ExecuteDropMove(TArray<FAssetData> AssetList, TArray<FString> A
 
 	if (AssetPaths.Num() > 0)
 	{
-		ContentBrowserUtils::MoveFolders(AssetPaths, DestinationPath);
+		CodeBrowserUtils::MoveFolders(AssetPaths, DestinationPath);
 	}
 
 	OnFolderPathChanged.ExecuteIfBound(MovedFolders);
 }
 
 
-void SAssetView::ExecuteDropAdvancedCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
+void SAssetView::ExecuteDropAdvancedCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
 {
-	ContentBrowserUtils::BeginAdvancedCopyPackages(AssetList, AssetPaths, DestinationPath);
+	CodeBrowserUtils::BeginAdvancedCopyPackages(AssetList, AssetPaths, DestinationPath);
 }
 
 void SAssetView::SetUserSearching(bool bInSearching)
@@ -4937,8 +4937,8 @@ void SAssetView::SetUserSearching(bool bInSearching)
 
 void SAssetView::HandleSettingChanged(FName PropertyName)
 {
-	if ((PropertyName == GET_MEMBER_NAME_CHECKED(UContentBrowserSettings, DisplayFolders)) ||
-		(PropertyName == GET_MEMBER_NAME_CHECKED(UContentBrowserSettings, DisplayEmptyFolders)) ||
+	if ((PropertyName == GET_MEMBER_NAME_CHECKED(UCodeBrowserSettings, DisplayFolders)) ||
+		(PropertyName == GET_MEMBER_NAME_CHECKED(UCodeBrowserSettings, DisplayEmptyFolders)) ||
 		(PropertyName == "DisplayDevelopersFolder") ||
 		(PropertyName == "DisplayEngineFolder") ||
 		(PropertyName == NAME_None))	// @todo: Needed if PostEditChange was called manually, for now

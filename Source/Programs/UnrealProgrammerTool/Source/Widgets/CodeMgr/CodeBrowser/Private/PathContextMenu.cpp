@@ -26,21 +26,21 @@
 #include "AssetRegistryModule.h"
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
-#include "ContentBrowserLog.h"
-#include "ContentBrowserSingleton.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserLog.h"
+#include "CodeBrowserSingleton.h"
+#include "CodeBrowserUtils.h"
 #include "SourceControlWindows.h"
-#include "ContentBrowserModule.h"
+#include "CodeBrowserModule.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Widgets/Colors/SColorPicker.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "NativeClassHierarchy.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "ContentBrowserCommands.h"
+#include "CodeBrowserCommands.h"
 
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 
 FPathContextMenu::FPathContextMenu(const TWeakPtr<SWidget>& InParentContent)
@@ -99,8 +99,8 @@ TSharedRef<FExtender> FPathContextMenu::MakePathViewContextMenuExtender(const TA
 	CacheCanExecuteVars();
 
 	// Get all menu extenders for this context menu from the content browser module
-	FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>( TEXT("ContentBrowser") );
-	TArray<FContentBrowserMenuExtender_SelectedPaths> MenuExtenderDelegates = ContentBrowserModule.GetAllPathViewContextMenuExtenders();
+	FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>( TEXT("CodeBrowser") );
+	TArray<FCodeBrowserMenuExtender_SelectedPaths> MenuExtenderDelegates = CodeBrowserModule.GetAllPathViewContextMenuExtenders();
 
 	TArray<TSharedPtr<FExtender>> Extenders;
 	for (int32 i = 0; i < MenuExtenderDelegates.Num(); ++i)
@@ -120,7 +120,7 @@ TSharedRef<FExtender> FPathContextMenu::MakePathViewContextMenuExtender(const TA
 void FPathContextMenu::MakePathViewContextMenu(FMenuBuilder& MenuBuilder)
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
 
 	// Only add something if at least one folder is selected
 	if ( SelectedPaths.Num() > 0 )
@@ -211,7 +211,7 @@ void FPathContextMenu::MakePathViewContextMenu(FMenuBuilder& MenuBuilder)
 			{
 			// Explore
 			MenuBuilder.AddMenuEntry(
-				ContentBrowserUtils::GetExploreFolderText(),
+				CodeBrowserUtils::GetExploreFolderText(),
 				LOCTEXT("ExploreTooltip", "Finds this folder on disk."),
 				FSlateIcon(),
 				FUIAction( FExecuteAction::CreateSP( this, &FPathContextMenu::ExecuteExplore ) )
@@ -227,7 +227,7 @@ void FPathContextMenu::MakePathViewContextMenu(FMenuBuilder& MenuBuilder)
 			if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == false)
 			{
 			// If any colors have already been set, display color options as a sub menu
-			if ( ContentBrowserUtils::HasCustomColors() )
+			if ( CodeBrowserUtils::HasCustomColors() )
 			{
 				// Set Color (submenu)
 				MenuBuilder.AddSubMenu(
@@ -254,7 +254,7 @@ void FPathContextMenu::MakePathViewContextMenu(FMenuBuilder& MenuBuilder)
 			if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == false)
 			{
 			// If this folder is already favorited, show the option to remove from favorites
-			if (ContentBrowserUtils::IsFavoriteFolder(SelectedPaths[0]))
+			if (CodeBrowserUtils::IsFavoriteFolder(SelectedPaths[0]))
 			{
 				// Remove from favorites
 				MenuBuilder.AddMenuEntry(
@@ -284,7 +284,7 @@ void FPathContextMenu::MakePathViewContextMenu(FMenuBuilder& MenuBuilder)
 			MenuBuilder.BeginSection("PathContextBulkOperations", LOCTEXT("AssetTreeBulkMenuHeading", "Bulk Operations") );
 			{
 				// Save
-				MenuBuilder.AddMenuEntry(FContentBrowserCommands::Get().SaveAllCurrentFolder, NAME_None,
+				MenuBuilder.AddMenuEntry(FCodeBrowserCommands::Get().SaveAllCurrentFolder, NAME_None,
 					LOCTEXT("SaveFolder", "Save All"),
 					LOCTEXT("SaveFolderTooltip", "Saves all modified assets in this folder.")
 					);
@@ -292,7 +292,7 @@ void FPathContextMenu::MakePathViewContextMenu(FMenuBuilder& MenuBuilder)
 				if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == false)
 				{
 				// Resave
-				MenuBuilder.AddMenuEntry(FContentBrowserCommands::Get().ResaveAllCurrentFolder);
+				MenuBuilder.AddMenuEntry(FCodeBrowserCommands::Get().ResaveAllCurrentFolder);
 				}
 
 				// Delete
@@ -401,7 +401,7 @@ void FPathContextMenu::MakePathViewContextMenu(FMenuBuilder& MenuBuilder)
 bool FPathContextMenu::CanCreateAsset() const
 {
 	// We can only create assets when we have a single asset path selected
-	return SelectedPaths.Num() == 1 && !ContentBrowserUtils::IsClassPath(SelectedPaths[0]);
+	return SelectedPaths.Num() == 1 && !CodeBrowserUtils::IsClassPath(SelectedPaths[0]);
 }
 
 void FPathContextMenu::MakeNewAssetSubMenu(FMenuBuilder& MenuBuilder)
@@ -428,7 +428,7 @@ void FPathContextMenu::ExecuteCreateClass()
 bool FPathContextMenu::CanCreateClass() const
 {
 	// We can only create assets when we have a single class path selected
-	return SelectedPaths.Num() == 1 && ContentBrowserUtils::IsValidPathToCreateNewClass(SelectedPaths[0]);
+	return SelectedPaths.Num() == 1 && CodeBrowserUtils::IsValidPathToCreateNewClass(SelectedPaths[0]);
 }
 
 void FPathContextMenu::MakeSetColorSubMenu(FMenuBuilder& MenuBuilder)
@@ -454,7 +454,7 @@ void FPathContextMenu::MakeSetColorSubMenu(FMenuBuilder& MenuBuilder)
 
 	// Add all the custom colors the user has chosen so far
 	TArray< FLinearColor > CustomColors;
-	if ( ContentBrowserUtils::HasCustomColors( &CustomColors ) )
+	if ( CodeBrowserUtils::HasCustomColors( &CustomColors ) )
 	{	
 		MenuBuilder.BeginSection("PathContextCustomColors", LOCTEXT("CustomColorsExistingColors", "Existing Colors") );
 		{
@@ -499,9 +499,9 @@ void FPathContextMenu::ExecuteMigrateFolder()
 		}
 
 		// Get a list of package names for input into MigratePackages
-		TArray<FAssetData> AssetDataList;
+		TArray<FFileData> AssetDataList;
 		TArray<FName> PackageNames;
-		ContentBrowserUtils::GetAssetsInPaths(SelectedPaths, AssetDataList);
+		CodeBrowserUtils::GetAssetsInPaths(SelectedPaths, AssetDataList);
 		for ( auto AssetIt = AssetDataList.CreateConstIterator(); AssetIt; ++AssetIt )
 		{
 			PackageNames.Add((*AssetIt).PackageName);
@@ -519,9 +519,9 @@ void FPathContextMenu::ExecuteExplore()
 	{
 		const FString& Path = SelectedPaths[PathIdx];
 		FString FilePath;
-		if (ContentBrowserUtils::IsClassPath(Path))
+		if (CodeBrowserUtils::IsClassPath(Path))
 		{
-			TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+			TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 			if (NativeClassHierarchy->GetFileSystemPath(Path, FilePath))
 			{
 				FilePath = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*FilePath);
@@ -547,7 +547,7 @@ void FPathContextMenu::ExecuteExplore()
 
 bool FPathContextMenu::CanExecuteRename() const
 {
-	return ContentBrowserUtils::CanRenameFromPathView(SelectedPaths);
+	return CodeBrowserUtils::CanRenameFromPathView(SelectedPaths);
 }
 
 void FPathContextMenu::ExecuteRename()
@@ -577,11 +577,11 @@ void FPathContextMenu::ExecutePickColor()
 		for (int32 PathIdx = SelectedPaths.Num() - 1; PathIdx >= 0; --PathIdx)
 		{
 			const FString& Path = SelectedPaths[PathIdx];
-			TSharedPtr<FLinearColor> Color = ContentBrowserUtils::LoadColor( Path );
+			TSharedPtr<FLinearColor> Color = CodeBrowserUtils::LoadColor( Path );
 			if ( !Color.IsValid() )
 			{
-				Color = MakeShareable( new FLinearColor( ContentBrowserUtils::GetDefaultColor() ) );
-				ContentBrowserUtils::SaveColor( Path, Color, true );
+				Color = MakeShareable( new FLinearColor( CodeBrowserUtils::GetDefaultColor() ) );
+				CodeBrowserUtils::SaveColor( Path, Color, true );
 			}
 			else
 			{
@@ -609,9 +609,9 @@ void FPathContextMenu::NewColorComplete(const TSharedRef<SWindow>& Window)
 	for (int32 PathIdx = 0; PathIdx < SelectedPaths.Num(); ++PathIdx)
 	{
 		const FString& Path = SelectedPaths[PathIdx];
-		const TSharedPtr<FLinearColor> Color = ContentBrowserUtils::LoadColor( Path );
+		const TSharedPtr<FLinearColor> Color = CodeBrowserUtils::LoadColor( Path );
 		check( Color.IsValid() );
-		ContentBrowserUtils::SaveColor( Path, Color );		
+		CodeBrowserUtils::SaveColor( Path, Color );		
 	}
 }
 
@@ -621,13 +621,13 @@ FReply FPathContextMenu::OnColorClicked( const FLinearColor InColor )
 	for (int32 PathIdx = 0; PathIdx < SelectedPaths.Num(); ++PathIdx)
 	{
 		const FString& Path = SelectedPaths[PathIdx];
-		TSharedPtr<FLinearColor> Color = ContentBrowserUtils::LoadColor( Path );
+		TSharedPtr<FLinearColor> Color = CodeBrowserUtils::LoadColor( Path );
 		if ( !Color.IsValid() )
 		{
 			Color = MakeShareable( new FLinearColor() );
 		}
 		*Color.Get() = InColor;
-		ContentBrowserUtils::SaveColor( Path, Color );
+		CodeBrowserUtils::SaveColor( Path, Color );
 	}
 
 	// Dismiss the menu here, as we can't make the 'clear' option appear if a folder has just had a color set for the first time
@@ -642,7 +642,7 @@ void FPathContextMenu::ResetColors()
 	for (int32 PathIdx = 0; PathIdx < SelectedPaths.Num(); ++PathIdx)
 	{
 		const FString& Path = SelectedPaths[PathIdx];
-		ContentBrowserUtils::SaveColor( Path, NULL );		
+		CodeBrowserUtils::SaveColor( Path, NULL );		
 	}
 }
 
@@ -668,7 +668,7 @@ void FPathContextMenu::ExecuteSaveFolder()
 	// Save all packages that were found
 	if ( Packages.Num() )
 	{
-		ContentBrowserUtils::SavePackages(Packages);
+		CodeBrowserUtils::SavePackages(Packages);
 	}
 }
 
@@ -695,13 +695,13 @@ void FPathContextMenu::ExecuteResaveFolder()
 
 	if (Packages.Num())
 	{
-		ContentBrowserUtils::SavePackages(Packages);
+		CodeBrowserUtils::SavePackages(Packages);
 	}
 }
 
 bool FPathContextMenu::CanExecuteDelete() const
 {
-	return ContentBrowserUtils::CanDeleteFromPathView(SelectedPaths);
+	return CodeBrowserUtils::CanDeleteFromPathView(SelectedPaths);
 }
 
 void FPathContextMenu::ExecuteDelete()
@@ -735,7 +735,7 @@ void FPathContextMenu::ExecuteDelete()
 		
 		// Spawn a confirmation dialog since this is potentially a highly destructive operation
 		FOnClicked OnYesClicked = FOnClicked::CreateSP( this, &FPathContextMenu::ExecuteDeleteFolderConfirmed );
- 		ContentBrowserUtils::DisplayConfirmationPopup(
+ 		CodeBrowserUtils::DisplayConfirmationPopup(
 			Prompt,
 			LOCTEXT("FolderDeleteConfirm_Yes", "Delete"),
 			LOCTEXT("FolderDeleteConfirm_No", "Cancel"),
@@ -758,7 +758,7 @@ void FPathContextMenu::ExecuteFixUpRedirectorsInFolder()
 	}
 
 	// Query for a list of assets in the selected paths
-	TArray<FAssetData> AssetList;
+	TArray<FFileData> AssetList;
 	AssetRegistryModule.Get().GetAssets(Filter, AssetList);
 
 	if (AssetList.Num() > 0)
@@ -772,7 +772,7 @@ void FPathContextMenu::ExecuteFixUpRedirectorsInFolder()
 		TArray<UObject*> Objects;
 		const bool bAllowedToPromptToLoadAssets = true;
 		const bool bLoadRedirects = true;
-		if (ContentBrowserUtils::LoadAssetsIfNeeded(ObjectPaths, Objects, bAllowedToPromptToLoadAssets, bLoadRedirects))
+		if (CodeBrowserUtils::LoadAssetsIfNeeded(ObjectPaths, Objects, bAllowedToPromptToLoadAssets, bLoadRedirects))
 		{
 			// Transform Objects array to ObjectRedirectors array
 			TArray<UObjectRedirector*> Redirectors;
@@ -792,7 +792,7 @@ void FPathContextMenu::ExecuteFixUpRedirectorsInFolder()
 
 FReply FPathContextMenu::ExecuteDeleteFolderConfirmed()
 {
-	if ( ContentBrowserUtils::DeleteFolders(SelectedPaths) )
+	if ( CodeBrowserUtils::DeleteFolders(SelectedPaths) )
 	{
 		ResetColors();
 		if (OnFolderDeleted.IsBound())
@@ -935,7 +935,7 @@ void FPathContextMenu::ExecuteSCCCheckIn()
 
 void FPathContextMenu::ExecuteSCCSync() const
 {
-	ContentBrowserUtils::SyncPathsFromSourceControl(SelectedPaths);
+	CodeBrowserUtils::SyncPathsFromSourceControl(SelectedPaths);
 }
 
 void FPathContextMenu::ExecuteSCCConnect() const
@@ -946,7 +946,7 @@ void FPathContextMenu::ExecuteSCCConnect() const
 bool FPathContextMenu::CanExecuteSCCCheckOut() const
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
 
 	// Can only perform SCC operations on asset paths
 	return bCanExecuteSCCCheckOut && (NumAssetPaths > 0 && NumClassPaths == 0);
@@ -955,7 +955,7 @@ bool FPathContextMenu::CanExecuteSCCCheckOut() const
 bool FPathContextMenu::CanExecuteSCCOpenForAdd() const
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
 
 	// Can only perform SCC operations on asset paths
 	return bCanExecuteSCCOpenForAdd && (NumAssetPaths > 0 && NumClassPaths == 0);
@@ -964,7 +964,7 @@ bool FPathContextMenu::CanExecuteSCCOpenForAdd() const
 bool FPathContextMenu::CanExecuteSCCCheckIn() const
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
 
 	// Can only perform SCC operations on asset paths
 	return bCanExecuteSCCCheckIn && (NumAssetPaths > 0 && NumClassPaths == 0);
@@ -973,7 +973,7 @@ bool FPathContextMenu::CanExecuteSCCCheckIn() const
 bool FPathContextMenu::CanExecuteSCCSync() const
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
 
 	// Can only perform SCC operations on asset paths
 	return (NumAssetPaths > 0 && NumClassPaths == 0);
@@ -982,7 +982,7 @@ bool FPathContextMenu::CanExecuteSCCSync() const
 bool FPathContextMenu::CanExecuteSCCConnect() const
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SelectedPaths, NumAssetPaths, NumClassPaths);
 
 	// Can only perform SCC operations on asset paths
 	return (!ISourceControlModule::Get().IsEnabled() || !ISourceControlModule::Get().GetProvider().IsAvailable()) && (NumAssetPaths > 0 && NumClassPaths == 0);
@@ -1045,7 +1045,7 @@ void FPathContextMenu::GetPackageNamesInSelectedPaths(TArray<FString>& OutPackag
 	}
 
 	// Query for a list of assets in the selected paths
-	TArray<FAssetData> AssetList;
+	TArray<FFileData> AssetList;
 	AssetRegistryModule.Get().GetAssets(Filter, AssetList);
 
 	// Form a list of unique package names from the assets
@@ -1073,8 +1073,8 @@ bool FPathContextMenu::SelectedHasCustomColors() const
 	{
 		// Ignore any that are the default color
 		const FString& Path = SelectedPaths[PathIdx];
-		const TSharedPtr<FLinearColor> Color = ContentBrowserUtils::LoadColor( Path );
-		if ( Color.IsValid() && !Color->Equals( ContentBrowserUtils::GetDefaultColor() ) )
+		const TSharedPtr<FLinearColor> Color = CodeBrowserUtils::LoadColor( Path );
+		if ( Color.IsValid() && !Color->Equals( CodeBrowserUtils::GetDefaultColor() ) )
 		{
 			return true;
 		}

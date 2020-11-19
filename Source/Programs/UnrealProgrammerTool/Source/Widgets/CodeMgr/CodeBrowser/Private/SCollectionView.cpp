@@ -17,7 +17,7 @@
 #include "ISourceControlProvider.h"
 #include "ISourceControlModule.h"
 #include "CollectionManagerModule.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserUtils.h"
 #include "HistoryManager.h"
 
 #include "CollectionAssetManagement.h"
@@ -25,11 +25,11 @@
 #include "DragAndDrop/AssetDragDropOp.h"
 #include "DragAndDrop/CollectionDragDropOp.h"
 #include "SourcesViewWidgets.h"
-#include "ContentBrowserModule.h"
+#include "CodeBrowserModule.h"
 #include "Widgets/Layout/SExpandableArea.h"
 #include "Widgets/Input/SSearchBox.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 namespace CollectionViewFilter
 {
@@ -131,7 +131,7 @@ void SCollectionView::Construct( const FArguments& InArgs )
 				+ SHorizontalBox::Slot()
 				[
 					SNew(STextBlock)
-					.Font( FEditorStyle::GetFontStyle("ContentBrowser.SourceTitleFont") )
+					.Font( FEditorStyle::GetFontStyle("CodeBrowser.SourceTitleFont") )
 					.Text( LOCTEXT("CollectionsListTitle", "Collections") )
 					.Visibility( this, &SCollectionView::GetCollectionsTitleTextVisibility )
 				]
@@ -157,7 +157,7 @@ void SCollectionView::Construct( const FArguments& InArgs )
 				.ContentPadding( FMargin(2, 2) )
 				.Visibility(this, &SCollectionView::GetAddCollectionButtonVisibility)
 				[
-					SNew(SImage) .Image( FEditorStyle::GetBrush("ContentBrowser.AddCollectionButtonIcon") )
+					SNew(SImage) .Image( FEditorStyle::GetBrush("CodeBrowser.AddCollectionButtonIcon") )
 				]
 			];
 
@@ -617,7 +617,7 @@ TArray<FCollectionNameType> SCollectionView::GetSelectedCollections() const
 	return RetArray;
 }
 
-void SCollectionView::SetSelectedAssets(const TArray<FAssetData>& SelectedAssets)
+void SCollectionView::SetSelectedAssets(const TArray<FFileData>& SelectedAssets)
 {
 	if ( QuickAssetManagement.IsValid() )
 	{
@@ -814,8 +814,8 @@ FReply SCollectionView::OnDrop( const FGeometry& MyGeometry, const FDragDropEven
 void SCollectionView::MakeSaveDynamicCollectionMenu(FText InQueryString)
 {
 	// Get all menu extenders for this context menu from the content browser module
-	FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>( TEXT("ContentBrowser") );
-	TArray<FContentBrowserMenuExtender> MenuExtenderDelegates = ContentBrowserModule.GetAllCollectionViewContextMenuExtenders();
+	FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>( TEXT("CodeBrowser") );
+	TArray<FCodeBrowserMenuExtender> MenuExtenderDelegates = CodeBrowserModule.GetAllCollectionViewContextMenuExtenders();
 
 	TArray<TSharedPtr<FExtender>> Extenders;
 	for (int32 i = 0; i < MenuExtenderDelegates.Num(); ++i)
@@ -854,8 +854,8 @@ bool SCollectionView::ShouldAllowSelectionChangedDelegate() const
 FReply SCollectionView::MakeAddCollectionMenu()
 {
 	// Get all menu extenders for this context menu from the content browser module
-	FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>( TEXT("ContentBrowser") );
-	TArray<FContentBrowserMenuExtender> MenuExtenderDelegates = ContentBrowserModule.GetAllCollectionViewContextMenuExtenders();
+	FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>( TEXT("CodeBrowser") );
+	TArray<FCodeBrowserMenuExtender> MenuExtenderDelegates = CodeBrowserModule.GetAllCollectionViewContextMenuExtenders();
 
 	TArray<TSharedPtr<FExtender>> Extenders;
 	for (int32 i = 0; i < MenuExtenderDelegates.Num(); ++i)
@@ -1042,7 +1042,7 @@ void SCollectionView::DeleteCollectionItems( const TArray<TSharedPtr<FCollection
 			// Display a warning
 			const FVector2D& CursorPos = FSlateApplication::Get().GetCursorPos();
 			FSlateRect MessageAnchor(CursorPos.X, CursorPos.Y, CursorPos.X, CursorPos.Y);
-			ContentBrowserUtils::DisplayMessage(
+			CodeBrowserUtils::DisplayMessage(
 				FText::Format( LOCTEXT("CollectionDestroyFailed", "Failed to destroy collection. {0}"), CollectionManagerModule.Get().GetLastError() ),
 				MessageAnchor,
 				CollectionTreePtr.ToSharedRef()
@@ -1088,7 +1088,7 @@ EVisibility SCollectionView::GetCollectionTreeVisibility() const
 
 const FSlateBrush* SCollectionView::GetCollectionViewDropTargetBorder() const
 {
-	return bDraggedOver ? FEditorStyle::GetBrush("ContentBrowser.CollectionTreeDragDropBorder") : FEditorStyle::GetBrush("NoBorder");
+	return bDraggedOver ? FEditorStyle::GetBrush("CodeBrowser.CollectionTreeDragDropBorder") : FEditorStyle::GetBrush("NoBorder");
 }
 
 TSharedRef<ITableRow> SCollectionView::GenerateCollectionRow( TSharedPtr<FCollectionItem> CollectionItem, const TSharedRef<STableViewBase>& OwnerTable )
@@ -1206,7 +1206,7 @@ FReply SCollectionView::HandleDragDropOnCollectionTree(const FGeometry& Geometry
 					NAME_None, ECollectionShareType::CST_All
 					))
 			{
-				ContentBrowserUtils::DisplayMessage(CollectionManagerModule.Get().GetLastError(), Geometry.GetLayoutBoundingRect(), SharedThis(this));
+				CodeBrowserUtils::DisplayMessage(CollectionManagerModule.Get().GetLastError(), Geometry.GetLayoutBoundingRect(), SharedThis(this));
 			}
 		}
 
@@ -1295,7 +1295,7 @@ FReply SCollectionView::HandleDragDropOnCollectionItem(TSharedRef<FCollectionIte
 					CollectionItem->CollectionName, CollectionItem->CollectionType
 					))
 			{
-				ContentBrowserUtils::DisplayMessage(CollectionManagerModule.Get().GetLastError(), Geometry.GetLayoutBoundingRect(), SharedThis(this));
+				CodeBrowserUtils::DisplayMessage(CollectionManagerModule.Get().GetLastError(), Geometry.GetLayoutBoundingRect(), SharedThis(this));
 			}
 		}
 
@@ -1304,11 +1304,11 @@ FReply SCollectionView::HandleDragDropOnCollectionItem(TSharedRef<FCollectionIte
 	else if (Operation->IsOfType<FAssetDragDropOp>())
 	{
 		TSharedPtr<FAssetDragDropOp> DragDropOp = StaticCastSharedPtr<FAssetDragDropOp>(Operation);
-		const TArray<FAssetData>& DroppedAssets = DragDropOp->GetAssets();
+		const TArray<FFileData>& DroppedAssets = DragDropOp->GetAssets();
 
 		TArray<FName> ObjectPaths;
 		ObjectPaths.Reserve(DroppedAssets.Num());
-		for (const FAssetData& AssetData : DroppedAssets)
+		for (const FFileData& AssetData : DroppedAssets)
 		{
 			ObjectPaths.Add(AssetData.ObjectPath);
 		}
@@ -1338,7 +1338,7 @@ FReply SCollectionView::HandleDragDropOnCollectionItem(TSharedRef<FCollectionIte
 		}
 
 		// Added items to the collection or failed. Either way, display the message.
-		ContentBrowserUtils::DisplayMessage(Message, Geometry.GetLayoutBoundingRect(), SharedThis(this));
+		CodeBrowserUtils::DisplayMessage(Message, Geometry.GetLayoutBoundingRect(), SharedThis(this));
 
 		return FReply::Handled();
 	}

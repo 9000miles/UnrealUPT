@@ -6,10 +6,10 @@
 #include "Textures/SlateIcon.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "EditorStyleSet.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserUtils.h"
 #include "SPathView.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 
 void SPathPicker::Construct( const FArguments& InArgs )
@@ -50,7 +50,7 @@ void SPathPicker::Construct( const FArguments& InArgs )
 	}
 }
 
-TSharedPtr<SWidget> SPathPicker::GetFolderContextMenu(const TArray<FString>& SelectedPaths, FContentBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder)
+TSharedPtr<SWidget> SPathPicker::GetFolderContextMenu(const TArray<FString>& SelectedPaths, FCodeBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder)
 {
 	TSharedPtr<FExtender> Extender;
 	if (InMenuExtender.IsBound())
@@ -63,7 +63,7 @@ TSharedPtr<SWidget> SPathPicker::GetFolderContextMenu(const TArray<FString>& Sel
 	FMenuBuilder MenuBuilder(bInShouldCloseWindowAfterSelection, nullptr, Extender, bCloseSelfOnly);
 
 	// We can only create folders when we have a single path selected
-	const bool bCanCreateNewFolder = SelectedPaths.Num() == 1 && ContentBrowserUtils::IsValidPathToCreateNewFolder(SelectedPaths[0]);
+	const bool bCanCreateNewFolder = SelectedPaths.Num() == 1 && CodeBrowserUtils::IsValidPathToCreateNewFolder(SelectedPaths[0]);
 
 	FText NewFolderToolTip;
 	if(SelectedPaths.Num() == 1)
@@ -86,7 +86,7 @@ TSharedPtr<SWidget> SPathPicker::GetFolderContextMenu(const TArray<FString>& Sel
 	MenuBuilder.AddMenuEntry(
 		LOCTEXT("NewFolder", "New Folder"),
 		NewFolderToolTip,
-		FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
+		FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),
 		FUIAction(
 			FExecuteAction::CreateSP(this, &SPathPicker::CreateNewFolder, SelectedPaths.Num() > 0 ? SelectedPaths[0] : FString(), InOnCreateNewFolder),
 			FCanExecuteAction::CreateLambda( [bCanCreateNewFolder] { return bCanCreateNewFolder; } )
@@ -103,7 +103,7 @@ void SPathPicker::CreateNewFolder(FString FolderPath, FOnCreateNewFolder InOnCre
 	FText DefaultFolderBaseName = LOCTEXT("DefaultFolderName", "NewFolder");
 	FText DefaultFolderName = DefaultFolderBaseName;
 	int32 NewFolderPostfix = 1;
-	while (ContentBrowserUtils::DoesFolderExist(FolderPath / DefaultFolderName.ToString()))
+	while (CodeBrowserUtils::DoesFolderExist(FolderPath / DefaultFolderName.ToString()))
 	{
 		DefaultFolderName = FText::Format(LOCTEXT("DefaultFolderNamePattern", "{0}{1}"), DefaultFolderBaseName, FText::AsNumber(NewFolderPostfix));
 		NewFolderPostfix++;

@@ -12,8 +12,8 @@
 #include "Widgets/Views/STableRow.h"
 #include "Widgets/Views/STreeView.h"
 #include "Misc/TextFilter.h"
-#include "IContentBrowserSingleton.h"
-#include "ContentBrowserDelegates.h"
+#include "ICodeBrowserSingleton.h"
+#include "CodeBrowserDelegates.h"
 #include "Delegates/DelegateCombinations.h"
 
 struct FHistoryData;
@@ -50,7 +50,7 @@ public:
 		SLATE_EVENT( FOnGetFolderContextMenu, OnGetFolderContextMenu )
 
 		/** Called a context menu is opening on a folder */
-		SLATE_EVENT( FContentBrowserMenuExtender_SelectedPaths, OnGetPathContextMenuExtender )
+		SLATE_EVENT( FCodeBrowserMenuExtender_SelectedPaths, OnGetPathContextMenuExtender )
 
 		/** If true, the search box will be focus the frame after construction */
 		SLATE_ARGUMENT( bool, FocusSearchBoxWhenOpened )
@@ -110,7 +110,7 @@ public:
 	 *	@param bAllowImplicitSync	- true to allow the view to sync to parent folders if they are already selected,
 	 *								  false to force the view to select the explicit Parent folders of each asset 
 	 */
-	void SyncToAssets( const TArray<FAssetData>& AssetDataList, const bool bAllowImplicitSync = false );
+	void SyncToAssets( const TArray<FFileData>& AssetDataList, const bool bAllowImplicitSync = false );
 
 	/**
 	 * Selects the given paths.
@@ -130,7 +130,7 @@ public:
 	 *	@param bAllowImplicitSync	- true to allow the view to sync to parent folders if they are already selected,
 	 *								  false to force the view to select the explicit Parent folders of each asset 
 	 */
-	void SyncTo( const FContentBrowserSelection& ItemSelection, const bool bAllowImplicitSync = false );
+	void SyncTo( const FCodeBrowserSelection& ItemSelection, const bool bAllowImplicitSync = false );
 
 	/** Finds the item that represents the specified path, if it exists. */
 	TSharedPtr<FTreeItem> FindItemRecursive(const FString& Path) const;
@@ -212,13 +212,13 @@ protected:
 	FReply OnFolderDragDetected(const FGeometry& Geometry, const FPointerEvent& MouseEvent);
 
 	/** Handler for when assets or asset paths are dropped on a tree item */
-	virtual void TreeAssetsOrPathsDropped(const TArray<FAssetData>& AssetList, const TArray<FString>& AssetPaths, const TSharedPtr<FTreeItem>& TreeItem);
+	virtual void TreeAssetsOrPathsDropped(const TArray<FFileData>& AssetList, const TArray<FString>& AssetPaths, const TSharedPtr<FTreeItem>& TreeItem);
 
 	/** Handler for when asset paths are dropped on a tree item */
 	void TreeFilesDropped(const TArray<FString>& FileNames, const TSharedPtr<FTreeItem>& TreeItem);
 
 	/** Handler for the user selecting to move assets or asset paths to the specified folder */
-	virtual void ExecuteTreeDropMove(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
+	virtual void ExecuteTreeDropMove(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
 
 public:
 	/** Called when "new folder" is selected in the context menu */
@@ -226,7 +226,7 @@ public:
 
 private:
 	/** Internal sync implementation, syncs to the tree to the given array of items */
-	void SyncToInternal( const TArray<FAssetData>& AssetDataList, const TArray<FString>& FolderPaths, const bool bAllowImplicitSync );
+	void SyncToInternal( const TArray<FFileData>& AssetDataList, const TArray<FString>& FolderPaths, const bool bAllowImplicitSync );
 
 	/** Selects the given path only if it exists. Returns true if selected. */
 	bool ExplicitlyAddPathToSelection(const FString& Path);
@@ -259,13 +259,13 @@ private:
 	bool IsTreeItemExpanded(TSharedPtr<FTreeItem> TreeItem) const;
 
 	/** Gets all the UObjects represented by assets in the AssetList */
-	void GetDroppedObjects(const TArray<FAssetData>& AssetList, TArray<UObject*>& OutDroppedObjects);
+	void GetDroppedObjects(const TArray<FFileData>& AssetList, TArray<UObject*>& OutDroppedObjects);
 
 	/** Handler for the user selecting to copy assets or asset paths to the specified folder */
-	void ExecuteTreeDropCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
+	void ExecuteTreeDropCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
 
 	/** Handler for the user selecting to copy assets or asset paths - and dependencies - to the specified folder */
-	void ExecuteTreeDropAdvancedCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
+	void ExecuteTreeDropAdvancedCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
 
 	/** Notification for when the Asset Registry has completed it's initial search */
 	void OnAssetRegistrySearchCompleted();
@@ -341,7 +341,7 @@ private:
 	FOnGetFolderContextMenu OnGetFolderContextMenu;
 
 	/** Delegate to invoke when a context menu for a folder is opening. */
-	FContentBrowserMenuExtender_SelectedPaths OnGetPathContextMenuExtender;
+	FCodeBrowserMenuExtender_SelectedPaths OnGetPathContextMenuExtender;
 
 	/** If > 0, the selection or expansion changed delegate will not be called. Used to update the tree from an external source or in certain bulk operations. */
 	int32 PreventTreeItemChangedDelegateCount;
@@ -404,7 +404,7 @@ private:
 	/** Handles updating the content browser when an asset path is removed from the asset registry */
 	virtual void OnAssetRegistryPathRemoved(const FString& Path) override;
 
-	virtual void ExecuteTreeDropMove(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath) override;
+	virtual void ExecuteTreeDropMove(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath) override;
 
 private:
 	TArray<FString> RemovedByFolderMove;

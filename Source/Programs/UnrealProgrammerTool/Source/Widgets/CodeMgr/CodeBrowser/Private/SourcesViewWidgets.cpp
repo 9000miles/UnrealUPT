@@ -10,11 +10,11 @@
 #include "DragAndDrop/AssetDragDropOp.h"
 #include "DragAndDrop/CollectionDragDropOp.h"
 #include "DragDropHandler.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserUtils.h"
 #include "CollectionViewUtils.h"
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 //////////////////////////
 // SAssetTreeItem
@@ -30,18 +30,18 @@ void SAssetTreeItem::Construct( const FArguments& InArgs )
 	IsItemExpanded = InArgs._IsItemExpanded;
 	bDraggedOver = false;
 
-	FolderOpenBrush = FEditorStyle::GetBrush("ContentBrowser.AssetTreeFolderOpen");
-	FolderClosedBrush = FEditorStyle::GetBrush("ContentBrowser.AssetTreeFolderClosed");
-	FolderOpenCodeBrush = FEditorStyle::GetBrush("ContentBrowser.AssetTreeFolderOpenCode");
-	FolderClosedCodeBrush = FEditorStyle::GetBrush("ContentBrowser.AssetTreeFolderClosedCode");
-	FolderDeveloperBrush = FEditorStyle::GetBrush("ContentBrowser.AssetTreeFolderDeveloper");
+	FolderOpenBrush = FEditorStyle::GetBrush("CodeBrowser.AssetTreeFolderOpen");
+	FolderClosedBrush = FEditorStyle::GetBrush("CodeBrowser.AssetTreeFolderClosed");
+	FolderOpenCodeBrush = FEditorStyle::GetBrush("CodeBrowser.AssetTreeFolderOpenCode");
+	FolderClosedCodeBrush = FEditorStyle::GetBrush("CodeBrowser.AssetTreeFolderClosedCode");
+	FolderDeveloperBrush = FEditorStyle::GetBrush("CodeBrowser.AssetTreeFolderDeveloper");
 		
 	FolderType = EFolderType::Normal;
-	if( ContentBrowserUtils::IsDevelopersFolder(InArgs._TreeItem->FolderPath) )
+	if( CodeBrowserUtils::IsDevelopersFolder(InArgs._TreeItem->FolderPath) )
 	{
 		FolderType = EFolderType::Developer;
 	}
-	else if( ContentBrowserUtils::IsClassPath/*IsClassRootDir*/(InArgs._TreeItem->FolderPath) )
+	else if( CodeBrowserUtils::IsClassPath/*IsClassRootDir*/(InArgs._TreeItem->FolderPath) )
 	{
 		FolderType = EFolderType::Code;
 	}
@@ -74,7 +74,7 @@ void SAssetTreeItem::Construct( const FArguments& InArgs )
 				SAssignNew(InlineRenameWidget, SInlineEditableTextBlock)
 					.Text(this, &SAssetTreeItem::GetNameText)
 					.ToolTipText(this, &SAssetTreeItem::GetToolTipText)
-					.Font( InArgs._FontOverride.IsSet() ? InArgs._FontOverride : FEditorStyle::GetFontStyle(bIsRoot ? "ContentBrowser.SourceTreeRootItemFont" : "ContentBrowser.SourceTreeItemFont") )
+					.Font( InArgs._FontOverride.IsSet() ? InArgs._FontOverride : FEditorStyle::GetFontStyle(bIsRoot ? "CodeBrowser.SourceTreeRootItemFont" : "CodeBrowser.SourceTreeItemFont") )
 					.HighlightText( InArgs._HighlightText )
 					.OnTextCommitted(this, &SAssetTreeItem::HandleNameCommitted)
 					.OnVerifyTextChanged(this, &SAssetTreeItem::VerifyNameChanged)
@@ -233,7 +233,7 @@ bool SAssetTreeItem::IsValidAssetPath() const
 	if ( TreeItem.IsValid() )
 	{
 		// The classes folder is not a real path
-		return !ContentBrowserUtils::IsClassPath(TreeItem.Pin()->FolderPath);
+		return !CodeBrowserUtils::IsClassPath(TreeItem.Pin()->FolderPath);
 	}
 	else
 	{
@@ -260,13 +260,13 @@ FSlateColor SAssetTreeItem::GetFolderColor() const
 {
 	if ( TreeItem.IsValid() )
 	{
-		const TSharedPtr<FLinearColor> Color = ContentBrowserUtils::LoadColor( TreeItem.Pin()->FolderPath );
+		const TSharedPtr<FLinearColor> Color = CodeBrowserUtils::LoadColor( TreeItem.Pin()->FolderPath );
 		if ( Color.IsValid() )
 		{
 			return *Color.Get();
 		}
 	}
-	return ContentBrowserUtils::GetDefaultColor();
+	return CodeBrowserUtils::GetDefaultColor();
 }
 
 FText SAssetTreeItem::GetNameText() const
@@ -354,7 +354,7 @@ void SCollectionTreeItem::Construct( const FArguments& InArgs )
 				SAssignNew(InlineRenameWidget, SInlineEditableTextBlock)
 				.Text( this, &SCollectionTreeItem::GetNameText )
 				.HighlightText( InArgs._HighlightText )
-				.Font( FEditorStyle::GetFontStyle("ContentBrowser.SourceListItemFont") )
+				.Font( FEditorStyle::GetFontStyle("CodeBrowser.SourceListItemFont") )
 				.OnBeginTextEdit(this, &SCollectionTreeItem::HandleBeginNameChange)
 				.OnTextCommitted(this, &SCollectionTreeItem::HandleNameCommitted)
 				.OnVerifyTextChanged(this, &SCollectionTreeItem::HandleVerifyNameChanged)
@@ -387,7 +387,7 @@ void SCollectionTreeItem::Construct( const FArguments& InArgs )
 			.Padding(2, 0, 2, 0)
 			[
 				SNew(SImage)
-				.Image(FEditorStyle::GetBrush("ContentBrowser.CollectionStatus"))
+				.Image(FEditorStyle::GetBrush("CodeBrowser.CollectionStatus"))
 				.ColorAndOpacity(this, &SCollectionTreeItem::GetCollectionStatusColor)
 				.ToolTipText(this, &SCollectionTreeItem::GetCollectionStatusToolTipText)
 			]
@@ -505,7 +505,7 @@ void SCollectionTreeItem::HandleNameCommitted( const FText& NewText, ETextCommit
 				if ( !OnNameChangeCommit.Execute(CollectionItemPtr, NewText.ToString(), bIsCommitted, WarningMessage) && ParentWidget.IsValid() && bIsCommitted )
 				{
 					// Failed to rename/create a collection, display a warning.
-					ContentBrowserUtils::DisplayMessage(WarningMessage, CachedGeometry.GetLayoutBoundingRect(), ParentWidget.ToSharedRef());
+					CodeBrowserUtils::DisplayMessage(WarningMessage, CachedGeometry.GetLayoutBoundingRect(), ParentWidget.ToSharedRef());
 				}
 			}				
 		}

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Input/Reply.h"
-#include "Editor/ContentBrowser/Private/NewAssetOrClassContextMenu.h"
+#include "Editor/CodeBrowser/Private/NewAssetOrClassContextMenu.h"
 
 class FExtender;
 class FMenuBuilder;

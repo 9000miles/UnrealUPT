@@ -30,13 +30,13 @@
 #include "Internationalization/BreakIterator.h"
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "Misc/EngineBuildSettings.h"
-#include "ContentBrowserLog.h"
+#include "CodeBrowserLog.h"
 #include "ObjectTools.h"
 #include "AssetThumbnail.h"
-#include "Settings/ContentBrowserSettings.h"
-#include "ContentBrowserModule.h"
+#include "Settings/CodeBrowserSettings.h"
+#include "CodeBrowserModule.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 
 ///////////////////////////////
@@ -50,7 +50,7 @@ FReply FAssetViewModeUtils::OnViewModeKeyDown( const TSet< TSharedPtr<FAssetView
 	{
 		FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
-		TArray<FAssetData> SelectedAssets;
+		TArray<FFileData> SelectedAssets;
 		for ( auto ItemIt = SelectedItems.CreateConstIterator(); ItemIt; ++ItemIt)
 		{
 			const TSharedPtr<FAssetViewItem>& Item = *ItemIt;
@@ -72,7 +72,7 @@ FReply FAssetViewModeUtils::OnViewModeKeyDown( const TSet< TSharedPtr<FAssetView
 			}
 		}
 
-		ContentBrowserUtils::CopyAssetReferencesToClipboard(SelectedAssets);
+		CodeBrowserUtils::CopyAssetReferencesToClipboard(SelectedAssets);
 
 		return FReply::Handled();
 	}
@@ -109,16 +109,16 @@ TSharedRef<SWidget> FAssetViewItemHelper::CreateListTileItemContents(T* const In
 		ECollectionShareType::Type CollectionFolderShareType = ECollectionShareType::CST_All;
 		if (AssetFolderItem->bCollectionFolder)
 		{
-			ContentBrowserUtils::IsCollectionPath(AssetFolderItem->FolderPath, nullptr, &CollectionFolderShareType);
+			CodeBrowserUtils::IsCollectionPath(AssetFolderItem->FolderPath, nullptr, &CollectionFolderShareType);
 		}
 
 		const FSlateBrush* FolderBaseImage = AssetFolderItem->bDeveloperFolder 
-			? FEditorStyle::GetBrush("ContentBrowser.ListViewDeveloperFolderIcon.Base") 
-			: FEditorStyle::GetBrush("ContentBrowser.ListViewFolderIcon.Base");
+			? FEditorStyle::GetBrush("CodeBrowser.ListViewDeveloperFolderIcon.Base") 
+			: FEditorStyle::GetBrush("CodeBrowser.ListViewFolderIcon.Base");
 
 		const FSlateBrush* FolderTintImage = AssetFolderItem->bDeveloperFolder 
-			? FEditorStyle::GetBrush("ContentBrowser.ListViewDeveloperFolderIcon.Mask") 
-			: FEditorStyle::GetBrush("ContentBrowser.ListViewFolderIcon.Mask");
+			? FEditorStyle::GetBrush("CodeBrowser.ListViewDeveloperFolderIcon.Mask") 
+			: FEditorStyle::GetBrush("CodeBrowser.ListViewFolderIcon.Mask");
 
 		// Folder base
 		ItemContentsOverlay->AddSlot()
@@ -182,7 +182,7 @@ TSharedRef<SWidget> FAssetViewItemHelper::CreateListTileItemContents(T* const In
 	}
 	else
 	{
-		OutItemShadowBorder = FName("ContentBrowser.ThumbnailShadow");
+		OutItemShadowBorder = FName("CodeBrowser.ThumbnailShadow");
 
 		// The actual thumbnail
 		ItemContentsOverlay->AddSlot()
@@ -266,7 +266,7 @@ public:
 		SToolTip::Construct(
 			SToolTip::FArguments()
 			.TextMargin(1.0f)
-			.BorderImage(FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.ToolTipBorder"))
+			.BorderImage(FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.ToolTipBorder"))
 			);
 	}
 
@@ -453,7 +453,7 @@ void SAssetViewItem::Construct( const FArguments& InArgs )
 
 	AssetItem->OnAssetDataChanged.AddSP(this, &SAssetViewItem::OnAssetDataChanged);
 
-	AssetDirtyBrush = FEditorStyle::GetBrush("ContentBrowser.ContentDirty");
+	AssetDirtyBrush = FEditorStyle::GetBrush("CodeBrowser.ContentDirty");
 	SCCStateBrush = nullptr;
 
 	// Set our tooltip - this will refresh each time it's opened to make sure it's up-to-date
@@ -589,12 +589,12 @@ bool SAssetViewItem::IsNameReadOnly() const
 	if (AssetItem->GetType() != EAssetItemType::Folder)
 	{
 		// Read-only if we can't be renamed
-		return !ContentBrowserUtils::CanRenameAsset(StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data);
+		return !CodeBrowserUtils::CanRenameAsset(StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data);
 	}
 	else
 	{
 		// Read-only if we can't be renamed
-		return !ContentBrowserUtils::CanRenameFolder(StaticCastSharedPtr<FAssetViewFolder>(AssetItem)->FolderPath);
+		return !CodeBrowserUtils::CanRenameFolder(StaticCastSharedPtr<FAssetViewFolder>(AssetItem)->FolderPath);
 	}
 
 	return false;
@@ -706,10 +706,10 @@ const FSlateBrush* SAssetViewItem::GetDirtyImage() const
 
 TSharedRef<SWidget> SAssetViewItem::GenerateExtraStateIconWidget(TAttribute<float> InMaxExtraStateIconWidth) const
 {
-	TArray<FOnGenerateAssetViewExtraStateIndicators>& ExtraStateIconGenerators = FModuleManager::GetModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser")).GetAllAssetViewExtraStateIconGenerators();
+	TArray<FOnGenerateAssetViewExtraStateIndicators>& ExtraStateIconGenerators = FModuleManager::GetModuleChecked<FCodeBrowserModule>(TEXT("CodeBrowser")).GetAllAssetViewExtraStateIconGenerators();
 	if (AssetItem->GetType() != EAssetItemType::Folder && ExtraStateIconGenerators.Num() > 0)
 	{
-		FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+		FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 		TSharedPtr<SHorizontalBox> Content = SNew(SHorizontalBox);
 		for (const auto& Generator : ExtraStateIconGenerators)
 		{
@@ -730,10 +730,10 @@ TSharedRef<SWidget> SAssetViewItem::GenerateExtraStateIconWidget(TAttribute<floa
 
 TSharedRef<SWidget> SAssetViewItem::GenerateExtraStateTooltipWidget() const
 {
-	TArray<FOnGenerateAssetViewExtraStateIndicators>& ExtraStateTooltipGenerators = FModuleManager::GetModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser")).GetAllAssetViewExtraStateTooltipGenerators();
+	TArray<FOnGenerateAssetViewExtraStateIndicators>& ExtraStateTooltipGenerators = FModuleManager::GetModuleChecked<FCodeBrowserModule>(TEXT("CodeBrowser")).GetAllAssetViewExtraStateTooltipGenerators();
 	if (AssetItem->GetType() != EAssetItemType::Folder && ExtraStateTooltipGenerators.Num() > 0)
 	{
-		FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+		FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 		TSharedPtr<SVerticalBox> Content = SNew(SVerticalBox);
 		for (const auto& Generator : ExtraStateTooltipGenerators)
 		{
@@ -763,18 +763,18 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 		bool bTryCustomAssetToolTip = true;
 		if (OnIsAssetValidForCustomToolTip.IsBound() && AssetItem->GetType() != EAssetItemType::Folder)
 		{
-			FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+			FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 			bTryCustomAssetToolTip = OnIsAssetValidForCustomToolTip.Execute(AssetData);
 		}
 
 		if(bTryCustomAssetToolTip && OnGetCustomAssetToolTip.IsBound() && AssetItem->GetType() != EAssetItemType::Folder)
 		{
-			FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+			FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 			return OnGetCustomAssetToolTip.Execute(AssetData);
 		}
 		else if(AssetItem->GetType() != EAssetItemType::Folder)
 		{
-			const FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+			const FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 
 			// The tooltip contains the name, class, path, and asset registry tags
 			const FText NameText = FText::FromName( AssetData.AssetName );
@@ -788,21 +788,21 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 
 			if(AssetData.PackageName != NAME_None)
 			{
-				int32 PackageNameLengthForCooking = ContentBrowserUtils::GetPackageLengthForCooking(AssetData.PackageName.ToString(), FEngineBuildSettings::IsInternalBuild());
+				int32 PackageNameLengthForCooking = CodeBrowserUtils::GetPackageLengthForCooking(AssetData.PackageName.ToString(), FEngineBuildSettings::IsInternalBuild());
 
-				int32 MaxCookPathLen = ContentBrowserUtils::GetMaxCookPathLen();
+				int32 MaxCookPathLen = CodeBrowserUtils::GetMaxCookPathLen();
 				AddToToolTipInfoBox(InfoBox, LOCTEXT("TileViewTooltipPathLengthForCookingKey", "Cooking Filepath Length"), FText::Format(LOCTEXT("TileViewTooltipPathLengthForCookingValue", "{0} / {1}"),
 					FText::AsNumber(PackageNameLengthForCooking), FText::AsNumber(MaxCookPathLen)), PackageNameLengthForCooking > MaxCookPathLen ? true : false);
 			}
 			else
 			{
-				UE_LOG(LogContentBrowser, Error, TEXT("AssetData for '%s' is invalid"), *AssetData.PackagePath.ToString());
+				UE_LOG(LogCodeBrowser, Error, TEXT("AssetData for '%s' is invalid"), *AssetData.PackagePath.ToString());
 			}
 
 			// Add Collections
 			{
 				FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
-				const FString CollectionNames = CollectionManagerModule.Get().GetCollectionsStringForObject(AssetData.ObjectPath, ECollectionShareType::CST_All, ECollectionRecursionFlags::Self, GetDefault<UContentBrowserSettings>()->bShowFullCollectionNameInToolTip);
+				const FString CollectionNames = CollectionManagerModule.Get().GetCollectionsStringForObject(AssetData.ObjectPath, ECollectionShareType::CST_All, ECollectionRecursionFlags::Self, GetDefault<UCodeBrowserSettings>()->bShowFullCollectionNameInToolTip);
 				if (!CollectionNames.IsEmpty())
 				{
 					AddToToolTipInfoBox(InfoBox, LOCTEXT("AssetToolTipKey_Collections", "Collections"), FText::FromString(CollectionNames), false);
@@ -839,7 +839,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 				[
 					SNew(SBorder)
 					.Padding(6)
-					.BorderImage(FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder"))
+					.BorderImage(FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.ContentBorder"))
 					[
 						SNew(SVerticalBox)
 
@@ -855,7 +855,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 							[
 								SNew(STextBlock)
 								.Text(NameText)
-								.Font(FEditorStyle::GetFontStyle("ContentBrowser.TileViewTooltip.NameFont"))
+								.Font(FEditorStyle::GetFontStyle("CodeBrowser.TileViewTooltip.NameFont"))
 							]
 
 							+ SHorizontalBox::Slot()
@@ -893,11 +893,11 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 					[
 						SNew(SBorder)
 						.Padding(6)
-						.BorderImage(FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder"))
+						.BorderImage(FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.ContentBorder"))
 						[
 							SNew(STextBlock)
 							.WrapTextAt(300.0f)
-							.Font(FEditorStyle::GetFontStyle("ContentBrowser.TileViewTooltip.AssetUserDescriptionFont"))
+							.Font(FEditorStyle::GetFontStyle("CodeBrowser.TileViewTooltip.AssetUserDescriptionFont"))
 							.Text(UserDescription)
 						]
 					];
@@ -909,7 +909,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 				[
 					SNew(SBorder)
 					.Padding(6)
-					.BorderImage(FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder"))
+					.BorderImage(FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.ContentBorder"))
 					[
 						InfoBox
 					]
@@ -918,7 +918,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 
 			return SNew(SBorder)
 				.Padding(6)
-				.BorderImage( FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.NonContentBorder") )
+				.BorderImage( FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.NonContentBorder") )
 				[
 					OverallTooltipVBox
 				];
@@ -935,7 +935,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 
 			return SNew(SBorder)
 				.Padding(6)
-				.BorderImage( FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.NonContentBorder") )
+				.BorderImage( FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.NonContentBorder") )
 				[
 					SNew(SVerticalBox)
 
@@ -945,7 +945,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 					[
 						SNew(SBorder)
 						.Padding(6)
-						.BorderImage( FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder") )
+						.BorderImage( FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.ContentBorder") )
 						[
 							SNew(SVerticalBox)
 
@@ -961,7 +961,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 								[
 									SNew(STextBlock)
 									.Text( FolderName )
-									.Font( FEditorStyle::GetFontStyle("ContentBrowser.TileViewTooltip.NameFont") )
+									.Font( FEditorStyle::GetFontStyle("CodeBrowser.TileViewTooltip.NameFont") )
 								]
 
 								+SHorizontalBox::Slot()
@@ -980,7 +980,7 @@ TSharedRef<SWidget> SAssetViewItem::CreateToolTipWidget() const
 					[
 						SNew(SBorder)
 						.Padding(6)
-						.BorderImage( FEditorStyle::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder") )
+						.BorderImage( FEditorStyle::GetBrush("CodeBrowser.TileViewTooltip.ContentBorder") )
 						[
 							InfoBox
 						]
@@ -1005,7 +1005,7 @@ FText SAssetViewItem::GetCheckedOutByOtherText() const
 {
 	if ( AssetItem.IsValid() && AssetItem->GetType() != EAssetItemType::Folder && !GIsSavingPackage && !IsGarbageCollecting() )
 	{
-		const FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+		const FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 		ISourceControlProvider& SourceControlProvider = ISourceControlModule::Get().GetProvider();
 		FSourceControlStatePtr SourceControlState = SourceControlProvider.GetState(SourceControlHelpers::PackageFilename(AssetData.PackageName.ToString()), EStateCacheUsage::Use);
 		FString UserWhichHasPackageCheckedOut;		
@@ -1025,7 +1025,7 @@ FText SAssetViewItem::GetAssetUserDescription() const
 	{
 		if (AssetItem->GetType() != EAssetItemType::Folder)
 		{
-			const FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+			const FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 			return AssetTypeActions.Pin()->GetAssetDescription(AssetData);
 		}
 	}
@@ -1132,7 +1132,7 @@ void SAssetViewItem::CacheDisplayTags()
 		return;
 	}
 
-	const FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+	const FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 
 	// Find the asset CDO so we can get the meta-data for the tags
 	UClass* AssetClass = FindObject<UClass>(ANY_PACKAGE, *AssetData.AssetClass.ToString());
@@ -1461,13 +1461,13 @@ FSlateColor SAssetViewItem::GetAssetColor() const
 			{
 				FName CollectionName;
 				ECollectionShareType::Type CollectionFolderShareType = ECollectionShareType::CST_All;
-				ContentBrowserUtils::IsCollectionPath(AssetFolderItem->FolderPath, &CollectionName, &CollectionFolderShareType);
+				CodeBrowserUtils::IsCollectionPath(AssetFolderItem->FolderPath, &CollectionName, &CollectionFolderShareType);
 
 				Color = CollectionViewUtils::LoadColor( CollectionName.ToString(), CollectionFolderShareType );
 			}
 			else
 			{
-				Color = ContentBrowserUtils::LoadColor( AssetFolderItem->FolderPath );
+				Color = CodeBrowserUtils::LoadColor( AssetFolderItem->FolderPath );
 			}
 
 			if ( Color.IsValid() )
@@ -1480,14 +1480,14 @@ FSlateColor SAssetViewItem::GetAssetColor() const
 			return AssetTypeActions.Pin()->GetTypeColor().ReinterpretAsLinear();
 		}
 	}
-	return ContentBrowserUtils::GetDefaultColor();
+	return CodeBrowserUtils::GetDefaultColor();
 }
 
 void SAssetViewItem::SetForceMipLevelsToBeResident(bool bForce) const
 {
 	if(AssetItem.IsValid() && AssetItem->GetType() == EAssetItemType::Normal)
 	{
-		const FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+		const FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 		if(AssetData.IsValid() && AssetData.IsAssetLoaded())
 		{
 			UObject* Asset = AssetData.GetAsset();
@@ -1510,7 +1510,7 @@ bool SAssetViewItem::OnVisualizeTooltip(const TSharedPtr<SWidget>& TooltipConten
 {
 	if(OnVisualizeAssetToolTip.IsBound() && TooltipContent.IsValid() && AssetItem->GetType() != EAssetItemType::Folder)
 	{
-		FAssetData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
+		FFileData& AssetData = StaticCastSharedPtr<FAssetViewAsset>(AssetItem)->Data;
 		return OnVisualizeAssetToolTip.Execute(TooltipContent, AssetData);
 	}
 
@@ -1619,7 +1619,7 @@ void SAssetListItem::Construct( const FArguments& InArgs )
 				.Padding(0, 1)
 				[
 					SAssignNew(InlineRenameWidget, SInlineEditableTextBlock)
-					.Font(FEditorStyle::GetFontStyle("ContentBrowser.AssetTileViewNameFont"))
+					.Font(FEditorStyle::GetFontStyle("CodeBrowser.AssetTileViewNameFont"))
 					.Text( GetNameText() )
 					.OnBeginTextEdit(this, &SAssetListItem::HandleBeginNameChange)
 					.OnTextCommitted(this, &SAssetListItem::HandleNameCommitted)
@@ -1635,7 +1635,7 @@ void SAssetListItem::Construct( const FArguments& InArgs )
 				[
 					// Class
 					SAssignNew(ClassText, STextBlock)
-					.Font(FEditorStyle::GetFontStyle("ContentBrowser.AssetListViewClassFont"))
+					.Font(FEditorStyle::GetFontStyle("CodeBrowser.AssetListViewClassFont"))
 					.Text(GetAssetClassText())
 					.HighlightText(InArgs._HighlightText)
 				]
@@ -1844,17 +1844,17 @@ FSlateFontInfo SAssetTileItem::GetThumbnailFont() const
 		float Size = ThumbSize.Get();
 		if ( Size < 50 )
 		{
-			const static FName SmallFontName("ContentBrowser.AssetTileViewNameFontVerySmall");
+			const static FName SmallFontName("CodeBrowser.AssetTileViewNameFontVerySmall");
 			return FEditorStyle::GetFontStyle(SmallFontName);
 		}
 		else if ( Size < 85 )
 		{
-			const static FName SmallFontName("ContentBrowser.AssetTileViewNameFontSmall");
+			const static FName SmallFontName("CodeBrowser.AssetTileViewNameFontSmall");
 			return FEditorStyle::GetFontStyle(SmallFontName);
 		}
 	}
 
-	const static FName RegularFont("ContentBrowser.AssetTileViewNameFont");
+	const static FName RegularFont("CodeBrowser.AssetTileViewNameFont");
 	return FEditorStyle::GetFontStyle(RegularFont);
 }
 
@@ -1952,16 +1952,16 @@ TSharedRef<SWidget> SAssetColumnItem::GenerateWidgetForColumn( const FName& Colu
 		{
 			if(AssetItem.IsValid() && StaticCastSharedPtr<FAssetViewFolder>(AssetItem)->bDeveloperFolder)
 			{
-				IconBrush = FEditorStyle::GetBrush("ContentBrowser.ColumnViewDeveloperFolderIcon");
+				IconBrush = FEditorStyle::GetBrush("CodeBrowser.ColumnViewDeveloperFolderIcon");
 			}
 			else
 			{
-				IconBrush = FEditorStyle::GetBrush("ContentBrowser.ColumnViewFolderIcon");
+				IconBrush = FEditorStyle::GetBrush("CodeBrowser.ColumnViewFolderIcon");
 			}
 		}
 		else
 		{
-			IconBrush = FEditorStyle::GetBrush("ContentBrowser.ColumnViewAssetIcon");
+			IconBrush = FEditorStyle::GetBrush("CodeBrowser.ColumnViewAssetIcon");
 		}
 
 		// Make icon overlays (eg, SCC and dirty status) a reasonable size in relation to the icon size (note: it is assumed this icon is square)

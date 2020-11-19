@@ -11,9 +11,9 @@
 #include "CollectionManagerTypes.h"
 #include "ICollectionManager.h"
 #include "CollectionManagerModule.h"
-#include "ContentBrowserLog.h"
+#include "CodeBrowserLog.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 /** The collection manager doesn't know how to follow redirectors, this class provides it with that knowledge */
 class FCollectionRedirectorFollower : public ICollectionRedirectorFollower
@@ -60,19 +60,19 @@ public:
 			TSet<FName> VisitedRedirectors;
 
 			// Use the asset registry to avoid loading the object
-			FAssetData ObjectAssetData = AssetRegistryModule.Get().GetAssetByObjectPath(InObjectPath, true);
+			FFileData ObjectAssetData = AssetRegistryModule.Get().GetAssetByObjectPath(InObjectPath, true);
 			while (ObjectAssetData.IsValid() && ObjectAssetData.IsRedirector())
 			{
 				// Check to see if we've already seen this path before, it's possible we might have found a redirector loop.
 				if ( VisitedRedirectors.Contains(ObjectAssetData.ObjectPath) )
 				{
-					UE_LOG(LogContentBrowser, Error, TEXT("Redirector Loop Found!"));
+					UE_LOG(LogCodeBrowser, Error, TEXT("Redirector Loop Found!"));
 					for ( FName Redirector : VisitedRedirectors )
 					{
-						UE_LOG(LogContentBrowser, Error, TEXT("Redirector: %s"), *Redirector.ToString());
+						UE_LOG(LogCodeBrowser, Error, TEXT("Redirector: %s"), *Redirector.ToString());
 					}
 
-					ObjectAssetData = FAssetData();
+					ObjectAssetData = FFileData();
 					break;
 				}
 
@@ -88,7 +88,7 @@ public:
 				}
 				else
 				{
-					ObjectAssetData = FAssetData();
+					ObjectAssetData = FFileData();
 				}
 			}
 
@@ -140,7 +140,7 @@ void FCollectionAssetRegistryBridge::OnAssetRegistryLoadComplete()
 	CollectionManagerModule.Get().HandleFixupRedirectors(RedirectorFollower);
 }
 
-void FCollectionAssetRegistryBridge::OnAssetRenamed(const FAssetData& AssetData, const FString& OldObjectPath)
+void FCollectionAssetRegistryBridge::OnAssetRenamed(const FFileData& AssetData, const FString& OldObjectPath)
 {
 	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
 
@@ -148,7 +148,7 @@ void FCollectionAssetRegistryBridge::OnAssetRenamed(const FAssetData& AssetData,
 	CollectionManagerModule.Get().HandleObjectRenamed(*OldObjectPath, AssetData.ObjectPath);
 }
 
-void FCollectionAssetRegistryBridge::OnAssetRemoved(const FAssetData& AssetData)
+void FCollectionAssetRegistryBridge::OnAssetRemoved(const FFileData& AssetData)
 {
 	FCollectionManagerModule& CollectionManagerModule = FCollectionManagerModule::GetModule();
 

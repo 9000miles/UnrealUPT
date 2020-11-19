@@ -9,7 +9,7 @@
 #include "Misc/TextFilterExpressionEvaluator.h"
 #include "FrontendFilterBase.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 class FMenuBuilder;
 

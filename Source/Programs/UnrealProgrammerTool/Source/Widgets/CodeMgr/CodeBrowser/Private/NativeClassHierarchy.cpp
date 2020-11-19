@@ -7,11 +7,11 @@
 #include "UObject/UObjectIterator.h"
 #include "UObject/Package.h"
 #include "Misc/PackageName.h"
-#include "ContentBrowserLog.h"
-#include "Kismet2/KismetEditorUtilities.h"
-#include "GameProjectGenerationModule.h"
+#include "CodeBrowserLog.h"
+//#include "Kismet2/KismetEditorUtilities.h"
+//#include "GameProjectGenerationModule.h"
 #include "Misc/HotReloadInterface.h"
-#include "SourceCodeNavigation.h"
+//#include "SourceCodeNavigation.h"
 #include "Interfaces/IPluginManager.h"
 
 TSharedRef<FNativeClassHierarchyNode> FNativeClassHierarchyNode::MakeFolderEntry(FName InEntryName, FString InEntryPath)
@@ -263,7 +263,7 @@ void FNativeClassHierarchy::PopulateHierarchy()
 		AddClass(CurrentClass, GameModules, PluginModules, AddClassMetrics);
 	}
 
-	UE_LOG(LogContentBrowser, Log, TEXT("Native class hierarchy populated in %0.4f seconds. Added %d classes and %d folders."), FPlatformTime::Seconds() - AddClassMetrics.StartTime, AddClassMetrics.NumClassesAdded, AddClassMetrics.NumFoldersAdded);
+	UE_LOG(LogCodeBrowser, Log, TEXT("Native class hierarchy populated in %0.4f seconds. Added %d classes and %d folders."), FPlatformTime::Seconds() - AddClassMetrics.StartTime, AddClassMetrics.NumClassesAdded, AddClassMetrics.NumFoldersAdded);
 
 	ClassHierarchyUpdatedDelegate.Broadcast();
 }
@@ -286,14 +286,14 @@ void FNativeClassHierarchy::AddClassesForModule(const FName& InModuleName)
 	GetObjectsWithOuter(ClassPackage, PackageObjects, false);
 	for(UObject* Object : PackageObjects)
 	{
-		UClass* const CurrentClass = Cast<UClass>(Object);
-		if(CurrentClass)
-		{
-			AddClass(CurrentClass, GameModules, PluginModules, AddClassMetrics);
-		}
+		//UClass* const CurrentClass = Cast<UClass>(Object);
+		//if(CurrentClass)
+		//{
+		//	AddClass(CurrentClass, GameModules, PluginModules, AddClassMetrics);
+		//}
 	}
 
-	UE_LOG(LogContentBrowser, Log, TEXT("Native class hierarchy updated for '%s' in %0.4f seconds. Added %d classes and %d folders."), *InModuleName.ToString(), FPlatformTime::Seconds() - AddClassMetrics.StartTime, AddClassMetrics.NumClassesAdded, AddClassMetrics.NumFoldersAdded);
+	UE_LOG(LogCodeBrowser, Log, TEXT("Native class hierarchy updated for '%s' in %0.4f seconds. Added %d classes and %d folders."), *InModuleName.ToString(), FPlatformTime::Seconds() - AddClassMetrics.StartTime, AddClassMetrics.NumClassesAdded, AddClassMetrics.NumFoldersAdded);
 
 	ClassHierarchyUpdatedDelegate.Broadcast();
 }
@@ -326,7 +326,7 @@ void FNativeClassHierarchy::RemoveClassesForModule(const FName& InModuleName)
 void FNativeClassHierarchy::AddClass(UClass* InClass, const TSet<FName>& InGameModules, const TMap<FName, FNativeClassHierarchyPluginModuleInfo>& InPluginModules, FAddClassMetrics& AddClassMetrics)
 {
 	// Ignore deprecated and temporary classes
-	if(InClass->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists) || FKismetEditorUtilities::IsClassABlueprintSkeleton(InClass))
+	if(InClass->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists))
 	{
 		return;
 	}
@@ -338,18 +338,18 @@ void FNativeClassHierarchy::AddClass(UClass* InClass, const TSet<FName>& InGameM
 	}
 
 	static const FName ModuleRelativePathMetaDataKey = "ModuleRelativePath";
-	const FString& ClassModuleRelativeIncludePath = InClass->GetMetaData(ModuleRelativePathMetaDataKey);
-	if(ClassModuleRelativeIncludePath.IsEmpty())
-	{
-		return;
-	}
+	//const FString& ClassModuleRelativeIncludePath = InClass->GetMetaData(ModuleRelativePathMetaDataKey);
+	//if(ClassModuleRelativeIncludePath.IsEmpty())
+	//{
+	//	return;
+	//}
 
 	// Work out which root this class should go under
 	EPluginLoadedFrom WhereLoadedFrom;
 	const FName RootNodeName = GetClassPathRootForModule(ClassModuleName, InGameModules, InPluginModules, WhereLoadedFrom);
 
 	// Work out the final path to this class within the hierarchy (which isn't the same as the path on disk)
-	const FString ClassModuleRelativePath = ClassModuleRelativeIncludePath.Left(ClassModuleRelativeIncludePath.Find(TEXT("/"), ESearchCase::CaseSensitive, ESearchDir::FromEnd));
+	const FString ClassModuleRelativePath;//= ClassModuleRelativeIncludePath.Left(ClassModuleRelativeIncludePath.Find(TEXT("/"), ESearchCase::CaseSensitive, ESearchDir::FromEnd));
 	const FString ClassHierarchyPath = ClassModuleName.ToString() + TEXT("/") + ClassModuleRelativePath;
 
 	// Ensure we've added a valid root node
@@ -435,14 +435,14 @@ bool FNativeClassHierarchy::GetFileSystemPath(const FString& InClassPath, FStrin
 	}
 
 	// Get the base file path to the module, and then append any remaining parts of the class path (as the remaining parts mirror the file system)
-	if(FSourceCodeNavigation::FindModulePath(ClassPathParts[1], OutFileSystemPath))
-	{
-		for(int32 PathPartIndex = 2; PathPartIndex < ClassPathParts.Num(); ++PathPartIndex)
-		{
-			OutFileSystemPath /= ClassPathParts[PathPartIndex];
-		}
-		return true;
-	}
+	//if(FSourceCodeNavigation::FindModulePath(ClassPathParts[1], OutFileSystemPath))
+	//{
+	//	for(int32 PathPartIndex = 2; PathPartIndex < ClassPathParts.Num(); ++PathPartIndex)
+	//	{
+	//		OutFileSystemPath /= ClassPathParts[PathPartIndex];
+	//	}
+	//	return true;
+	//}
 
 	return false;
 }
@@ -456,11 +456,11 @@ bool FNativeClassHierarchy::GetClassPath(UClass* InClass, FString& OutClassPath,
 	}
 
 	static const FName ModuleRelativePathMetaDataKey = "ModuleRelativePath";
-	const FString& ClassModuleRelativeIncludePath = InClass->GetMetaData(ModuleRelativePathMetaDataKey);
-	if(ClassModuleRelativeIncludePath.IsEmpty())
-	{
-		return false;
-	}
+	//const FString& ClassModuleRelativeIncludePath = InClass->GetMetaData(ModuleRelativePathMetaDataKey);
+	//if(ClassModuleRelativeIncludePath.IsEmpty())
+	//{
+	//	return false;
+	//}
 
 	TSet<FName> GameModules = GetGameModules();
 	TMap<FName, FNativeClassHierarchyPluginModuleInfo> PluginModules = GetPluginModules();
@@ -470,7 +470,7 @@ bool FNativeClassHierarchy::GetClassPath(UClass* InClass, FString& OutClassPath,
 	const FName RootNodeName = GetClassPathRootForModule(ClassModuleName, GameModules, PluginModules, WhereLoadedFrom);
 
 	// Work out the final path to this class within the hierarchy (which isn't the same as the path on disk)
-	const FString ClassModuleRelativePath = ClassModuleRelativeIncludePath.Left(ClassModuleRelativeIncludePath.Find(TEXT("/"), ESearchCase::CaseSensitive, ESearchDir::FromEnd));
+	const FString ClassModuleRelativePath;// = ClassModuleRelativeIncludePath.Left(ClassModuleRelativeIncludePath.Find(TEXT("/"), ESearchCase::CaseSensitive, ESearchDir::FromEnd));
 	OutClassPath = FString(TEXT("/")) + RootNodeName.ToString() + TEXT("/") + ClassModuleName.ToString();
 
 	if(!ClassModuleRelativePath.IsEmpty())
@@ -546,18 +546,18 @@ FName FNativeClassHierarchy::GetClassPathRootForModule(const FName& InModuleName
 
 TSet<FName> FNativeClassHierarchy::GetGameModules()
 {
-	FGameProjectGenerationModule& GameProjectModule = FGameProjectGenerationModule::Get();
+	//FGameProjectGenerationModule& GameProjectModule = FGameProjectGenerationModule::Get();
 
 	// Build up a set of known game modules - used to work out which modules populate Classes_Game
 	TSet<FName> GameModules;
-	if(GameProjectModule.ProjectHasCodeFiles())
-	{
-		TArray<FModuleContextInfo> GameModulesInfo = GameProjectModule.GetCurrentProjectModules();
-		for(const auto& GameModuleInfo : GameModulesInfo)
-		{
-			GameModules.Add(FName(*GameModuleInfo.ModuleName));
-		}
-	}
+	//if(GameProjectModule.ProjectHasCodeFiles())
+	//{
+	//	TArray<FModuleContextInfo> GameModulesInfo = GameProjectModule.GetCurrentProjectModules();
+	//	for(const auto& GameModuleInfo : GameModulesInfo)
+	//	{
+	//		GameModules.Add(FName(*GameModuleInfo.ModuleName));
+	//	}
+	//}
 
 	return GameModules;
 }

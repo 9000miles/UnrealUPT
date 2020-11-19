@@ -14,51 +14,15 @@
 #include "Widgets/Layout/SBox.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "EditorStyleSet.h"
-#include "Settings/ContentBrowserSettings.h"
-#include "Factories/Factory.h"
-#include "IAssetTools.h"
-#include "IAssetTypeActions.h"
-#include "AssetToolsModule.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserUtils.h"
 #include "Widgets/SToolTip.h"
-#include "IDocumentation.h"
 #include "ClassIconFinder.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
-struct FFactoryItem
-{
-	UFactory* Factory;
-	FText DisplayName;
 
-	FFactoryItem(UFactory* InFactory, const FText& InDisplayName)
-		: Factory(InFactory), DisplayName(InDisplayName)
-	{}
-};
 
-TArray<FFactoryItem> FindFactoriesInCategory(EAssetTypeCategories::Type AssetTypeCategory)
-{
-	TArray<FFactoryItem> FactoriesInThisCategory;
-	for (TObjectIterator<UClass> It; It; ++It)
-	{
-		UClass* Class = *It;
-		if (Class->IsChildOf(UFactory::StaticClass()) && !Class->HasAnyClassFlags(CLASS_Abstract))
-		{
-			UFactory* Factory = Class->GetDefaultObject<UFactory>();
-			if (Factory->ShouldShowInNewMenu() && ensure(!Factory->GetDisplayName().IsEmpty()))
-			{
-				uint32 FactoryCategories = Factory->GetMenuCategories();
 
-				if (FactoryCategories & AssetTypeCategory)
-				{
-					new(FactoriesInThisCategory)FFactoryItem(Factory, Factory->GetDisplayName());
-				}
-			}
-		}
-	}
-
-	return FactoriesInThisCategory;
-}
 
 class SFactoryMenuEntry : public SCompoundWidget
 {
@@ -78,13 +42,13 @@ public:
 	 * @param	InArgs				Declaration used by the SNew() macro to construct this widget
 	 * @param	Factory				The factory this menu entry represents
 	 */
-	void Construct( const FArguments& InArgs, UFactory* Factory )
+	void Construct( const FArguments& InArgs )
 	{
-		const FName ClassThumbnailBrushOverride = Factory->GetNewAssetThumbnailOverride();
+			const FName ClassThumbnailBrushOverride;// = Factory->GetNewAssetThumbnailOverride();
 		const FSlateBrush* ClassThumbnail = nullptr;
 		if (ClassThumbnailBrushOverride.IsNone())
 		{
-			ClassThumbnail = FClassIconFinder::FindThumbnailForClass(Factory->GetSupportedClass());
+			//ClassThumbnail = FClassIconFinder::FindThumbnailForClass(Factory->GetSupportedClass());
 		}
 		else
 		{
@@ -94,14 +58,14 @@ public:
 			ClassThumbnail = FClassIconFinder::FindThumbnailForClass(nullptr, ClassThumbnailBrushOverride);
 		}
 
-		FAssetToolsModule& AssetToolsModule = FAssetToolsModule::GetModule();
-		TWeakPtr<IAssetTypeActions> AssetTypeActions = AssetToolsModule.Get().GetAssetTypeActionsForClass(Factory->GetSupportedClass());
+		//FAssetToolsModule& AssetToolsModule = FAssetToolsModule::GetModule();
+		//TWeakPtr<IAssetTypeActions> AssetTypeActions = AssetToolsModule.Get().GetAssetTypeActionsForClass(Factory->GetSupportedClass());
 
 		FLinearColor AssetColor = FLinearColor::White;
-		if ( AssetTypeActions.IsValid() )
-		{
-			AssetColor = AssetTypeActions.Pin()->GetTypeColor();
-		}
+		//if ( AssetTypeActions.IsValid() )
+		//{
+		//	AssetColor = AssetTypeActions.Pin()->GetTypeColor();
+		//}
 
 		ChildSlot
 		[
@@ -154,13 +118,13 @@ public:
 				[
 					SNew(STextBlock)
 					.Font( FEditorStyle::GetFontStyle("LevelViewportContextMenu.AssetLabel.Text.Font") )
-					.Text( Factory->GetDisplayName() )
+					//.Text( Factory->GetDisplayName() )
 				]
 			]
 		];
 
 		
-		SetToolTip(IDocumentation::Get()->CreateToolTip(Factory->GetToolTip(), nullptr, Factory->GetToolTipDocumentationPage(), Factory->GetToolTipDocumentationExcerpt()));
+		//SetToolTip(IDocumentation::Get()->CreateToolTip(Factory->GetToolTip(), nullptr, Factory->GetToolTipDocumentationPage(), Factory->GetToolTipDocumentationExcerpt()));
 	}
 };
 
@@ -195,11 +159,11 @@ void FNewAssetOrClassContextMenu::MakeContextMenu(
 	)
 {
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(InSelectedPaths, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(InSelectedPaths, NumAssetPaths, NumClassPaths);
 
 	const FString FirstSelectedPath = (InSelectedPaths.Num() > 0) ? InSelectedPaths[0] : FString();
-	const bool bIsValidNewClassPath = ContentBrowserUtils::IsValidPathToCreateNewClass(FirstSelectedPath);
-	const bool bIsValidNewFolderPath = ContentBrowserUtils::IsValidPathToCreateNewFolder(FirstSelectedPath);
+	const bool bIsValidNewClassPath = CodeBrowserUtils::IsValidPathToCreateNewClass(FirstSelectedPath);
+	const bool bIsValidNewFolderPath = CodeBrowserUtils::IsValidPathToCreateNewFolder(FirstSelectedPath);
 	const bool bHasSinglePathSelected = InSelectedPaths.Num() == 1;
 
 	auto CanExecuteFolderActions = [NumAssetPaths, NumClassPaths, bIsValidNewFolderPath]() -> bool
@@ -227,12 +191,12 @@ void FNewAssetOrClassContextMenu::MakeContextMenu(
 	// Get Content
 	if ( InOnGetContentRequested.IsBound() )
 	{
-		MenuBuilder.BeginSection( "ContentBrowserGetContent", LOCTEXT( "GetContentMenuHeading", "Content" ) );
+		MenuBuilder.BeginSection( "CodeBrowserGetContent", LOCTEXT( "GetContentMenuHeading", "Content" ) );
 		{
 			MenuBuilder.AddMenuEntry(
 				LOCTEXT( "GetContentText", "Add Feature or Content Pack..." ),
 				LOCTEXT( "GetContentTooltip", "Add features and content packs to the project." ),
-				FSlateIcon( FEditorStyle::GetStyleSetName(), "ContentBrowser.AddContent" ),
+				FSlateIcon( FEditorStyle::GetStyleSetName(), "CodeBrowser.AddContent" ),
 				FUIAction( FExecuteAction::CreateStatic( &FNewAssetOrClassContextMenu::ExecuteGetContent, InOnGetContentRequested ) )
 				);
 		}
@@ -240,39 +204,39 @@ void FNewAssetOrClassContextMenu::MakeContextMenu(
 	}
 
 	// New Folder
-	if(InOnNewFolderRequested.IsBound() && GetDefault<UContentBrowserSettings>()->DisplayFolders)
-	{
-		MenuBuilder.BeginSection("ContentBrowserNewFolder", LOCTEXT("FolderMenuHeading", "Folder") );
-		{
-			FText NewFolderToolTip;
-			if(bHasSinglePathSelected)
-			{
-				if(bIsValidNewFolderPath)
-				{
-					NewFolderToolTip = FText::Format(LOCTEXT("NewFolderTooltip_CreateIn", "Create a new folder in {0}."), FText::FromString(FirstSelectedPath));
-				}
-				else
-				{
-					NewFolderToolTip = FText::Format(LOCTEXT("NewFolderTooltip_InvalidPath", "Cannot create new folders in {0}."), FText::FromString(FirstSelectedPath));
-				}
-			}
-			else
-			{
-				NewFolderToolTip = LOCTEXT("NewFolderTooltip_InvalidNumberOfPaths", "Can only create folders when there is a single path selected.");
-			}
+	//if(InOnNewFolderRequested.IsBound() && GetDefault<UCodeBrowserSettings>()->DisplayFolders)
+	//{
+	//	MenuBuilder.BeginSection("CodeBrowserNewFolder", LOCTEXT("FolderMenuHeading", "Folder") );
+	//	{
+	//		FText NewFolderToolTip;
+	//		if(bHasSinglePathSelected)
+	//		{
+	//			if(bIsValidNewFolderPath)
+	//			{
+	//				NewFolderToolTip = FText::Format(LOCTEXT("NewFolderTooltip_CreateIn", "Create a new folder in {0}."), FText::FromString(FirstSelectedPath));
+	//			}
+	//			else
+	//			{
+	//				NewFolderToolTip = FText::Format(LOCTEXT("NewFolderTooltip_InvalidPath", "Cannot create new folders in {0}."), FText::FromString(FirstSelectedPath));
+	//			}
+	//		}
+	//		else
+	//		{
+	//			NewFolderToolTip = LOCTEXT("NewFolderTooltip_InvalidNumberOfPaths", "Can only create folders when there is a single path selected.");
+	//		}
 
-			MenuBuilder.AddMenuEntry(
-				LOCTEXT("NewFolderLabel", "New Folder"),
-				NewFolderToolTip,
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.NewFolderIcon"),
-				FUIAction(
-					FExecuteAction::CreateStatic(&FNewAssetOrClassContextMenu::ExecuteNewFolder, FirstSelectedPath, InOnNewFolderRequested),
-					CanExecuteFolderActionsDelegate
-					)
-				);
-		}
-		MenuBuilder.EndSection(); //ContentBrowserNewFolder
-	}
+	//		MenuBuilder.AddMenuEntry(
+	//			LOCTEXT("NewFolderLabel", "New Folder"),
+	//			NewFolderToolTip,
+	//			FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),
+	//			FUIAction(
+	//				FExecuteAction::CreateStatic(&FNewAssetOrClassContextMenu::ExecuteNewFolder, FirstSelectedPath, InOnNewFolderRequested),
+	//				CanExecuteFolderActionsDelegate
+	//				)
+	//			);
+	//	}
+	//	MenuBuilder.EndSection(); //CodeBrowserNewFolder
+	//}
 
 	// Add Class
 	if(InOnNewClassRequested.IsBound())
@@ -296,7 +260,7 @@ void FNewAssetOrClassContextMenu::MakeContextMenu(
 			NewClassToolTip = LOCTEXT("NewClassTooltip_InvalidNumberOfPaths", "Can only create classes when there is a single path selected.");
 		}
 
-		MenuBuilder.BeginSection("ContentBrowserNewClass", LOCTEXT("ClassMenuHeading", "C++ Class") );
+		MenuBuilder.BeginSection("CodeBrowserNewClass", LOCTEXT("ClassMenuHeading", "C++ Class") );
 		{
 			MenuBuilder.AddMenuEntry(
 				LOCTEXT("NewClassLabel", "New C++ Class..."),
@@ -308,18 +272,18 @@ void FNewAssetOrClassContextMenu::MakeContextMenu(
 					)
 				);
 		}
-		MenuBuilder.EndSection(); //ContentBrowserNewClass
+		MenuBuilder.EndSection(); //CodeBrowserNewClass
 	}
 
 	// Import
 	if (InOnImportAssetRequested.IsBound() && !FirstSelectedPath.IsEmpty())
 	{
-		MenuBuilder.BeginSection( "ContentBrowserImportAsset", LOCTEXT( "ImportAssetMenuHeading", "Import Asset" ) );
+		MenuBuilder.BeginSection( "CodeBrowserImportAsset", LOCTEXT( "ImportAssetMenuHeading", "Import Asset" ) );
 		{
 			MenuBuilder.AddMenuEntry(
 				FText::Format( LOCTEXT( "ImportAsset", "Import to {0}..." ), FText::FromString( FirstSelectedPath ) ),
 				LOCTEXT( "ImportAssetTooltip_NewAssetOrClass", "Imports an asset from file to this folder." ),
-				FSlateIcon( FEditorStyle::GetStyleSetName(), "ContentBrowser.ImportIcon" ),
+				FSlateIcon( FEditorStyle::GetStyleSetName(), "CodeBrowser.ImportIcon" ),
 				FUIAction(
 					FExecuteAction::CreateStatic( &FNewAssetOrClassContextMenu::ExecuteImportAsset, InOnImportAssetRequested, FirstSelectedPath ),
 					CanExecuteAssetActionsDelegate
@@ -333,7 +297,7 @@ void FNewAssetOrClassContextMenu::MakeContextMenu(
 	if (InOnNewAssetRequested.IsBound())
 	{
 		// Add Basic Asset
-		MenuBuilder.BeginSection("ContentBrowserNewBasicAsset", LOCTEXT("CreateBasicAssetsMenuHeading", "Create Basic Asset") );
+		MenuBuilder.BeginSection("CodeBrowserNewBasicAsset", LOCTEXT("CreateBasicAssetsMenuHeading", "Create Basic Asset") );
 		{
 			CreateNewAssetMenuCategory(
 				MenuBuilder, 
@@ -343,77 +307,77 @@ void FNewAssetOrClassContextMenu::MakeContextMenu(
 				CanExecuteAssetActionsDelegate
 				);
 		}
-		MenuBuilder.EndSection(); //ContentBrowserNewBasicAsset
+		MenuBuilder.EndSection(); //CodeBrowserNewBasicAsset
 
 		// Add Advanced Asset
-		MenuBuilder.BeginSection("ContentBrowserNewAdvancedAsset", LOCTEXT("CreateAdvancedAssetsMenuHeading", "Create Advanced Asset"));
-		{
-			FAssetToolsModule& AssetToolsModule = FAssetToolsModule::GetModule();
+		//MenuBuilder.BeginSection("CodeBrowserNewAdvancedAsset", LOCTEXT("CreateAdvancedAssetsMenuHeading", "Create Advanced Asset"));
+		//{
+		//	FAssetToolsModule& AssetToolsModule = FAssetToolsModule::GetModule();
 
-			TArray<FAdvancedAssetCategory> AdvancedAssetCategories;
-			AssetToolsModule.Get().GetAllAdvancedAssetCategories(/*out*/ AdvancedAssetCategories);
-			AdvancedAssetCategories.Sort([](const FAdvancedAssetCategory& A, const FAdvancedAssetCategory& B) {
-				return (A.CategoryName.CompareToCaseIgnored(B.CategoryName) < 0);
-			});
+		//	TArray<FAdvancedAssetCategory> AdvancedAssetCategories;
+		//	AssetToolsModule.Get().GetAllAdvancedAssetCategories(/*out*/ AdvancedAssetCategories);
+		//	AdvancedAssetCategories.Sort([](const FAdvancedAssetCategory& A, const FAdvancedAssetCategory& B) {
+		//		return (A.CategoryName.CompareToCaseIgnored(B.CategoryName) < 0);
+		//	});
 
-			for (const FAdvancedAssetCategory& AdvancedAssetCategory : AdvancedAssetCategories)
-			{
-				TArray<FFactoryItem> Factories = FindFactoriesInCategory(AdvancedAssetCategory.CategoryType);
-				if (Factories.Num() > 0)
-				{
-					MenuBuilder.AddSubMenu(
-						AdvancedAssetCategory.CategoryName,
-						FText::GetEmpty(),
-						FNewMenuDelegate::CreateStatic(
-							&FNewAssetOrClassContextMenu::CreateNewAssetMenuCategory, 
-							AdvancedAssetCategory.CategoryType, 
-							FirstSelectedPath, 
-							InOnNewAssetRequested, 
-							FCanExecuteAction() // We handle this at this level, rather than at the sub-menu item level
-						),
-						FUIAction(
-							FExecuteAction(),
-							CanExecuteAssetActionsDelegate
-						),
-						NAME_None,
-						EUserInterfaceActionType::Button
-						);
-				}
-			}
-		}
-		MenuBuilder.EndSection(); //ContentBrowserNewAdvancedAsset
+		//	for (const FAdvancedAssetCategory& AdvancedAssetCategory : AdvancedAssetCategories)
+		//	{
+		//		TArray<FFactoryItem> Factories = FindFactoriesInCategory(AdvancedAssetCategory.CategoryType);
+		//		if (Factories.Num() > 0)
+		//		{
+		//			MenuBuilder.AddSubMenu(
+		//				AdvancedAssetCategory.CategoryName,
+		//				FText::GetEmpty(),
+		//				FNewMenuDelegate::CreateStatic(
+		//					&FNewAssetOrClassContextMenu::CreateNewAssetMenuCategory, 
+		//					AdvancedAssetCategory.CategoryType, 
+		//					FirstSelectedPath, 
+		//					InOnNewAssetRequested, 
+		//					FCanExecuteAction() // We handle this at this level, rather than at the sub-menu item level
+		//				),
+		//				FUIAction(
+		//					FExecuteAction(),
+		//					CanExecuteAssetActionsDelegate
+		//				),
+		//				NAME_None,
+		//				EUserInterfaceActionType::Button
+		//				);
+		//		}
+		//	}
+		//}
+		//MenuBuilder.EndSection(); //CodeBrowserNewAdvancedAsset
 	}
 }
 
 void FNewAssetOrClassContextMenu::CreateNewAssetMenuCategory(FMenuBuilder& MenuBuilder, EAssetTypeCategories::Type AssetTypeCategory, FString InPath, FOnNewAssetRequested InOnNewAssetRequested, FCanExecuteAction InCanExecuteAction)
 {
-	// Find UFactory classes that can create new objects in this category.
-	TArray<FFactoryItem> FactoriesInThisCategory = FindFactoriesInCategory(AssetTypeCategory);
+	//// Find UFactory classes that can create new objects in this category.
+	//TArray<FFactoryItem> FactoriesInThisCategory = FindFactoriesInCategory(AssetTypeCategory);
 
-	// Sort the list
-	struct FCompareFactoryDisplayNames
-	{
-		FORCEINLINE bool operator()( const FFactoryItem& A, const FFactoryItem& B ) const
-		{
-			return A.DisplayName.CompareToCaseIgnored(B.DisplayName) < 0;
-		}
-	};
-	FactoriesInThisCategory.Sort( FCompareFactoryDisplayNames() );
+	//// Sort the list
+	//struct FCompareFactoryDisplayNames
+	//{
+	//	FORCEINLINE bool operator()( const FFactoryItem& A, const FFactoryItem& B ) const
+	//	{
+	//		return A.DisplayName.CompareToCaseIgnored(B.DisplayName) < 0;
+	//	}
+	//};
+	//FactoriesInThisCategory.Sort( FCompareFactoryDisplayNames() );
 
-	// Add menu entries for each one
-	for ( auto FactoryIt = FactoriesInThisCategory.CreateConstIterator(); FactoryIt; ++FactoryIt )
-	{
-		UFactory* Factory = (*FactoryIt).Factory;
-		TWeakObjectPtr<UClass> WeakFactoryClass = Factory->GetClass();
+	//// Add menu entries for each one
+	//for ( auto FactoryIt = FactoriesInThisCategory.CreateConstIterator(); FactoryIt; ++FactoryIt )
+	//{
+	//	UFactory* Factory = (*FactoryIt).Factory;
+	//	TWeakObjectPtr<UClass> WeakFactoryClass = Factory->GetClass();
 
-		MenuBuilder.AddMenuEntry(
-			FUIAction(
-				FExecuteAction::CreateStatic( &FNewAssetOrClassContextMenu::ExecuteNewAsset, InPath, WeakFactoryClass, InOnNewAssetRequested ),
-				InCanExecuteAction
-				),
-			SNew( SFactoryMenuEntry, Factory )
-			);
-	}
+	//	MenuBuilder.AddMenuEntry(
+	//		FUIAction(
+	//			FExecuteAction::CreateStatic( &FNewAssetOrClassContextMenu::ExecuteNewAsset, InPath, WeakFactoryClass, InOnNewAssetRequested ),
+	//			InCanExecuteAction
+	//			),
+	//		SNew( SFactoryMenuEntry, Factory )
+	//		);
+	//}
 }
 
 void FNewAssetOrClassContextMenu::ExecuteImportAsset( FOnImportAssetRequested InOnInportAssetRequested, FString InPath )

@@ -8,7 +8,7 @@
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SCompoundWidget.h"
 #include "AssetData.h"
-#include "IContentBrowserSingleton.h"
+#include "ICodeBrowserSingleton.h"
 
 class SEditableTextBox;
 class STextBlock;
@@ -84,15 +84,15 @@ private:
 	FReply OnCancelClicked();
 
 	/** Handler for when an asset was selected in the asset picker */
-	void OnAssetSelected(const FAssetData& AssetData);
+	void OnAssetSelected(const FFileData& AssetData);
 
 	/* Handler for when an asset was double clicked in the asset picker */
-	void OnAssetsActivated(const TArray<FAssetData>& SelectedAssets, EAssetTypeActivationMethod::Type ActivationType);
+	void OnAssetsActivated(const TArray<FFileData>& SelectedAssets, EAssetTypeActivationMethod::Type ActivationType);
 
 
 	/** Will generate the context menu if an asset or a folder is selected, either from the PathView or AssetView */
-	TSharedPtr<SWidget> OnGetAssetContextMenu(const TArray<FAssetData>& SelectedAssets);
-	TSharedPtr<SWidget> OnGetFolderContextMenu(const TArray<FString>& SelectedPaths, FContentBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder);
+	TSharedPtr<SWidget> OnGetAssetContextMenu(const TArray<FFileData>& SelectedAssets);
+	TSharedPtr<SWidget> OnGetFolderContextMenu(const TArray<FString>& SelectedPaths, FCodeBrowserMenuExtender_SelectedPaths InMenuExtender, FOnCreateNewFolder InOnCreateNewFolder);
 
 	/** Handler to check to see if a rename command is allowed */
 	bool CanExecuteRename() const;
@@ -131,7 +131,7 @@ private:
 	void UpdateInputValidity();
 
 	/** Used to commit the assets that were selected for open in this dialog */
-	void ChooseAssetsForOpen(const TArray<FAssetData>& SelectedAssets);
+	void ChooseAssetsForOpen(const TArray<FFileData>& SelectedAssets);
 
 	FString GetObjectPathForSave() const;
 
@@ -165,7 +165,7 @@ private:
 	FOnAssetDialogCancelled OnAssetDialogCancelled;
 
 	/** The assets that are currently selected in the asset picker */
-	TArray<FAssetData> CurrentlySelectedAssets;
+	TArray<FFileData> CurrentlySelectedAssets;
 
 	/** The name box. Only used in save dialogs. */
 	TSharedPtr<SEditableTextBox> NameEditableText;

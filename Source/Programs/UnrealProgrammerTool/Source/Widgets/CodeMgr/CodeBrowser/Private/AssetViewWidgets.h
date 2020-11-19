@@ -15,7 +15,7 @@
 #include "AssetData.h"
 #include "AssetThumbnail.h"
 #include "Fonts/SlateFontInfo.h"
-#include "ContentBrowserDelegates.h"
+#include "CodeBrowserDelegates.h"
 #include "Widgets/Views/STableViewBase.h"
 #include "Types/SlateStructs.h"
 #include "Widgets/SBoxPanel.h"
@@ -95,7 +95,7 @@ class SAssetViewItem : public SCompoundWidget
 	friend class SAssetViewItemToolTip;
 
 public:
-	DECLARE_DELEGATE_ThreeParams( FOnAssetsOrPathsDragDropped, const TArray<FAssetData>& /*AssetList*/, const TArray<FString>& /*AssetPaths*/, const FString& /*DestinationPath*/);
+	DECLARE_DELEGATE_ThreeParams( FOnAssetsOrPathsDragDropped, const TArray<FFileData>& /*AssetList*/, const TArray<FString>& /*AssetPaths*/, const FString& /*DestinationPath*/);
 	DECLARE_DELEGATE_TwoParams( FOnFilesDragDropped, const TArray<FString>& /*FileNames*/, const FString& /*DestinationPath*/);
 
 	SLATE_BEGIN_ARGS( SAssetViewItem )
@@ -689,7 +689,7 @@ public:
 
 		SMultiColumnTableRow< TSharedPtr<FAssetViewItem> >::Construct( 
 			FSuperRowType::FArguments()
-				.Style(FEditorStyle::Get(), "ContentBrowser.AssetListView.TableRow")
+				.Style(FEditorStyle::Get(), "CodeBrowser.AssetListView.TableRow")
 				.OnDragDetected(InArgs._OnDragDetected), 
 			InOwnerTableView);
 		Content = this->AssetColumnItem;

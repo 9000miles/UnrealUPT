@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/Views/SHeaderRow.h"
-#include "ContentBrowserDelegates.h"
+#include "CodeBrowserDelegates.h"
 
 struct FAssetViewItem;
 

@@ -64,7 +64,7 @@ public:
 	void RemoveAllFilters();
 
 	/** Disables any active filters that would hide the supplied assets */
-	void DisableFiltersThatHideAssets(const TArray<FAssetData>& AssetDataList);
+	void DisableFiltersThatHideAssets(const TArray<FFileData>& AssetDataList);
 
 	/** Saves any settings to config that should be persistent between editor sessions */
 	void SaveSettings(const FString& IniFilename, const FString& IniSection, const FString& SettingsString) const;

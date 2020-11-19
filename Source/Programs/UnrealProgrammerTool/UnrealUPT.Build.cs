@@ -27,6 +27,10 @@ public class UnrealUPT : ModuleRules
                 Path.Combine(ModuleDirectory, "Source/Widgets/MainFrame"),
                 Path.Combine(ModuleDirectory, "Source/Widgets/ProjectUnit"),
                 Path.Combine(ModuleDirectory, "Source/Widgets/Settings"),
+
+
+                Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/CodeBrowser/Public"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/CodeBrowser/Private"),
             }
             );
 

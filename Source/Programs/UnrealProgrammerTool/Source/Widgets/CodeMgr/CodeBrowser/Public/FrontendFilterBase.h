@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Misc/IFilter.h"
-#include "IContentBrowserSingleton.h"
+#include "ICodeBrowserSingleton.h"
 
 class FMenuBuilder;
 

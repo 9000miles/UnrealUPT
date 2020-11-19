@@ -22,9 +22,8 @@
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
 #include "FrontendFilters.h"
-#include "ContentBrowserFrontEndFilterExtension.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 /** A class for check boxes in the filter list. If you double click a filter checkbox, you will enable it and disable all others */
 class SFilterCheckBox : public SCheckBox
@@ -139,10 +138,10 @@ public:
 			SNew(SBorder)
 			.Padding(0)
 			.BorderBackgroundColor( FLinearColor(0.2f, 0.2f, 0.2f, 0.2f) )
-			.BorderImage(FEditorStyle::GetBrush("ContentBrowser.FilterButtonBorder"))
+			.BorderImage(FEditorStyle::GetBrush("CodeBrowser.FilterButtonBorder"))
 			[
 				SAssignNew( ToggleButtonPtr, SFilterCheckBox )
-				.Style(FEditorStyle::Get(), "ContentBrowser.FilterButton")
+				.Style(FEditorStyle::Get(), "CodeBrowser.FilterButton")
 				.ToolTipText(FilterToolTip)
 				.Padding(this, &SFilter::GetFilterNamePadding)
 				.IsChecked(this, &SFilter::IsChecked)
@@ -152,7 +151,7 @@ public:
 				[
 					SNew(STextBlock)
 					.ColorAndOpacity(this, &SFilter::GetFilterNameColorAndOpacity)
-					.Font(FEditorStyle::GetFontStyle("ContentBrowser.FilterNameFont"))
+					.Font(FEditorStyle::GetFontStyle("CodeBrowser.FilterNameFont"))
 					.ShadowOffset(FVector2D(1.f, 1.f))
 					.Text(this, &SFilter::GetFilterName)
 				]
@@ -419,31 +418,6 @@ void SFilterList::Construct( const FArguments& InArgs )
 	AllFrontendFilters.Add(MakeShareable(new FFrontendFilter_Recent(DefaultCategory)));
 	AllFrontendFilters.Add( MakeShareable(new FFrontendFilter_NotSourceControlled(DefaultCategory)) );
 
-	// Add any global user-defined frontend filters
-	for (TObjectIterator<UContentBrowserFrontEndFilterExtension> ExtensionIt(RF_NoFlags); ExtensionIt; ++ExtensionIt)
-	{
-		if (UContentBrowserFrontEndFilterExtension* PotentialExtension = *ExtensionIt)
-		{
-			if (PotentialExtension->HasAnyFlags(RF_ClassDefaultObject) && !PotentialExtension->GetClass()->HasAnyClassFlags(CLASS_Deprecated | CLASS_Abstract))
-			{
-				// Grab the filters
-				TArray< TSharedRef<FFrontendFilter> > ExtendedFrontendFilters;
-				PotentialExtension->AddFrontEndFilterExtensions(DefaultCategory, ExtendedFrontendFilters);
-				AllFrontendFilters.Append(ExtendedFrontendFilters);
-
-				// Grab the categories
-				for (const TSharedRef<FFrontendFilter>& FilterRef : ExtendedFrontendFilters)
-				{
-					TSharedPtr<FFrontendFilterCategory> Category = FilterRef->GetCategory();
-					if (Category.IsValid())
-					{
-						AllFrontendFilterCategories.AddUnique(Category);
-					}
-				}
-			}
-		}
-	}
-
 	// Add in filters specific to this invocation
 	for (auto Iter = InArgs._ExtraFrontendFilters.CreateConstIterator(); Iter; ++Iter)
 	{
@@ -597,7 +571,7 @@ void SFilterList::RemoveAllFilters()
 	}
 }
 
-void SFilterList::DisableFiltersThatHideAssets(const TArray<FAssetData>& AssetDataList)
+void SFilterList::DisableFiltersThatHideAssets(const TArray<FFileData>& AssetDataList)
 {
 	if ( HasAnyFilters() )
 	{
@@ -605,7 +579,7 @@ void SFilterList::DisableFiltersThatHideAssets(const TArray<FAssetData>& AssetDa
 		FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 		FARFilter CombinedBackendFilter = GetCombinedBackendFilter();
 		bool bDisableAllBackendFilters = false;
-		TArray<FAssetData> LocalAssetDataList = AssetDataList;
+		TArray<FFileData> LocalAssetDataList = AssetDataList;
 		AssetRegistryModule.Get().RunAssetsThroughFilter(LocalAssetDataList, CombinedBackendFilter);
 		if ( LocalAssetDataList.Num() != AssetDataList.Num() )
 		{
@@ -1056,7 +1030,7 @@ TSharedRef<SWidget> SFilterList::MakeAddFilterMenu(EAssetTypeCategories::Type Me
 	TMap<EAssetTypeCategories::Type, FCategoryMenu> CategoryToMenuMap;
 
 	// Add the Basic category
-	CategoryToMenuMap.Add(EAssetTypeCategories::Basic, FCategoryMenu( LOCTEXT("BasicFilter", "Basic"), LOCTEXT("BasicFilterTooltip", "Filter by basic assets."), "ContentBrowserFilterBasicAsset", LOCTEXT("BasicAssetsMenuHeading", "Basic Assets") ) );
+	CategoryToMenuMap.Add(EAssetTypeCategories::Basic, FCategoryMenu( LOCTEXT("BasicFilter", "Basic"), LOCTEXT("BasicFilterTooltip", "Filter by basic assets."), "CodeBrowserFilterBasicAsset", LOCTEXT("BasicAssetsMenuHeading", "Basic Assets") ) );
 
 	// Add the advanced categories
 	TArray<FAdvancedAssetCategory> AdvancedAssetCategories;
@@ -1119,7 +1093,7 @@ TSharedRef<SWidget> SFilterList::MakeAddFilterMenu(EAssetTypeCategories::Type Me
 
 	FMenuBuilder MenuBuilder(/*bInShouldCloseWindowAfterMenuSelection=*/true, nullptr, nullptr, /*bCloseSelfOnly=*/true);
 
-	MenuBuilder.BeginSection( "ContentBrowserResetFilters" );
+	MenuBuilder.BeginSection( "CodeBrowserResetFilters" );
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT( "FilterListResetFilters", "Reset Filters" ),
@@ -1128,7 +1102,7 @@ TSharedRef<SWidget> SFilterList::MakeAddFilterMenu(EAssetTypeCategories::Type Me
 			FUIAction( FExecuteAction::CreateSP( this, &SFilterList::OnResetFilters ) )
 			);
 	}
-	MenuBuilder.EndSection(); //ContentBrowserResetFilters
+	MenuBuilder.EndSection(); //CodeBrowserResetFilters
 
 	// First add the expanded category, this appears as standard entries in the list (Note: intentionally not using FindChecked here as removing it from the map later would cause the ref to be garbage)
 	FCategoryMenu* ExpandedCategory = CategoryToMenuMap.Find( MenuExpansion );
@@ -1155,14 +1129,14 @@ TSharedRef<SWidget> SFilterList::MakeAddFilterMenu(EAssetTypeCategories::Type Me
 		// Now populate with all the basic assets
 		SFilterList::CreateFiltersMenuCategory( MenuBuilder, ExpandedCategory->Assets);
 	}
-	MenuBuilder.EndSection(); //ContentBrowserFilterBasicAsset
+	MenuBuilder.EndSection(); //CodeBrowserFilterBasicAsset
 
 	// Remove the basic category from the map now, as this is treated differently and is no longer needed.
 	ExpandedCategory = NULL;
 	CategoryToMenuMap.Remove( EAssetTypeCategories::Basic );
 
 	// If we have expanded Basic, assume we are in full menu mode and add all the other categories
-	MenuBuilder.BeginSection("ContentBrowserFilterAdvancedAsset", LOCTEXT("AdvancedAssetsMenuHeading", "Other Assets") );
+	MenuBuilder.BeginSection("CodeBrowserFilterAdvancedAsset", LOCTEXT("AdvancedAssetsMenuHeading", "Other Assets") );
 	{
 		if(MenuExpansion == EAssetTypeCategories::Basic)
 		{
@@ -1203,10 +1177,10 @@ TSharedRef<SWidget> SFilterList::MakeAddFilterMenu(EAssetTypeCategories::Type Me
 				);
 		}
 	}
-	MenuBuilder.EndSection(); //ContentBrowserFilterAdvancedAsset
+	MenuBuilder.EndSection(); //CodeBrowserFilterAdvancedAsset
 
-	MenuBuilder.BeginSection("ContentBrowserFilterMiscAsset", LOCTEXT("MiscAssetsMenuHeading", "Misc Options") );
-	MenuBuilder.EndSection(); //ContentBrowserFilterMiscAsset
+	MenuBuilder.BeginSection("CodeBrowserFilterMiscAsset", LOCTEXT("MiscAssetsMenuHeading", "Misc Options") );
+	MenuBuilder.EndSection(); //CodeBrowserFilterMiscAsset
 
 	FDisplayMetrics DisplayMetrics;
 	FSlateApplication::Get().GetCachedDisplayMetrics( DisplayMetrics );

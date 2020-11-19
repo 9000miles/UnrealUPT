@@ -35,9 +35,9 @@
 #include "AssetRegistryModule.h"
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserUtils.h"
 #include "SAssetView.h"
-#include "ContentBrowserModule.h"
+#include "CodeBrowserModule.h"
 #include "Dialogs/Dialogs.h"
 #include "SMetaDataView.h"
 
@@ -69,12 +69,12 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Engine/LevelStreaming.h"
-#include "ContentBrowserCommands.h"
+#include "CodeBrowserCommands.h"
 
 #include "PackageHelperFunctions.h"
 #include "EngineUtils.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 FAssetContextMenu::FAssetContextMenu(const TWeakPtr<SAssetView>& InAssetView)
 	: AssetView(InAssetView)
@@ -100,13 +100,13 @@ void FAssetContextMenu::BindCommands(TSharedPtr< FUICommandList >& Commands)
 		FIsActionButtonVisible::CreateSP(this, &FAssetContextMenu::CanExecuteDuplicate)
 		));
 
-	Commands->MapAction(FGlobalEditorCommonCommands::Get().FindInContentBrowser, FUIAction(
+	Commands->MapAction(FGlobalEditorCommonCommands::Get().FindInCodeBrowser, FUIAction(
 		FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteSyncToAssetTree),
 		FCanExecuteAction::CreateSP(this, &FAssetContextMenu::CanExecuteSyncToAssetTree)
 		));
 }
 
-TSharedRef<SWidget> FAssetContextMenu::MakeContextMenu(const TArray<FAssetData>& InSelectedAssets, const FSourcesData& InSourcesData, TSharedPtr< FUICommandList > InCommandList)
+TSharedRef<SWidget> FAssetContextMenu::MakeContextMenu(const TArray<FFileData>& InSelectedAssets, const FSourcesData& InSourcesData, TSharedPtr< FUICommandList > InCommandList)
 {
 	SetSelectedAssets(InSelectedAssets);
 	SourcesData = InSourcesData;
@@ -116,8 +116,8 @@ TSharedRef<SWidget> FAssetContextMenu::MakeContextMenu(const TArray<FAssetData>&
 	CacheCanExecuteVars();
 
 	// Get all menu extenders for this context menu from the content browser module
-	FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>( TEXT("ContentBrowser") );
-	TArray<FContentBrowserMenuExtender_SelectedAssets> MenuExtenderDelegates = ContentBrowserModule.GetAllAssetViewContextMenuExtenders();
+	FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>( TEXT("CodeBrowser") );
+	TArray<FCodeBrowserMenuExtender_SelectedAssets> MenuExtenderDelegates = CodeBrowserModule.GetAllAssetViewContextMenuExtenders();
 
 	TArray<TSharedPtr<FExtender>> Extenders;
 	for (int32 i = 0; i < MenuExtenderDelegates.Num(); ++i)
@@ -171,7 +171,7 @@ TSharedRef<SWidget> FAssetContextMenu::MakeContextMenu(const TArray<FAssetData>&
 	return MenuBuilder.MakeWidget();
 }
 
-void FAssetContextMenu::SetSelectedAssets(const TArray<FAssetData>& InSelectedAssets)
+void FAssetContextMenu::SetSelectedAssets(const TArray<FFileData>& InSelectedAssets)
 {
 	SelectedAssets = InSelectedAssets;
 }
@@ -242,7 +242,7 @@ bool FAssetContextMenu::AddImportedAssetMenuOptions(FMenuBuilder& MenuBuilder)
 							SubMenuBuilder.AddMenuEntry(
 								ReimportLabel,
 								ReimportLabelTooltip,
-								FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.ReimportAsset"),
+								FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.ReimportAsset"),
 								FUIAction(
 									FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteReimportWithNewFile, SourceFileIndex),
 									FCanExecuteAction()
@@ -254,7 +254,7 @@ bool FAssetContextMenu::AddImportedAssetMenuOptions(FMenuBuilder& MenuBuilder)
 							SubMenuBuilder.AddMenuEntry(
 								ReimportLabel,
 								ReimportLabelTooltip,
-								FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.ReimportAsset"),
+								FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.ReimportAsset"),
 								FUIAction(
 									FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteReimport, SourceFileIndex),
 									FCanExecuteAction()
@@ -284,7 +284,7 @@ bool FAssetContextMenu::AddImportedAssetMenuOptions(FMenuBuilder& MenuBuilder)
 				MenuBuilder.AddMenuEntry(
 					LOCTEXT("Reimport", "Reimport"),
 					LOCTEXT("ReimportTooltip", "Reimport the selected asset(s) from the source file on disk."),
-					FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.ReimportAsset"),
+					FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.ReimportAsset"),
 					FUIAction(
 						FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteReimport, (int32)INDEX_NONE),
 						FCanExecuteAction()
@@ -296,7 +296,7 @@ bool FAssetContextMenu::AddImportedAssetMenuOptions(FMenuBuilder& MenuBuilder)
 					MenuBuilder.AddMenuEntry(
 						LOCTEXT("ReimportWithNewFile", "Reimport With New File"),
 						LOCTEXT("ReimportWithNewFileTooltip", "Reimport the selected asset from a new source file on disk."),
-						FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.ReimportAsset"),
+						FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.ReimportAsset"),
 						FUIAction(
 							FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteReimportWithNewFile, (int32)INDEX_NONE),
 							FCanExecuteAction()
@@ -309,7 +309,7 @@ bool FAssetContextMenu::AddImportedAssetMenuOptions(FMenuBuilder& MenuBuilder)
 			MenuBuilder.AddMenuEntry(
 				LOCTEXT("FindSourceFile", "Open Source Location"),
 				LOCTEXT("FindSourceFileTooltip", "Opens the folder containing the source of the selected asset(s)."),
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.OpenSourceLocation"),
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.OpenSourceLocation"),
 				FUIAction(
 					FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteFindSourceInExplorer, ResolvedFilePaths),
 					FCanExecuteAction::CreateSP(this, &FAssetContextMenu::CanExecuteImportedAssetActions, ResolvedFilePaths)
@@ -320,7 +320,7 @@ bool FAssetContextMenu::AddImportedAssetMenuOptions(FMenuBuilder& MenuBuilder)
 			MenuBuilder.AddMenuEntry(
 				LOCTEXT("OpenInExternalEditor", "Open In External Editor"),
 				LOCTEXT("OpenInExternalEditorTooltip", "Open the selected asset(s) in the default external editor."),
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.OpenInExternalEditor"),
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.OpenInExternalEditor"),
 				FUIAction(
 					FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteOpenInExternalEditor, ResolvedFilePaths),
 					FCanExecuteAction::CreateSP(this, &FAssetContextMenu::CanExecuteImportedAssetActions, ResolvedFilePaths)
@@ -339,7 +339,7 @@ bool FAssetContextMenu::AddImportedAssetMenuOptions(FMenuBuilder& MenuBuilder)
 bool FAssetContextMenu::AddCommonMenuOptions(FMenuBuilder& MenuBuilder)
 {
 	int32 NumAssetItems, NumClassItems;
-	ContentBrowserUtils::CountItemTypes(SelectedAssets, NumAssetItems, NumClassItems);
+	CodeBrowserUtils::CountItemTypes(SelectedAssets, NumAssetItems, NumClassItems);
 
 	MenuBuilder.BeginSection("CommonAssetActions", LOCTEXT("CommonAssetActionsMenuHeading", "Common"));
 	{
@@ -350,7 +350,7 @@ bool FAssetContextMenu::AddCommonMenuOptions(FMenuBuilder& MenuBuilder)
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("EditAsset", "Edit..."),
 			LOCTEXT("EditAssetTooltip", "Opens the selected asset(s) for edit."),
-			FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Edit"),
+			FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Edit"),
 			FUIAction( FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteEditAsset) )
 			);
 		}
@@ -362,7 +362,7 @@ bool FAssetContextMenu::AddCommonMenuOptions(FMenuBuilder& MenuBuilder)
 			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None,
 				LOCTEXT("Rename", "Rename"),
 				LOCTEXT("RenameTooltip", "Rename the selected asset."),
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Rename")
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Rename")
 				);
 
 #pragma region // Asset右键菜单 - 
@@ -372,12 +372,12 @@ bool FAssetContextMenu::AddCommonMenuOptions(FMenuBuilder& MenuBuilder)
 			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Duplicate, NAME_None,
 				LOCTEXT("Duplicate", "Duplicate"),
 				LOCTEXT("DuplicateTooltip", "Create a copy of the selected asset(s)."),
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Duplicate")
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Duplicate")
 				);
 			}
 
 			// Save
-			MenuBuilder.AddMenuEntry(FContentBrowserCommands::Get().SaveSelectedAsset, NAME_None,
+			MenuBuilder.AddMenuEntry(FCodeBrowserCommands::Get().SaveSelectedAsset, NAME_None,
 				LOCTEXT("SaveAsset", "Save"),
 				LOCTEXT("SaveAssetTooltip", "Saves the asset to file."),
 				FSlateIcon(FEditorStyle::GetStyleSetName(), "Level.SaveIcon16x")
@@ -387,7 +387,7 @@ bool FAssetContextMenu::AddCommonMenuOptions(FMenuBuilder& MenuBuilder)
 			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Delete, NAME_None,
 				LOCTEXT("Delete", "Delete"),
 				LOCTEXT("DeleteTooltip", "Delete the selected assets."),
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Delete")
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Delete")
 				);
 
 #pragma region // Asset右键菜单 - 
@@ -405,7 +405,7 @@ bool FAssetContextMenu::AddCommonMenuOptions(FMenuBuilder& MenuBuilder)
 				NAME_None,
 				EUserInterfaceActionType::Button,
 				false, 
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions")
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions")
 				);
 
 			if (NumClassItems == 0)
@@ -419,7 +419,7 @@ bool FAssetContextMenu::AddCommonMenuOptions(FMenuBuilder& MenuBuilder)
 					NAME_None,
 					EUserInterfaceActionType::Button,
 					false,
-					FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetLocalization")
+					FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetLocalization")
 					);
 			}
 			}
@@ -436,7 +436,7 @@ void FAssetContextMenu::AddExploreMenuOptions(FMenuBuilder& MenuBuilder)
 	{
 		// Find in Content Browser
 		MenuBuilder.AddMenuEntry(
-			FGlobalEditorCommonCommands::Get().FindInContentBrowser, 
+			FGlobalEditorCommonCommands::Get().FindInCodeBrowser, 
 			NAME_None, 
 			LOCTEXT("ShowInFolderView", "Show in Folder View"),
 			LOCTEXT("ShowInFolderViewTooltip", "Selects the folder that contains this asset in the Content Browser Sources Panel.")
@@ -444,9 +444,9 @@ void FAssetContextMenu::AddExploreMenuOptions(FMenuBuilder& MenuBuilder)
 
 		// Find in Explorer
 		MenuBuilder.AddMenuEntry(
-			ContentBrowserUtils::GetExploreFolderText(),
+			CodeBrowserUtils::GetExploreFolderText(),
 			LOCTEXT("FindInExplorerTooltip", "Finds this asset on disk"),
-			FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInContentBrowser"),
+			FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInCodeBrowser"),
 			FUIAction(
 				FExecuteAction::CreateSP( this, &FAssetContextMenu::ExecuteFindInExplorer ),
 				FCanExecuteAction::CreateSP( this, &FAssetContextMenu::CanExecuteFindInExplorer )
@@ -476,7 +476,7 @@ void FAssetContextMenu::MakeAssetActionsSubMenu(FMenuBuilder& MenuBuilder)
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("CaptureThumbnail", "Capture Thumbnail"),
 			LOCTEXT("CaptureThumbnailTooltip", "Captures a thumbnail from the active viewport."),
-			FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.CreateThumbnail"),
+			FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.CreateThumbnail"),
 			FUIAction(
 				FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteCaptureThumbnail),
 				FCanExecuteAction::CreateSP(this, &FAssetContextMenu::CanExecuteCaptureThumbnail)
@@ -490,7 +490,7 @@ void FAssetContextMenu::MakeAssetActionsSubMenu(FMenuBuilder& MenuBuilder)
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("ClearCustomThumbnail", "Clear Thumbnail"),
 			LOCTEXT("ClearCustomThumbnailTooltip", "Clears all custom thumbnails for selected assets."),
-			FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.DeleteThumbnail"),
+			FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.DeleteThumbnail"),
 			FUIAction( FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteClearThumbnail) ) 
 			);
 	}
@@ -515,7 +515,7 @@ void FAssetContextMenu::MakeAssetActionsSubMenu(FMenuBuilder& MenuBuilder)
 	MenuBuilder.BeginSection("AssetContextMoveActions", LOCTEXT("AssetContextMoveActionsMenuHeading", "Move"));
 	{
 		bool bHasExportableAssets = false;
-		for (const FAssetData& AssetData : SelectedAssets)
+		for (const FFileData& AssetData : SelectedAssets)
 		{
 			const UObject* Object = AssetData.GetAsset();
 			if (Object)
@@ -672,7 +672,7 @@ void FAssetContextMenu::MakeAssetActionsSubMenu(FMenuBuilder& MenuBuilder)
 void FAssetContextMenu::ExportSelectedAssetsToText()
 {
 	FString FailedPackage;
-	for (const FAssetData& Asset : SelectedAssets)
+	for (const FFileData& Asset : SelectedAssets)
 	{
 		UPackage* Package = Asset.GetPackage();
 		FString Filename = FPackageName::LongPackageNameToFilename(Package->GetPathName(), FPackageName::GetTextAssetPackageExtension());
@@ -718,11 +718,11 @@ void FAssetContextMenu::MakeAssetLocalizationSubMenu(FMenuBuilder& MenuBuilder)
 		bool bIncludeEngineCultures = false;
 		bool bIncludeProjectCultures = false;
 
-		for (const FAssetData& Asset : SelectedAssets)
+		for (const FFileData& Asset : SelectedAssets)
 		{
 			const FString AssetPath = Asset.ObjectPath.ToString();
 
-			if (ContentBrowserUtils::IsEngineFolder(AssetPath))
+			if (CodeBrowserUtils::IsEngineFolder(AssetPath))
 			{
 				bIncludeEngineCultures = true;
 			}
@@ -782,7 +782,7 @@ void FAssetContextMenu::MakeAssetLocalizationSubMenu(FMenuBuilder& MenuBuilder)
 		FLocalizedAssetsState& LocalizedAssetsStateForCulture = LocalizedAssetsState[LocalizedAssetsState.AddDefaulted()];
 		LocalizedAssetsStateForCulture.Culture = CurrentCulture;
 
-		for (const FAssetData& Asset : SelectedAssets)
+		for (const FFileData& Asset : SelectedAssets)
 		{
 			// Can this type of asset be localized?
 			bool bCanLocalizeAsset = false;
@@ -819,7 +819,7 @@ void FAssetContextMenu::MakeAssetLocalizationSubMenu(FMenuBuilder& MenuBuilder)
 				{
 					// Does this localized asset already exist?
 					FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
-					FAssetData LocalizedAssetData = AssetRegistryModule.Get().GetAssetByObjectPath(*LocalizedObjectPath);
+					FFileData LocalizedAssetData = AssetRegistryModule.Get().GetAssetByObjectPath(*LocalizedObjectPath);
 
 					if (LocalizedAssetData.IsValid())
 					{
@@ -891,14 +891,14 @@ void FAssetContextMenu::MakeAssetLocalizationSubMenu(FMenuBuilder& MenuBuilder)
 			MenuBuilder.AddMenuEntry(
 				LOCTEXT("ShowSourceAsset", "Show Source Asset"),
 				LOCTEXT("ShowSourceAssetTooltip", "Show the source asset in the Content Browser."),
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInContentBrowser"),
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInCodeBrowser"),
 				FUIAction(FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteFindInAssetTree, SourceAssetsState.CurrentAssets.Array()))
 				);
 
 			MenuBuilder.AddMenuEntry(
 				LOCTEXT("EditSourceAsset", "Edit Source Asset"),
 				LOCTEXT("EditSourceAssetTooltip", "Edit the source asset."),
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Edit"),
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Edit"),
 				FUIAction(FExecuteAction::CreateSP(this, &FAssetContextMenu::ExecuteOpenEditorsForAssets, SourceAssetsState.CurrentAssets.Array()))
 				);
 		}
@@ -918,7 +918,7 @@ void FAssetContextMenu::MakeAssetLocalizationSubMenu(FMenuBuilder& MenuBuilder)
 				NAME_None,
 				EUserInterfaceActionType::Button,
 				false,
-				FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Duplicate")
+				FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Duplicate")
 				);
 
 			int32 NumLocalizedAssets = 0;
@@ -937,7 +937,7 @@ void FAssetContextMenu::MakeAssetLocalizationSubMenu(FMenuBuilder& MenuBuilder)
 					NAME_None,
 					EUserInterfaceActionType::Button,
 					false,
-					FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInContentBrowser")
+					FSlateIcon(FEditorStyle::GetStyleSetName(), "SystemWideCommands.FindInCodeBrowser")
 					);
 
 				MenuBuilder.AddSubMenu(
@@ -948,7 +948,7 @@ void FAssetContextMenu::MakeAssetLocalizationSubMenu(FMenuBuilder& MenuBuilder)
 					NAME_None,
 					EUserInterfaceActionType::Button,
 					false,
-					FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.Edit")
+					FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.Edit")
 					);
 			}
 		}
@@ -1008,7 +1008,7 @@ void FAssetContextMenu::MakeEditLocalizedAssetSubMenu(FMenuBuilder& MenuBuilder,
 void FAssetContextMenu::ExecuteCreateLocalizedAsset(TSet<FName> InSelectedSourceAssets, FLocalizedAssetsState InLocalizedAssetsStateForCulture)
 {
 	TArray<UPackage*> PackagesToSave;
-	TArray<FAssetData> NewObjects;
+	TArray<FFileData> NewObjects;
 
 	for (const FName SourceAssetName : InSelectedSourceAssets)
 	{
@@ -1040,7 +1040,7 @@ void FAssetContextMenu::ExecuteCreateLocalizedAsset(TSet<FName> InSelectedSource
 		if (NewObject)
 		{
 			PackagesToSave.Add(NewObject->GetOutermost());
-			NewObjects.Add(FAssetData(NewObject));
+			NewObjects.Add(FFileData(NewObject));
 		}
 	}
 
@@ -1059,7 +1059,7 @@ void FAssetContextMenu::ExecuteFindInAssetTree(TArray<FName> InAssets)
 	FARFilter ARFilter;
 	ARFilter.ObjectPaths = MoveTemp(InAssets);
 	
-	TArray<FAssetData> FoundLocalizedAssetData;
+	TArray<FFileData> FoundLocalizedAssetData;
 	AssetRegistryModule.Get().GetAssets(ARFilter, FoundLocalizedAssetData);
 
 	OnFindInAssetTreeRequested.ExecuteIfBound(FoundLocalizedAssetData);
@@ -1092,7 +1092,7 @@ bool FAssetContextMenu::AddDocumentationMenuOptions(FMenuBuilder& MenuBuilder)
 
 	// Objects must be loaded for this operation... for now
 	UClass* SelectedClass = (SelectedAssets.Num() > 0 ? SelectedAssets[0].GetClass() : nullptr);
-	for (const FAssetData& AssetData : SelectedAssets)
+	for (const FFileData& AssetData : SelectedAssets)
 	{
 		if (SelectedClass != AssetData.GetClass())
 		{
@@ -1129,7 +1129,7 @@ bool FAssetContextMenu::AddDocumentationMenuOptions(FMenuBuilder& MenuBuilder)
 					MenuBuilder.AddMenuEntry(
 						FText::Format( LOCTEXT("GoToCodeForAsset", "Open {0}"), FText::FromString( CodeFileName ) ),
 						FText::Format( LOCTEXT("GoToCodeForAsset_ToolTip", "Opens the header file for this asset ({0}) in a code editing program"), FText::FromString( CodeFileName ) ),
-						FSlateIcon(FEditorStyle::GetStyleSetName(), "ContentBrowser.AssetActions.GoToCodeForAsset"),
+						FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.AssetActions.GoToCodeForAsset"),
 						FUIAction( FExecuteAction::CreateSP( this, &FAssetContextMenu::ExecuteGoToCodeForAsset, SelectedClass ) )
 						);
 				}
@@ -1224,7 +1224,7 @@ bool FAssetContextMenu::AddAssetTypeMenuOptions(FMenuBuilder& MenuBuilder)
 	}
 
 	TArray<UObject*> SelectedObjects;
-	if ( ContentBrowserUtils::LoadAssetsIfNeeded(ObjectPaths, SelectedObjects) )
+	if ( CodeBrowserUtils::LoadAssetsIfNeeded(ObjectPaths, SelectedObjects) )
 	{
 		// Load the asset tools module
 		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
@@ -1593,7 +1593,7 @@ void FAssetContextMenu::ExecuteReimport(int32 SourceFileIndex /*= INDEX_NONE*/)
 {
 	// Reimport all selected assets
 	TArray<UObject *> CopyOfSelectedAssets;
-	for (const FAssetData &SelectedAsset : SelectedAssets)
+	for (const FFileData &SelectedAsset : SelectedAssets)
 	{
 		UObject *Asset = SelectedAsset.GetAsset();
 		CopyOfSelectedAssets.Add(Asset);
@@ -1607,7 +1607,7 @@ void FAssetContextMenu::ExecuteReimportWithNewFile(int32 SourceFileIndex /*= IND
 	check(SelectedAssets.Num() == 1);
 
 	TArray<UObject *> CopyOfSelectedAssets;
-	for (const FAssetData &SelectedAsset : SelectedAssets)
+	for (const FFileData &SelectedAsset : SelectedAssets)
 	{
 		UObject *Asset = SelectedAsset.GetAsset();
 		CopyOfSelectedAssets.Add(Asset);
@@ -1708,7 +1708,7 @@ void FAssetContextMenu::GetSelectedAssetSourceFilePaths(TArray<FString>& OutFile
 void FAssetContextMenu::ExecuteSyncToAssetTree()
 {
 	// Copy this as the sync may adjust our selected assets array
-	const TArray<FAssetData> SelectedAssetsCopy = SelectedAssets;
+	const TArray<FFileData> SelectedAssetsCopy = SelectedAssets;
 	OnFindInAssetTreeRequested.ExecuteIfBound(SelectedAssetsCopy);
 }
 
@@ -1719,7 +1719,7 @@ void FAssetContextMenu::ExecuteFindInExplorer()
 		const UObject* Asset = SelectedAssets[AssetIdx].GetAsset();
 		if (Asset)
 		{
-			FAssetData AssetData(Asset);
+			FFileData AssetData(Asset);
 
 			const FString PackageName = AssetData.PackageName.ToString();
 
@@ -1934,7 +1934,7 @@ void FAssetContextMenu::ExecutePropertyMatrix()
 
 void FAssetContextMenu::ExecuteShowAssetMetaData()
 {
-	for (const FAssetData& AssetData : SelectedAssets)
+	for (const FFileData& AssetData : SelectedAssets)
 	{
 		UObject* Asset = AssetData.GetAsset();
 		if (Asset)
@@ -2024,10 +2024,10 @@ void FAssetContextMenu::ExecuteDuplicate()
 		TArray<UObject*> NewObjects;
 		ObjectTools::DuplicateObjects(ObjectsToDuplicate, TEXT(""), TEXT(""), /*bOpenDialog=*/false, &NewObjects);
 
-		TArray<FAssetData> AssetsToSync;
+		TArray<FFileData> AssetsToSync;
 		for ( auto ObjIt = NewObjects.CreateConstIterator(); ObjIt; ++ObjIt )
 		{
-			new(AssetsToSync) FAssetData(*ObjIt);
+			new(AssetsToSync) FFileData(*ObjIt);
 		}
 
 		// Sync to asset tree
@@ -2040,7 +2040,7 @@ void FAssetContextMenu::ExecuteDuplicate()
 
 void FAssetContextMenu::ExecuteRename()
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	TArray< FString > SelectedFolders = AssetView.Pin()->GetSelectedFolders();
 
 	if ( AssetViewSelectedAssets.Num() == 1 && SelectedFolders.Num() == 0 )
@@ -2074,14 +2074,14 @@ void FAssetContextMenu::ExecuteDelete()
 		}
 	}
 
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	if(AssetViewSelectedAssets.Num() > 0)
 	{
-		TArray<FAssetData> AssetsToDelete;
+		TArray<FFileData> AssetsToDelete;
 
 		for( auto AssetIt = AssetViewSelectedAssets.CreateConstIterator(); AssetIt; ++AssetIt )
 		{
-			const FAssetData& AssetData = *AssetIt;
+			const FFileData& AssetData = *AssetIt;
 
 			if( AssetData.AssetClass == UObjectRedirector::StaticClass()->GetFName() )
 			{
@@ -2112,7 +2112,7 @@ void FAssetContextMenu::ExecuteDelete()
 		}
 
 		// Spawn a confirmation dialog since this is potentially a highly destructive operation
-		ContentBrowserUtils::DisplayConfirmationPopup(
+		CodeBrowserUtils::DisplayConfirmationPopup(
 			Prompt,
 			LOCTEXT("FolderDeleteConfirm_Yes", "Delete"),
 			LOCTEXT("FolderDeleteConfirm_No", "Cancel"),
@@ -2123,19 +2123,19 @@ void FAssetContextMenu::ExecuteDelete()
 
 bool FAssetContextMenu::CanExecuteReload() const
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	TArray< FString > SelectedFolders = AssetView.Pin()->GetSelectedFolders();
 
 	int32 NumAssetItems, NumClassItems;
-	ContentBrowserUtils::CountItemTypes(AssetViewSelectedAssets, NumAssetItems, NumClassItems);
+	CodeBrowserUtils::CountItemTypes(AssetViewSelectedAssets, NumAssetItems, NumClassItems);
 
 	int32 NumAssetPaths, NumClassPaths;
-	ContentBrowserUtils::CountPathTypes(SelectedFolders, NumAssetPaths, NumClassPaths);
+	CodeBrowserUtils::CountPathTypes(SelectedFolders, NumAssetPaths, NumClassPaths);
 
 	bool bHasSelectedCollections = false;
 	for (const FString& SelectedFolder : SelectedFolders)
 	{
-		if (ContentBrowserUtils::IsCollectionPath(SelectedFolder))
+		if (CodeBrowserUtils::IsCollectionPath(SelectedFolder))
 		{
 			bHasSelectedCollections = true;
 			break;
@@ -2162,14 +2162,14 @@ void FAssetContextMenu::ExecuteReload()
 		}
 	}
 
-	TArray<FAssetData> AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray<FFileData> AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	if (AssetViewSelectedAssets.Num() > 0)
 	{
 		TArray<UPackage*> PackagesToReload;
 
 		for (auto AssetIt = AssetViewSelectedAssets.CreateConstIterator(); AssetIt; ++AssetIt)
 		{
-			const FAssetData& AssetData = *AssetIt;
+			const FFileData& AssetData = *AssetIt;
 
 			if (AssetData.AssetClass == UObjectRedirector::StaticClass()->GetFName())
 			{
@@ -2192,7 +2192,7 @@ FReply FAssetContextMenu::ExecuteDeleteFolderConfirmed()
 	TArray< FString > SelectedFolders = AssetView.Pin()->GetSelectedFolders();
 	if(SelectedFolders.Num() > 0)
 	{
-		ContentBrowserUtils::DeleteFolders(SelectedFolders);
+		CodeBrowserUtils::DeleteFolders(SelectedFolders);
 	}
 
 	return FReply::Handled();
@@ -2222,7 +2222,7 @@ void FAssetContextMenu::ExecuteCaptureThumbnail()
 		GCurrentLevelEditingViewportClient = NULL;
 		Viewport->Draw();
 
-		ContentBrowserUtils::CaptureThumbnailFromViewport(Viewport, SelectedAssets);
+		CodeBrowserUtils::CaptureThumbnailFromViewport(Viewport, SelectedAssets);
 
 		//redraw viewport to have the yellow highlight again
 		GCurrentLevelEditingViewportClient = OldViewportClient;
@@ -2232,7 +2232,7 @@ void FAssetContextMenu::ExecuteCaptureThumbnail()
 
 void FAssetContextMenu::ExecuteClearThumbnail()
 {
-	ContentBrowserUtils::ClearCustomThumbnails(SelectedAssets);
+	CodeBrowserUtils::ClearCustomThumbnails(SelectedAssets);
 }
 
 void FAssetContextMenu::ExecuteMigrateAsset()
@@ -2281,7 +2281,7 @@ void FAssetContextMenu::ExecuteGoToDocsForAsset(UClass* SelectedClass, const FSt
 
 void FAssetContextMenu::ExecuteCopyReference()
 {
-	ContentBrowserUtils::CopyAssetReferencesToClipboard(SelectedAssets);
+	CodeBrowserUtils::CopyAssetReferencesToClipboard(SelectedAssets);
 }
 
 void FAssetContextMenu::ExecuteCopyTextToClipboard(FString InText)
@@ -2298,7 +2298,7 @@ void FAssetContextMenu::ExecuteResetLocalizationId()
 		return;
 	}
 
-	for (const FAssetData& AssetData : SelectedAssets)
+	for (const FFileData& AssetData : SelectedAssets)
 	{
 		UObject* Asset = AssetData.GetAsset();
 		if (Asset)
@@ -2453,7 +2453,7 @@ void FAssetContextMenu::ExecuteSCCMerge()
 	for (int32 AssetIdx = 0; AssetIdx < SelectedAssets.Num(); AssetIdx++)
 	{
 		// Get the actual asset (will load it)
-		const FAssetData& AssetData = SelectedAssets[AssetIdx];
+		const FFileData& AssetData = SelectedAssets[AssetIdx];
 
 		UObject* CurrentObject = AssetData.GetAsset();
 		if (CurrentObject)
@@ -2588,7 +2588,7 @@ void FAssetContextMenu::ExecuteSCCDiffAgainstDepot() const
 	for(int32 AssetIdx=0; AssetIdx<SelectedAssets.Num(); AssetIdx++)
 	{
 		// Get the actual asset (will load it)
-		const FAssetData& AssetData = SelectedAssets[AssetIdx];
+		const FFileData& AssetData = SelectedAssets[AssetIdx];
 
 		UObject* CurrentObject = AssetData.GetAsset();
 		if( CurrentObject )
@@ -2611,7 +2611,7 @@ void FAssetContextMenu::ExecuteSCCSync()
 {
 	TArray<FString> PackageNames;
 	GetSelectedPackageNames(PackageNames);
-	ContentBrowserUtils::SyncPackagesFromSourceControl(PackageNames);
+	CodeBrowserUtils::SyncPackagesFromSourceControl(PackageNames);
 }
 
 void FAssetContextMenu::ExecuteEnableSourceControl()
@@ -2627,7 +2627,7 @@ bool FAssetContextMenu::CanExecuteSyncToAssetTree() const
 bool FAssetContextMenu::CanExecuteFindInExplorer() const
 {
 	// selection must contain at least one asset that has already been saved to disk
-	for (const FAssetData& Asset : SelectedAssets)
+	for (const FFileData& Asset : SelectedAssets)
 	{
 		if ((Asset.PackageFlags & PKG_NewlyCreated) == 0)
 		{
@@ -2724,10 +2724,10 @@ bool FAssetContextMenu::CanExecuteShowAssetMetaData() const
 
 bool FAssetContextMenu::CanExecuteDuplicate() const
 {
-	const TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	const TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	uint32 NumNonRedirectors = 0;
 
-	for (const FAssetData& AssetData : AssetViewSelectedAssets)
+	for (const FFileData& AssetData : AssetViewSelectedAssets)
 	{
 		if (!AssetData.IsValid())
 		{
@@ -2750,12 +2750,12 @@ bool FAssetContextMenu::CanExecuteDuplicate() const
 
 bool FAssetContextMenu::CanExecuteRename() const
 {
-	return ContentBrowserUtils::CanRenameFromAssetView(AssetView);
+	return CodeBrowserUtils::CanRenameFromAssetView(AssetView);
 }
 
 bool FAssetContextMenu::CanExecuteDelete() const
 {
-	return ContentBrowserUtils::CanDeleteFromAssetView(AssetView);
+	return CodeBrowserUtils::CanDeleteFromAssetView(AssetView);
 }
 
 bool FAssetContextMenu::CanExecuteRemoveFromCollection() const 
@@ -2776,7 +2776,7 @@ bool FAssetContextMenu::CanExecuteSCCMerge() const
 	for (int32 AssetIdx = 0; AssetIdx < SelectedAssets.Num() && bCanExecuteMerge; AssetIdx++)
 	{
 		// Get the actual asset (will load it)
-		const FAssetData& AssetData = SelectedAssets[AssetIdx];
+		const FFileData& AssetData = SelectedAssets[AssetIdx];
 		UObject* CurrentObject = AssetData.GetAsset();
 		if (CurrentObject)
 		{
@@ -2883,8 +2883,8 @@ bool FAssetContextMenu::CanExecuteDiffSelected() const
 	bool bCanDiffSelected = false;
 	if (SelectedAssets.Num() == 2 && !bAtLeastOneClassSelected)
 	{
-		FAssetData const& FirstSelection = SelectedAssets[0];
-		FAssetData const& SecondSelection = SelectedAssets[1];
+		FFileData const& FirstSelection = SelectedAssets[0];
+		FFileData const& SecondSelection = SelectedAssets[1];
 
 		bCanDiffSelected = FirstSelection.AssetClass == SecondSelection.AssetClass;
 	}
@@ -2901,7 +2901,7 @@ bool FAssetContextMenu::CanClearCustomThumbnails() const
 {
 	for ( auto AssetIt = SelectedAssets.CreateConstIterator(); AssetIt; ++AssetIt )
 	{
-		if ( ContentBrowserUtils::AssetHasCustomThumbnail(*AssetIt) )
+		if ( CodeBrowserUtils::AssetHasCustomThumbnail(*AssetIt) )
 		{
 			return true;
 		}
@@ -2924,7 +2924,7 @@ void FAssetContextMenu::CacheCanExecuteVars()
 
 	for (auto AssetIt = SelectedAssets.CreateConstIterator(); AssetIt; ++AssetIt)
 	{
-		const FAssetData& AssetData = *AssetIt;
+		const FFileData& AssetData = *AssetIt;
 		if ( !AssetData.IsValid() )
 		{
 			continue;
@@ -3021,7 +3021,7 @@ void FAssetContextMenu::GetSelectedPackages(TArray<UPackage*>& OutPackages) cons
 void FAssetContextMenu::MakeChunkIDListMenu(FMenuBuilder& MenuBuilder)
 {
 	TArray<int32> FoundChunks;
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	for (const auto& SelectedAsset : AssetViewSelectedAssets)
 	{
 		UPackage* Package = FindPackage(NULL, *SelectedAsset.PackageName.ToString());
@@ -3050,7 +3050,7 @@ void FAssetContextMenu::MakeChunkIDListMenu(FMenuBuilder& MenuBuilder)
 
 void FAssetContextMenu::ExecuteAssignChunkID()
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	auto AssetViewPtr = AssetView.Pin();
 	if (AssetViewSelectedAssets.Num() > 0 && AssetViewPtr.IsValid())
 	{
@@ -3134,7 +3134,7 @@ void FAssetContextMenu::ExecuteAssignChunkID()
 void FAssetContextMenu::ExecuteRemoveAllChunkID()
 {
 	TArray<int32> EmptyChunks;
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	for (const auto& SelectedAsset : AssetViewSelectedAssets)
 	{
 		UPackage* Package = FindPackage(NULL, *SelectedAsset.PackageName.ToString());
@@ -3159,7 +3159,7 @@ void FAssetContextMenu::OnChunkIDAssignChanged(int32 NewChunkID)
 
 FReply FAssetContextMenu::OnChunkIDAssignCommit(TSharedPtr<SWindow> Window)
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	for (const auto& SelectedAsset : AssetViewSelectedAssets)
 	{
 		UPackage* Package = FindPackage(NULL, *SelectedAsset.PackageName.ToString());
@@ -3187,7 +3187,7 @@ FReply FAssetContextMenu::OnChunkIDAssignCancel(TSharedPtr<SWindow> Window)
 
 void FAssetContextMenu::ExecuteRemoveChunkID(int32 ChunkID)
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetView.Pin()->GetSelectedAssets();
 	for (const auto& SelectedAsset : AssetViewSelectedAssets)
 	{
 		UPackage* Package = FindPackage(NULL, *SelectedAsset.PackageName.ToString());

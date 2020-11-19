@@ -6,7 +6,7 @@
 #include "AssetData.h"
 #include "UObject/GCObject.h"
 #include "Misc/Paths.h"
-#include "Editor/ContentBrowser/Private/ContentBrowserUtils.h"
+#include "Editor/CodeBrowser/Private/CodeBrowserUtils.h"
 #include "Misc/TextFilterUtils.h"
 
 class UFactory;
@@ -59,7 +59,7 @@ struct FAssetViewItem
 struct FAssetViewAsset : public FAssetViewItem
 {
 	/** The asset registry data associated with this item */
-	FAssetData Data;
+	FFileData Data;
 
 	/** Map of values for custom columns */
 	TMap<FName, FString> CustomColumnData;
@@ -69,7 +69,7 @@ struct FAssetViewAsset : public FAssetViewItem
 
 	TCHAR FirstFewAssetNameCharacters[8];
 
-	explicit FAssetViewAsset(const FAssetData& AssetData)
+	explicit FAssetViewAsset(const FFileData& AssetData)
 		: Data(AssetData)
 	{
 		SetFirstFewAssetNameCharacters();
@@ -91,7 +91,7 @@ struct FAssetViewAsset : public FAssetViewItem
 		FCStringWide::Strupr(FirstFewAssetNameCharacters);
 	}
 
-	void SetAssetData(const FAssetData& NewData)
+	void SetAssetData(const FFileData& NewData)
 	{
 		Data = NewData;
 		SetFirstFewAssetNameCharacters();
@@ -176,8 +176,8 @@ struct FAssetViewFolder : public FAssetViewItem
 		, bNewFolder(false)
 	{
 		FolderName = FText::FromString(FPaths::GetBaseFilename(FolderPath));
-		bDeveloperFolder = ContentBrowserUtils::IsDevelopersFolder(FolderPath);
-		bCollectionFolder = ContentBrowserUtils::IsCollectionPath(FolderPath);
+		bDeveloperFolder = CodeBrowserUtils::IsDevelopersFolder(FolderPath);
+		bCollectionFolder = CodeBrowserUtils::IsCollectionPath(FolderPath);
 	}
 
 	/** Set the name of this folder (without path) */
@@ -209,7 +209,7 @@ struct FAssetViewCreation : public FAssetViewAsset, public FGCObject
 	/** The factory to use when creating the asset. */
 	UFactory* Factory;
 
-	FAssetViewCreation(const FAssetData& AssetData, UClass* InAssetClass, UFactory* InFactory)
+	FAssetViewCreation(const FFileData& AssetData, UClass* InAssetClass, UFactory* InFactory)
 		: FAssetViewAsset(AssetData)
 		, AssetClass(InAssetClass)
 		, Factory(InFactory)
@@ -240,7 +240,7 @@ struct FAssetViewDuplication : public FAssetViewAsset
 	/** The context to use when creating the asset. Used when initializing an asset with another related asset. */
 	TWeakObjectPtr<UObject> SourceObject;
 
-	FAssetViewDuplication(const FAssetData& AssetData, const TWeakObjectPtr<UObject>& InSourceObject = NULL)
+	FAssetViewDuplication(const FFileData& AssetData, const TWeakObjectPtr<UObject>& InSourceObject = NULL)
 		: FAssetViewAsset(AssetData)
 		, SourceObject(InSourceObject)
 	{}

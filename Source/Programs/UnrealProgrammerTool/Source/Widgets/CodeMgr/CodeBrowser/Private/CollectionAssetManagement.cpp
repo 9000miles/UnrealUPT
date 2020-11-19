@@ -8,7 +8,7 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 FCollectionAssetManagement::FCollectionAssetManagement()
 {
@@ -37,10 +37,10 @@ FCollectionAssetManagement::~FCollectionAssetManagement()
 	}
 }
 
-void FCollectionAssetManagement::SetCurrentAssets(const TArray<FAssetData>& CurrentAssets)
+void FCollectionAssetManagement::SetCurrentAssets(const TArray<FFileData>& CurrentAssets)
 {
 	CurrentAssetPaths.Empty();
-	for (const FAssetData& AssetData : CurrentAssets)
+	for (const FFileData& AssetData : CurrentAssets)
 	{
 		CurrentAssetPaths.Add(AssetData.ObjectPath);
 	}

@@ -13,12 +13,12 @@
 #include "AssetData.h"
 #include "ARFilter.h"
 #include "AssetThumbnail.h"
-#include "IContentBrowserSingleton.h"
+#include "ICodeBrowserSingleton.h"
 #include "SourcesData.h"
 #include "Animation/CurveSequence.h"
 #include "Widgets/Views/STableViewBase.h"
 #include "Widgets/Views/STableRow.h"
-#include "Editor/ContentBrowser/Private/AssetViewSortManager.h"
+#include "Editor/CodeBrowser/Private/AssetViewSortManager.h"
 #include "AssetViewTypes.h"
 #include "HistoryManager.h"
 
@@ -33,7 +33,7 @@ class UFactory;
 struct FPropertyChangedEvent;
 
 /** Delegate called when selection changed. Provides more context than FOnAssetSelected */
-DECLARE_DELEGATE_TwoParams(FOnAssetSelectionChanged, const FAssetData& /*InAssetData*/, ESelectInfo::Type /*InSelectInfo*/);
+DECLARE_DELEGATE_TwoParams(FOnAssetSelectionChanged, const FFileData& /*InAssetData*/, ESelectInfo::Type /*InSelectInfo*/);
 
 /** Fires whenever one of the "Search" options changes, useful for modifying search criteria to match */
 DECLARE_DELEGATE(FOnSearchOptionChanged);
@@ -88,7 +88,7 @@ public:
 		SLATE_EVENT( FOnGetFolderContextMenu, OnGetFolderContextMenu )
 
 		/** The delegate that fires when a path is right clicked and a context menu is requested */
-		SLATE_EVENT( FContentBrowserMenuExtender_SelectedPaths, OnGetPathContextMenuExtender )
+		SLATE_EVENT( FCodeBrowserMenuExtender_SelectedPaths, OnGetPathContextMenuExtender )
 
 		/** Invoked when a "Find in Asset Tree" is requested */
 		SLATE_EVENT( FOnFindInAssetTreeRequested, OnFindInAssetTreeRequested )
@@ -133,7 +133,7 @@ public:
 		SLATE_ARGUMENT( FARFilter, InitialBackendFilter )
 
 		/** The asset that should be initially selected */
-		SLATE_ARGUMENT( FAssetData, InitialAssetSelection )
+		SLATE_ARGUMENT( FFileData, InitialAssetSelection )
 
 		/** The initial view type */
 		SLATE_ARGUMENT( EAssetViewType::Type, InitialViewType )
@@ -236,19 +236,19 @@ public:
 	void DuplicateAsset(const FString& PackagePath, const TWeakObjectPtr<UObject>& OriginalObject);
 
 	/** Sets up an inline rename for the specified asset */
-	void RenameAsset(const FAssetData& ItemToRename);
+	void RenameAsset(const FFileData& ItemToRename);
 
 	/** Sets up an inline rename for the specified folder */
 	void RenameFolder(const FString& FolderToRename);
 
 	/** Selects the paths containing the specified assets. */
-	void SyncToAssets( const TArray<FAssetData>& AssetDataList, const bool bFocusOnSync = true );
+	void SyncToAssets( const TArray<FFileData>& AssetDataList, const bool bFocusOnSync = true );
 
 	/** Selects the specified paths. */
 	void SyncToFolders( const TArray<FString>& FolderList, const bool bFocusOnSync = true );
 
 	/** Selects the paths containing the specified items. */
-	void SyncTo( const FContentBrowserSelection& ItemSelection, const bool bFocusOnSync = true );
+	void SyncTo( const FCodeBrowserSelection& ItemSelection, const bool bFocusOnSync = true );
 
 	/** Sets the state of the asset view to the one described by the history data */
 	void ApplyHistoryData( const FHistoryData& History );
@@ -257,7 +257,7 @@ public:
 	TArray<TSharedPtr<FAssetViewItem>> GetSelectedItems() const;
 
 	/** Returns all the asset data objects in items currently selected in the view */
-	TArray<FAssetData> GetSelectedAssets() const;
+	TArray<FFileData> GetSelectedAssets() const;
 
 	/** Returns all the folders currently selected in the view */
 	TArray<FString> GetSelectedFolders() const;
@@ -393,7 +393,7 @@ private:
 	void OnAssetsAddedToCollection( const FCollectionNameType& Collection, const TArray< FName >& ObjectPaths );
 
 	/** Handler for when an asset was created or added to the asset registry */
-	void OnAssetAdded(const FAssetData& AssetData);
+	void OnAssetAdded(const FFileData& AssetData);
 
 	/** Process assets that we were recently informed of & buffered in RecentlyAddedAssets */
 	void ProcessRecentlyAddedAssets();
@@ -402,7 +402,7 @@ private:
 	void OnAssetsRemovedFromCollection( const FCollectionNameType& Collection, const TArray< FName >& ObjectPaths );
 
 	/** Handler for when an asset was deleted or removed from the asset registry */
-	void OnAssetRemoved(const FAssetData& AssetData);
+	void OnAssetRemoved(const FFileData& AssetData);
 
 	/** Removes the specified asset from view's caches */
 	void RemoveAssetByPath( const FName& ObjectPath );
@@ -414,10 +414,10 @@ private:
 	void OnCollectionUpdated( const FCollectionNameType& Collection );
 
 	/** Handler for when an asset was renamed in the asset registry */
-	void OnAssetRenamed(const FAssetData& AssetData, const FString& OldObjectPath);
+	void OnAssetRenamed(const FFileData& AssetData, const FString& OldObjectPath);
 
 	/** Handler for when an asset is updated in the asset registry */
-	void OnAssetUpdated(const FAssetData& AssetData);
+	void OnAssetUpdated(const FFileData& AssetData);
 
 	/** Handler for when an asset was loaded */
 	void OnAssetLoaded(UObject* Asset);
@@ -435,13 +435,13 @@ private:
 	bool IsFrontendFilterActive() const;
 
 	/** Returns true if the specified asset data item passes all applied frontend (non asset registry) filters */
-	bool PassesCurrentFrontendFilter(const FAssetData& Item) const;
+	bool PassesCurrentFrontendFilter(const FFileData& Item) const;
 
 	/** Returns true if the specified asset data item passes all applied backend (asset registry) filters */
-	bool PassesCurrentBackendFilter(const FAssetData& Item) const;
+	bool PassesCurrentBackendFilter(const FFileData& Item) const;
 
 	/** Removes asset data items from the given array that don't pass all applied backend (asset registry) filters */
-	void RunAssetsThroughBackendFilter(TArray<FAssetData>& InOutAssetDataList) const;
+	void RunAssetsThroughBackendFilter(TArray<FFileData>& InOutAssetDataList) const;
 
 	/** Returns true if the current filters deem that the asset view should be filtered recursively (overriding folder view) */
 	bool ShouldFilterRecursively() const;
@@ -721,19 +721,19 @@ private:
 	bool HasSingleCollectionSource() const;
 
 	/** Delegate for when assets or asset paths are dragged onto a folder */
-	void OnAssetsOrPathsDragDropped(const TArray<FAssetData>& AssetList, const TArray<FString>& AssetPaths, const FString& DestinationPath);
+	void OnAssetsOrPathsDragDropped(const TArray<FFileData>& AssetList, const TArray<FString>& AssetPaths, const FString& DestinationPath);
 
 	/** Delegate for when external assets are dragged onto a folder */
 	void OnFilesDragDropped(const TArray<FString>& AssetList, const FString& DestinationPath);
 
 	/** Delegate to respond to drop of assets or asset paths onto a folder */
-	void ExecuteDropCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
+	void ExecuteDropCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
 
 	/** Delegate to respond to drop of assets or asset paths onto a folder */
-	void ExecuteDropMove(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
+	void ExecuteDropMove(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
 
 	/** Delegate to respond to drop of assets or asset paths onto a folder */
-	void ExecuteDropAdvancedCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
+	void ExecuteDropAdvancedCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath);
 
 	/** Creates a new asset from deferred data */
 	void DeferredCreateNewAsset();
@@ -802,19 +802,19 @@ public:
 private:
 
 	/** The asset items being displayed in the view and the filtered list */
-	TArray<FAssetData> QueriedAssetItems;
-	TArray<FAssetData> AssetItems;
+	TArray<FFileData> QueriedAssetItems;
+	TArray<FFileData> AssetItems;
 	TArray<TSharedPtr<FAssetViewItem>> FilteredAssetItems;
 
 	/** The folder items being displayed in the view */
 	TSet<FString> Folders;
 
 	/** A set of assets that were loaded or changed since the last frame */
-	TSet<FAssetData> RecentlyLoadedOrChangedAssets;
+	TSet<FFileData> RecentlyLoadedOrChangedAssets;
 
 	/** A list of assets that were recently reported as added by the asset registry */
-	TArray<FAssetData> RecentlyAddedAssets;
-	TArray<FAssetData> FilteredRecentlyAddedAssets;
+	TArray<FFileData> RecentlyAddedAssets;
+	TArray<FFileData> FilteredRecentlyAddedAssets;
 	double LastProcessAddsTime;
 
 	/** The list view that is displaying the assets */
@@ -866,7 +866,7 @@ private:
 	FOnGetFolderContextMenu OnGetFolderContextMenu;
 
 	/** The delegate that fires when a folder is right clicked and a context menu is requested */
-	FContentBrowserMenuExtender_SelectedPaths OnGetPathContextMenuExtender;
+	FCodeBrowserMenuExtender_SelectedPaths OnGetPathContextMenuExtender;
 
 	/** Called when a "Find in Asset Tree" is requested */
 	FOnFindInAssetTreeRequested OnFindInAssetTreeRequested;

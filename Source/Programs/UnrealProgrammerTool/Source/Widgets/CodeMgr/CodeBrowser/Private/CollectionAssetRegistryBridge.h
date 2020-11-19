@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-struct FAssetData;
+struct FFileData;
 
 /**
  * The bridge between the asset registry and the collections manager - used to update collections as certain asset events happen
@@ -20,8 +20,8 @@ private:
 	void OnAssetRegistryLoadComplete();
 
 	/** Handler for when an asset was renamed in the asset registry */
-	void OnAssetRenamed(const FAssetData& AssetData, const FString& OldObjectPath);
+	void OnAssetRenamed(const FFileData& AssetData, const FString& OldObjectPath);
 
 	/** Handler for when an asset was removed from the asset registry */
-	void OnAssetRemoved(const FAssetData& AssetData);
+	void OnAssetRemoved(const FFileData& AssetData);
 };

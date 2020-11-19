@@ -18,7 +18,7 @@ public:
 	~FCollectionAssetManagement();
 
 	/** Set the assets that we are currently observing and managing the collection state of */
-	void SetCurrentAssets(const TArray<FAssetData>& CurrentAssets);
+	void SetCurrentAssets(const TArray<FFileData>& CurrentAssets);
 
 	/** Add the current assets to the given collection */
 	void AddCurrentAssetsToCollection(FCollectionNameType InCollectionKey);

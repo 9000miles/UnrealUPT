@@ -7,12 +7,12 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Widgets/Layout/SSeparator.h"
 #include "EditorStyleSet.h"
-#include "Settings/ContentBrowserSettings.h"
+#include "Settings/CodeBrowserSettings.h"
 #include "AssetRegistryModule.h"
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
-#include "ContentBrowserSingleton.h"
-#include "ContentBrowserUtils.h"
+#include "CodeBrowserSingleton.h"
+#include "CodeBrowserUtils.h"
 #include "HistoryManager.h"
 
 #include "DragAndDrop/AssetDragDropOp.h"
@@ -23,9 +23,9 @@
 #include "Widgets/Input/SSearchBox.h"
 #include "NativeClassHierarchy.h"
 #include "EmptyFolderVisibilityManager.h"
-#include "ContentBrowserModule.h"
+#include "CodeBrowserModule.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 SPathView::~SPathView()
 {
@@ -36,13 +36,13 @@ SPathView::~SPathView()
 	// Unsubscribe from class events
 	if ( bAllowClassesFolder )
 	{
-		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 		NativeClassHierarchy->OnClassHierarchyUpdated().RemoveAll( this );
 	}
 
 	// Unsubscribe from folder population events
 	{
-		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 		EmptyFolderVisibilityManager->OnFolderPopulated().RemoveAll(this);
 	}
 
@@ -73,7 +73,7 @@ void SPathView::Construct( const FArguments& InArgs )
 	}
 
 	// Listen for when view settings are changed
-	UContentBrowserSettings::OnSettingChanged().AddSP(this, &SPathView::HandleSettingChanged);
+	UCodeBrowserSettings::OnSettingChanged().AddSP(this, &SPathView::HandleSettingChanged);
 
 	//Setup the SearchBox filter
 	SearchBoxFolderFilter = MakeShareable( new FolderTextFilter( FolderTextFilter::FItemToStringArray::CreateSP( this, &SPathView::PopulateFolderSearchStrings ) ) );
@@ -86,13 +86,13 @@ void SPathView::Construct( const FArguments& InArgs )
 	// Listen to find out when the available classes are changed, so that we can refresh our paths
 	if ( bAllowClassesFolder )
 	{
-		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+		TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 		NativeClassHierarchy->OnClassHierarchyUpdated().AddSP( this, &SPathView::OnClassHierarchyUpdated );
 	}
 
 	// Listen to find out when previously empty paths are populated with content
 	{
-		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 		EmptyFolderVisibilityManager->OnFolderPopulated().AddSP(this, &SPathView::OnFolderPopulated);
 	}
 
@@ -145,7 +145,7 @@ void SPathView::Construct( const FArguments& InArgs )
 		.AutoHeight()
 		[
 			SNew(STextBlock)
-			.Font( FEditorStyle::GetFontStyle("ContentBrowser.SourceTitleFont") )
+			.Font( FEditorStyle::GetFontStyle("CodeBrowser.SourceTitleFont") )
 			.Text(this, &SPathView::GetTreeTitle)
 			.Visibility(InArgs._ShowTreeTitle ? EVisibility::Visible : EVisibility::Collapsed)
 		]
@@ -315,8 +315,8 @@ TSharedPtr<FTreeItem> SPathView::AddPath(const FString& Path, bool bUserNamed)
 	if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == true)
 	{
 		TArray<FString> DirectoryWantToDisplay;
-		FContentBrowserModule& ContentBrowserModule = FModuleManager::GetModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
-		ContentBrowserModule.GetOnDirectoryWantToDisplay().ExecuteIfBound(DirectoryWantToDisplay);
+		FCodeBrowserModule& CodeBrowserModule = FModuleManager::GetModuleChecked<FCodeBrowserModule>(TEXT("CodeBrowser"));
+		CodeBrowserModule.GetOnDirectoryWantToDisplay().ExecuteIfBound(DirectoryWantToDisplay);
 		bool bDirectoryIsWant = true;
 		for (FString Directory : DirectoryWantToDisplay)
 		{
@@ -364,12 +364,12 @@ TSharedPtr<FTreeItem> SPathView::AddPath(const FString& Path, bool bUserNamed)
 		// Found or added the root item?
 		if ( CurrentItem.IsValid() )
 		{
-			TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+			TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 
 			// Now add children as necessary
-			const bool bDisplayEmpty = GetDefault<UContentBrowserSettings>()->DisplayEmptyFolders;
-			const bool bDisplayDev = GetDefault<UContentBrowserSettings>()->GetDisplayDevelopersFolder();
-			const bool bDisplayL10N = GetDefault<UContentBrowserSettings>()->GetDisplayL10NFolder();
+			const bool bDisplayEmpty = GetDefault<UCodeBrowserSettings>()->DisplayEmptyFolders;
+			const bool bDisplayDev = GetDefault<UCodeBrowserSettings>()->GetDisplayDevelopersFolder();
+			const bool bDisplayL10N = GetDefault<UCodeBrowserSettings>()->GetDisplayL10NFolder();
 			for ( int32 PathItemIdx = 1; PathItemIdx < PathItemList.Num(); ++PathItemIdx )
 			{
 				const FString& PathItemName = PathItemList[PathItemIdx];
@@ -390,13 +390,13 @@ TSharedPtr<FTreeItem> SPathView::AddPath(const FString& Path, bool bUserNamed)
 						}
 
 						// If this is a developer folder, and we don't want to show them break out here
-						if ( !bDisplayDev && ContentBrowserUtils::IsDevelopersFolder(FolderPath) )
+						if ( !bDisplayDev && CodeBrowserUtils::IsDevelopersFolder(FolderPath) )
 						{
 							break;
 						}
 
 						// If this is a localized folder, and we don't want to show them break out here
-						if ( !bDisplayL10N && ContentBrowserUtils::IsLocalizationFolder(FolderPath) )
+						if ( !bDisplayL10N && CodeBrowserUtils::IsLocalizationFolder(FolderPath) )
 						{
 							break;
 						}
@@ -505,22 +505,22 @@ void SPathView::RenameFolder(const FString& FolderToRename)
 	}
 }
 
-void SPathView::SyncToAssets( const TArray<FAssetData>& AssetDataList, const bool bAllowImplicitSync )
+void SPathView::SyncToAssets( const TArray<FFileData>& AssetDataList, const bool bAllowImplicitSync )
 {
 	SyncToInternal(AssetDataList, TArray<FString>(), bAllowImplicitSync);
 }
 
 void SPathView::SyncToFolders( const TArray<FString>& FolderList, const bool bAllowImplicitSync )
 {
-	SyncToInternal(TArray<FAssetData>(), FolderList, bAllowImplicitSync);
+	SyncToInternal(TArray<FFileData>(), FolderList, bAllowImplicitSync);
 }
 
-void SPathView::SyncTo( const FContentBrowserSelection& ItemSelection, const bool bAllowImplicitSync )
+void SPathView::SyncTo( const FCodeBrowserSelection& ItemSelection, const bool bAllowImplicitSync )
 {
 	SyncToInternal(ItemSelection.SelectedAssets, ItemSelection.SelectedFolders, bAllowImplicitSync);
 }
 
-void SPathView::SyncToInternal( const TArray<FAssetData>& AssetDataList, const TArray<FString>& FolderPaths, const bool bAllowImplicitSync )
+void SPathView::SyncToInternal( const TArray<FFileData>& AssetDataList, const TArray<FString>& FolderPaths, const bool bAllowImplicitSync )
 {
 	TArray<TSharedPtr<FTreeItem>> SyncTreeItems;
 
@@ -528,13 +528,13 @@ void SPathView::SyncToInternal( const TArray<FAssetData>& AssetDataList, const T
 	SearchBoxPtr->SetText(FText::GetEmpty());
 
 	TSet<FString> PackagePaths = TSet<FString>(FolderPaths);
-	for (const FAssetData& AssetData : AssetDataList)
+	for (const FFileData& AssetData : AssetDataList)
 	{
 		FString PackagePath;
 		if (AssetData.AssetClass == NAME_Class)
 		{
 			// Classes are found in the /Classes_ roots
-			TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+			TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 			NativeClassHierarchy->GetClassPath(Cast<UClass>(AssetData.GetAsset()), PackagePath, false/*bIncludeClassName*/);
 		}
 		else
@@ -848,12 +848,12 @@ TSharedPtr<struct FTreeItem> SPathView::AddRootItem( const FString& InFolderName
 	TSharedPtr<struct FTreeItem> NewItem = nullptr;
 
 	// If this isn't an engine folder or we want to show them, add
-	const bool bDisplayEngine = GetDefault<UContentBrowserSettings>()->GetDisplayEngineFolder();
-	const bool bDisplayPlugins = GetDefault<UContentBrowserSettings>()->GetDisplayPluginFolders();
-	const bool bDisplayCpp = GetDefault<UContentBrowserSettings>()->GetDisplayCppFolders();
+	const bool bDisplayEngine = GetDefault<UCodeBrowserSettings>()->GetDisplayEngineFolder();
+	const bool bDisplayPlugins = GetDefault<UCodeBrowserSettings>()->GetDisplayPluginFolders();
+	const bool bDisplayCpp = GetDefault<UCodeBrowserSettings>()->GetDisplayCppFolders();
 
 	// Filter out classes folders if we're not showing them.
-	if ( !bDisplayCpp && ContentBrowserUtils::IsClassesFolder(InFolderName) )
+	if ( !bDisplayCpp && CodeBrowserUtils::IsClassesFolder(InFolderName) )
 	{
 		return nullptr;
 	}
@@ -863,14 +863,14 @@ TSharedPtr<struct FTreeItem> SPathView::AddRootItem( const FString& InFolderName
 	EPluginLoadedFrom PluginSource = EPluginLoadedFrom::Engine; // init to avoid warning
 	if (!bDisplayEngine || !bDisplayPlugins)
 	{
-		bIsPlugin = ContentBrowserUtils::IsPluginFolder(InFolderName, &PluginSource);
+		bIsPlugin = CodeBrowserUtils::IsPluginFolder(InFolderName, &PluginSource);
 	}
 
-	if ((bDisplayEngine || !ContentBrowserUtils::IsEngineFolder(InFolderName)) &&
+	if ((bDisplayEngine || !CodeBrowserUtils::IsEngineFolder(InFolderName)) &&
  		 ((bDisplayEngine && bDisplayPlugins) || !(bIsPlugin && PluginSource == EPluginLoadedFrom::Engine)) &&
 		 (bDisplayPlugins || !(bIsPlugin && PluginSource == EPluginLoadedFrom::Project)))
 		{
-			const FText DisplayName = ContentBrowserUtils::GetRootDirDisplayName(InFolderName);
+			const FText DisplayName = CodeBrowserUtils::GetRootDirDisplayName(InFolderName);
 			NewItem = MakeShareable( new FTreeItem(DisplayName, InFolderName, FString(TEXT("/")) + InFolderName, TSharedPtr<FTreeItem>()));
 			TreeRootItems.Add( NewItem );
 			TreeViewPtr->RequestTreeRefresh();
@@ -1026,12 +1026,12 @@ void SPathView::Populate()
 	TreeViewPtr->ClearSelection();
 
 	// Load the native class hierarchy to listen for updates
-	TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+	TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 
 	const bool bFilteringByText = !SearchBoxFolderFilter->GetRawFilterText().IsEmpty();
 	
-	const bool bDisplayEngine = GetDefault<UContentBrowserSettings>()->GetDisplayEngineFolder();
-	const bool bDisplayPlugins = GetDefault<UContentBrowserSettings>()->GetDisplayPluginFolders();
+	const bool bDisplayEngine = GetDefault<UCodeBrowserSettings>()->GetDisplayEngineFolder();
+	const bool bDisplayPlugins = GetDefault<UCodeBrowserSettings>()->GetDisplayPluginFolders();
 
 	TArray<FName> ClassRoots;
 	TArray<FString> ClassFolders;
@@ -1088,11 +1088,11 @@ void SPathView::Populate()
 	PathList.Add(UserDeveloperFolder);
 
 	// Remove paths of localized assets, if not displaying localized assets.
-	if (!(GetDefault<UContentBrowserSettings>()->GetDisplayL10NFolder()))
+	if (!(GetDefault<UCodeBrowserSettings>()->GetDisplayL10NFolder()))
 	{
 		PathList.RemoveAll([](const FString& Path) -> bool
 		{
-			return ContentBrowserUtils::IsLocalizationFolder(Path);
+			return CodeBrowserUtils::IsLocalizationFolder(Path);
 		});
 	}
 
@@ -1207,7 +1207,7 @@ void SPathView::PopulateFolderSearchStrings( const FString& FolderName, OUT TArr
 
 FReply SPathView::OnFolderDragDetected(const FGeometry& Geometry, const FPointerEvent& MouseEvent)
 {
-#pragma region // ContentBrowser不允许拖拽文件夹
+#pragma region // CodeBrowser不允许拖拽文件夹
 	if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == true)
 	{
 		return FReply::Unhandled();
@@ -1235,7 +1235,7 @@ FReply SPathView::OnFolderDragDetected(const FGeometry& Geometry, const FPointer
 
 bool SPathView::VerifyFolderNameChanged(const FString& InName, FText& OutErrorMessage, const FString& InFolderPath) const
 {	
-	return ContentBrowserUtils::IsValidFolderPathForCreate(FPaths::GetPath(InFolderPath), InName, OutErrorMessage);
+	return CodeBrowserUtils::IsValidFolderPathForCreate(FPaths::GetPath(InFolderPath), InName, OutErrorMessage);
 }
 
 void SPathView::FolderNameChanged( const TSharedPtr< FTreeItem >& TreeItem, const FString& OldPath, const FVector2D& MessageLocation, const ETextCommit::Type CommitType )
@@ -1243,7 +1243,7 @@ void SPathView::FolderNameChanged( const TSharedPtr< FTreeItem >& TreeItem, cons
 	TArray<FMovedContentFolder> MovedFolders;
 	// Verify the name of the folder
 	FText Reason;
-	if ( ContentBrowserUtils::IsValidFolderName(TreeItem->FolderName, Reason) )
+	if ( CodeBrowserUtils::IsValidFolderName(TreeItem->FolderName, Reason) )
 	{
 		if (CommitType == ETextCommit::OnCleared)
 		{
@@ -1291,10 +1291,10 @@ void SPathView::FolderNameChanged( const TSharedPtr< FTreeItem >& TreeItem, cons
 
 		// Update either the asset registry or the native class hierarchy so this folder will persist
 		/*
-		if (ContentBrowserUtils::IsClassPath(TreeItem->FolderPath))
+		if (CodeBrowserUtils::IsClassPath(TreeItem->FolderPath))
 		{
 			// todo: jdale - CLASS - This will need updating to support renaming of class folders (SAssetView has similar logic - needs abstracting)
-			TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FContentBrowserSingleton::Get().GetNativeClassHierarchy();
+			TSharedRef<FNativeClassHierarchy> NativeClassHierarchy = FCodeBrowserSingleton::Get().GetNativeClassHierarchy();
 			NativeClassHierarchy->AddFolder(TreeItem->FolderPath);
 		}
 		else
@@ -1304,7 +1304,7 @@ void SPathView::FolderNameChanged( const TSharedPtr< FTreeItem >& TreeItem, cons
 			FString NewPathOnDisk;
 			if (FPackageName::TryConvertLongPackageNameToFilename(TreeItem->FolderPath, NewPathOnDisk) && IFileManager::Get().MakeDirectory(*NewPathOnDisk, true))
 			{
-				TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+				TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 				EmptyFolderVisibilityManager->SetAlwaysShowPath(TreeItem->FolderPath);
 
 				FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
@@ -1312,20 +1312,20 @@ void SPathView::FolderNameChanged( const TSharedPtr< FTreeItem >& TreeItem, cons
 				{
 					MovedFolders.Add(FMovedContentFolder(OldPath, TreeItem->FolderPath));
 					// move any assets in our folder
-					TArray<FAssetData> AssetsInFolder;
+					TArray<FFileData> AssetsInFolder;
 					AssetRegistryModule.Get().GetAssetsByPath(*OldPath, AssetsInFolder, true);
 					TArray<UObject*> ObjectsInFolder;
-					ContentBrowserUtils::GetObjectsInAssetData(AssetsInFolder, ObjectsInFolder);
-					ContentBrowserUtils::MoveAssets(ObjectsInFolder, TreeItem->FolderPath, OldPath);
+					CodeBrowserUtils::GetObjectsInAssetData(AssetsInFolder, ObjectsInFolder);
+					CodeBrowserUtils::MoveAssets(ObjectsInFolder, TreeItem->FolderPath, OldPath);
 
 					// Now check to see if the original folder is empty, if so we can delete it
-					TArray<FAssetData> AssetsInOriginalFolder;
+					TArray<FFileData> AssetsInOriginalFolder;
 					AssetRegistryModule.Get().GetAssetsByPath(*OldPath, AssetsInOriginalFolder, true);
 					if (AssetsInOriginalFolder.Num() == 0)
 					{
 						TArray<FString> FoldersToDelete;
 						FoldersToDelete.Add(OldPath);
-						ContentBrowserUtils::DeleteFolders(FoldersToDelete);
+						CodeBrowserUtils::DeleteFolders(FoldersToDelete);
 					}
 					OnFolderPathChanged.ExecuteIfBound(MovedFolders);
 				}
@@ -1339,7 +1339,7 @@ void SPathView::FolderNameChanged( const TSharedPtr< FTreeItem >& TreeItem, cons
 
 		// Display the reason why the folder was invalid
 		FSlateRect MessageAnchor(MessageLocation.X, MessageLocation.Y, MessageLocation.X, MessageLocation.Y);
-		ContentBrowserUtils::DisplayMessage(Reason, MessageAnchor, SharedThis(this));
+		CodeBrowserUtils::DisplayMessage(Reason, MessageAnchor, SharedThis(this));
 	}
 }
 
@@ -1405,9 +1405,9 @@ void SPathView::RemoveFolderItem(const TSharedPtr< FTreeItem >& TreeItem)
 	}
 }
 
-void SPathView::TreeAssetsOrPathsDropped(const TArray<FAssetData>& AssetList, const TArray<FString>& AssetPaths, const TSharedPtr<FTreeItem>& TreeItem)
+void SPathView::TreeAssetsOrPathsDropped(const TArray<FFileData>& AssetList, const TArray<FString>& AssetPaths, const TSharedPtr<FTreeItem>& TreeItem)
 {
-#pragma region // 屏蔽拖拽资源到ContentBrowser中
+#pragma region // 屏蔽拖拽资源到CodeBrowser中
 	if (CHECK_ENGINE_IS_COURSEWARE_EDITOR == true)
 	{
 		return;
@@ -1442,17 +1442,17 @@ bool SPathView::IsTreeItemSelected(TSharedPtr<FTreeItem> TreeItem) const
 	return TreeViewPtr->IsItemSelected(TreeItem);
 }
 
-void SPathView::ExecuteTreeDropCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
+void SPathView::ExecuteTreeDropCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
 {
 	if (AssetList.Num() > 0)
 	{
 		TArray<UObject*> DroppedObjects;
-		ContentBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
+		CodeBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
 
-		ContentBrowserUtils::CopyAssets(DroppedObjects, DestinationPath);
+		CodeBrowserUtils::CopyAssets(DroppedObjects, DestinationPath);
 	}
 
-	if (AssetPaths.Num() > 0 && ContentBrowserUtils::CopyFolders(AssetPaths, DestinationPath))
+	if (AssetPaths.Num() > 0 && CodeBrowserUtils::CopyFolders(AssetPaths, DestinationPath))
 	{
 		TSharedPtr<FTreeItem> RootItem = FindItemRecursive(DestinationPath);
 		if (RootItem.IsValid())
@@ -1477,14 +1477,14 @@ void SPathView::ExecuteTreeDropCopy(TArray<FAssetData> AssetList, TArray<FString
 	}
 }
 
-void SPathView::ExecuteTreeDropMove(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
+void SPathView::ExecuteTreeDropMove(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
 {
 	if (AssetList.Num() > 0)
 	{
 		TArray<UObject*> DroppedObjects;
-		ContentBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
+		CodeBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
 
-		ContentBrowserUtils::MoveAssets(DroppedObjects, DestinationPath);
+		CodeBrowserUtils::MoveAssets(DroppedObjects, DestinationPath);
 	}
 
 	// Prepare to fixup any asset paths that are favorites
@@ -1496,7 +1496,7 @@ void SPathView::ExecuteTreeDropMove(TArray<FAssetData> AssetList, TArray<FString
 		MovedFolders.Add(FMovedContentFolder(OldPath, NewPath));
 	}
 
-	if (AssetPaths.Num() > 0 && ContentBrowserUtils::MoveFolders(AssetPaths, DestinationPath))
+	if (AssetPaths.Num() > 0 && CodeBrowserUtils::MoveFolders(AssetPaths, DestinationPath))
 	{
 		TSharedPtr<FTreeItem> RootItem = FindItemRecursive(DestinationPath);
 		if (RootItem.IsValid())
@@ -1523,9 +1523,9 @@ void SPathView::ExecuteTreeDropMove(TArray<FAssetData> AssetList, TArray<FString
 }
 
 
-void SPathView::ExecuteTreeDropAdvancedCopy(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
+void SPathView::ExecuteTreeDropAdvancedCopy(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
 {
-	ContentBrowserUtils::BeginAdvancedCopyPackages(AssetList, AssetPaths, DestinationPath);
+	CodeBrowserUtils::BeginAdvancedCopyPackages(AssetList, AssetPaths, DestinationPath);
 }
 
 void SPathView::OnAssetRegistryPathAdded(const FString& Path)
@@ -1573,31 +1573,31 @@ void SPathView::OnClassHierarchyUpdated()
 
 void SPathView::HandleSettingChanged(FName PropertyName)
 {
-	if ((PropertyName == GET_MEMBER_NAME_CHECKED(UContentBrowserSettings, DisplayEmptyFolders)) ||
+	if ((PropertyName == GET_MEMBER_NAME_CHECKED(UCodeBrowserSettings, DisplayEmptyFolders)) ||
 		(PropertyName == "DisplayDevelopersFolder") ||
 		(PropertyName == "DisplayEngineFolder") ||
 		(PropertyName == "DisplayPluginFolders") ||
 		(PropertyName == "DisplayL10NFolder") ||
 		(PropertyName == NAME_None))	// @todo: Needed if PostEditChange was called manually, for now
 	{
-		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FContentBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
+		TSharedRef<FEmptyFolderVisibilityManager> EmptyFolderVisibilityManager = FCodeBrowserSingleton::Get().GetEmptyFolderVisibilityManager();
 
 		// If the dev or engine folder is no longer visible but we're inside it...
-		const bool bDisplayEmpty = GetDefault<UContentBrowserSettings>()->DisplayEmptyFolders;
-		const bool bDisplayDev = GetDefault<UContentBrowserSettings>()->GetDisplayDevelopersFolder();
-		const bool bDisplayEngine = GetDefault<UContentBrowserSettings>()->GetDisplayEngineFolder();
-		const bool bDisplayPlugins = GetDefault<UContentBrowserSettings>()->GetDisplayPluginFolders();
-		const bool bDisplayL10N = GetDefault<UContentBrowserSettings>()->GetDisplayL10NFolder();
+		const bool bDisplayEmpty = GetDefault<UCodeBrowserSettings>()->DisplayEmptyFolders;
+		const bool bDisplayDev = GetDefault<UCodeBrowserSettings>()->GetDisplayDevelopersFolder();
+		const bool bDisplayEngine = GetDefault<UCodeBrowserSettings>()->GetDisplayEngineFolder();
+		const bool bDisplayPlugins = GetDefault<UCodeBrowserSettings>()->GetDisplayPluginFolders();
+		const bool bDisplayL10N = GetDefault<UCodeBrowserSettings>()->GetDisplayL10NFolder();
 		if (!bDisplayEmpty || !bDisplayDev || !bDisplayEngine || !bDisplayPlugins || !bDisplayL10N)
 		{
 			const FString OldSelectedPath = GetSelectedPath();
-			const ContentBrowserUtils::ECBFolderCategory OldFolderCategory = ContentBrowserUtils::GetFolderCategory(OldSelectedPath);
+			const CodeBrowserUtils::ECBFolderCategory OldFolderCategory = CodeBrowserUtils::GetFolderCategory(OldSelectedPath);
 
 			if ((!bDisplayEmpty && !EmptyFolderVisibilityManager->ShouldShowPath(OldSelectedPath)) || 
-				(!bDisplayDev && OldFolderCategory == ContentBrowserUtils::ECBFolderCategory::DeveloperContent) || 
-				(!bDisplayEngine && (OldFolderCategory == ContentBrowserUtils::ECBFolderCategory::EngineContent || OldFolderCategory == ContentBrowserUtils::ECBFolderCategory::EngineClasses)) || 
-				(!bDisplayPlugins && (OldFolderCategory == ContentBrowserUtils::ECBFolderCategory::PluginContent || OldFolderCategory == ContentBrowserUtils::ECBFolderCategory::PluginClasses)) ||
-				(!bDisplayL10N && ContentBrowserUtils::IsLocalizationFolder(OldSelectedPath)))
+				(!bDisplayDev && OldFolderCategory == CodeBrowserUtils::ECBFolderCategory::DeveloperContent) || 
+				(!bDisplayEngine && (OldFolderCategory == CodeBrowserUtils::ECBFolderCategory::EngineContent || OldFolderCategory == CodeBrowserUtils::ECBFolderCategory::EngineClasses)) || 
+				(!bDisplayPlugins && (OldFolderCategory == CodeBrowserUtils::ECBFolderCategory::PluginContent || OldFolderCategory == CodeBrowserUtils::ECBFolderCategory::PluginClasses)) ||
+				(!bDisplayL10N && CodeBrowserUtils::IsLocalizationFolder(OldSelectedPath)))
 			{
 				// Set the folder back to the root, and refresh the contents
 				TSharedPtr<FTreeItem> GameRoot = FindItemRecursive(TEXT("/Game"));
@@ -1619,12 +1619,12 @@ void SPathView::HandleSettingChanged(FName PropertyName)
 		if (bDisplayDev || bDisplayEngine || bDisplayPlugins || bDisplayL10N)
 		{
 			const FString NewSelectedPath = GetSelectedPath();
-			const ContentBrowserUtils::ECBFolderCategory NewFolderCategory = ContentBrowserUtils::GetFolderCategory(NewSelectedPath);
+			const CodeBrowserUtils::ECBFolderCategory NewFolderCategory = CodeBrowserUtils::GetFolderCategory(NewSelectedPath);
 
-			if ((bDisplayDev && NewFolderCategory == ContentBrowserUtils::ECBFolderCategory::DeveloperContent) || 
-				(bDisplayEngine && (NewFolderCategory == ContentBrowserUtils::ECBFolderCategory::EngineContent || NewFolderCategory == ContentBrowserUtils::ECBFolderCategory::EngineClasses)) || 
-				(bDisplayPlugins && (NewFolderCategory == ContentBrowserUtils::ECBFolderCategory::PluginContent || NewFolderCategory == ContentBrowserUtils::ECBFolderCategory::PluginClasses)) ||
-				(bDisplayL10N && ContentBrowserUtils::IsLocalizationFolder(NewSelectedPath)))
+			if ((bDisplayDev && NewFolderCategory == CodeBrowserUtils::ECBFolderCategory::DeveloperContent) || 
+				(bDisplayEngine && (NewFolderCategory == CodeBrowserUtils::ECBFolderCategory::EngineContent || NewFolderCategory == CodeBrowserUtils::ECBFolderCategory::EngineClasses)) || 
+				(bDisplayPlugins && (NewFolderCategory == CodeBrowserUtils::ECBFolderCategory::PluginContent || NewFolderCategory == CodeBrowserUtils::ECBFolderCategory::PluginClasses)) ||
+				(bDisplayL10N && CodeBrowserUtils::IsLocalizationFolder(NewSelectedPath)))
 			{
 				// Refresh the contents
 				OnPathSelected.ExecuteIfBound(NewSelectedPath);
@@ -1660,7 +1660,7 @@ void SFavoritePathView::Populate()
 	// Clear all root items and clear selection
 	TreeRootItems.Empty();
 	TreeViewPtr->ClearSelection();
-	const TArray<FString> FavoritePaths = ContentBrowserUtils::GetFavoriteFolders();
+	const TArray<FString> FavoritePaths = CodeBrowserUtils::GetFavoriteFolders();
 	// we have a text filter, expand all parents of matching folders
 	for (const FString& Path : FavoritePaths)
 	{
@@ -1693,7 +1693,7 @@ void SFavoritePathView::SaveSettings(const FString& IniFilename, const FString& 
 	SPathView::SaveSettings(IniFilename, IniSection, SettingsString);
 
 	FString FavoritePathsString;
-	const TArray<FString> FavoritePaths = ContentBrowserUtils::GetFavoriteFolders();
+	const TArray<FString> FavoritePaths = CodeBrowserUtils::GetFavoriteFolders();
 	for (const FString& PathIt : FavoritePaths)
 	{
 		if (FavoritePathsString.Len() > 0)
@@ -1729,7 +1729,7 @@ void SFavoritePathView::LoadSettings(const FString& IniFilename, const FString& 
 			for (int32 PathIdx = 0; PathIdx < NewFavoritePaths.Num(); ++PathIdx)
 			{
 				const FString& Path = NewFavoritePaths[PathIdx];
-				ContentBrowserUtils::AddFavoriteFolder(Path, false);
+				CodeBrowserUtils::AddFavoriteFolder(Path, false);
 				bAddedAtLeastOnePath = true;
 			}
 		}
@@ -1864,12 +1864,12 @@ TSharedPtr<FTreeItem> SFavoritePathView::AddPath(const FString& Path, bool bUser
 		TSharedPtr<struct FTreeItem> NewItem = nullptr;
 
 		// If this isn't an engine folder or we want to show them, add
-		const bool bDisplayEngine = GetDefault<UContentBrowserSettings>()->GetDisplayEngineFolder();
-		const bool bDisplayPlugins = GetDefault<UContentBrowserSettings>()->GetDisplayPluginFolders();
-		const bool bDisplayCpp = GetDefault<UContentBrowserSettings>()->GetDisplayCppFolders();
-		const bool bDisplayLoc = GetDefault<UContentBrowserSettings>()->GetDisplayL10NFolder();
+		const bool bDisplayEngine = GetDefault<UCodeBrowserSettings>()->GetDisplayEngineFolder();
+		const bool bDisplayPlugins = GetDefault<UCodeBrowserSettings>()->GetDisplayPluginFolders();
+		const bool bDisplayCpp = GetDefault<UCodeBrowserSettings>()->GetDisplayCppFolders();
+		const bool bDisplayLoc = GetDefault<UCodeBrowserSettings>()->GetDisplayL10NFolder();
 		// Filter out classes folders if we're not showing them.
-		if (!bDisplayCpp && ContentBrowserUtils::IsClassesFolder(FolderName))
+		if (!bDisplayCpp && CodeBrowserUtils::IsClassesFolder(FolderName))
 		{
 			return nullptr;
 		}
@@ -1879,15 +1879,15 @@ TSharedPtr<FTreeItem> SFavoritePathView::AddPath(const FString& Path, bool bUser
 		EPluginLoadedFrom PluginSource = EPluginLoadedFrom::Engine; // init to avoid warning
 		if (!bDisplayEngine || !bDisplayPlugins)
 		{
-			bIsPlugin = ContentBrowserUtils::IsPluginFolder(FolderName, &PluginSource);
+			bIsPlugin = CodeBrowserUtils::IsPluginFolder(FolderName, &PluginSource);
 		}
 
-		if ((bDisplayEngine || !ContentBrowserUtils::IsEngineFolder(FolderName)) &&
+		if ((bDisplayEngine || !CodeBrowserUtils::IsEngineFolder(FolderName)) &&
 			((bDisplayEngine && bDisplayPlugins) || !(bIsPlugin && PluginSource == EPluginLoadedFrom::Engine)) &&
 			(bDisplayPlugins || !(bIsPlugin && PluginSource == EPluginLoadedFrom::Project)) &&
-			(bDisplayLoc || !ContentBrowserUtils::IsLocalizationFolder(FolderName)))
+			(bDisplayLoc || !CodeBrowserUtils::IsLocalizationFolder(FolderName)))
 		{
-			const FText DisplayName = ContentBrowserUtils::GetRootDirDisplayName(FolderName);
+			const FText DisplayName = CodeBrowserUtils::GetRootDirDisplayName(FolderName);
 			NewItem = MakeShareable(new FTreeItem(FText::FromString(FolderName), FolderName, FolderPath, TSharedPtr<FTreeItem>()));
 			TreeRootItems.Add(NewItem);
 			TreeViewPtr->RequestTreeRefresh();
@@ -1916,7 +1916,7 @@ TSharedRef<ITableRow> SFavoritePathView::GenerateTreeRow(TSharedPtr<FTreeItem> T
 			.IsItemExpanded(false)
 			.HighlightText(this, &SFavoritePathView::GetHighlightText)
 			.IsSelected(this, &SFavoritePathView::IsTreeItemSelected, TreeItem)
-			.FontOverride(FEditorStyle::GetFontStyle("ContentBrowser.SourceTreeItemFont"))
+			.FontOverride(FEditorStyle::GetFontStyle("CodeBrowser.SourceTreeItemFont"))
 		];
 }
 
@@ -1927,18 +1927,18 @@ void SFavoritePathView::OnAssetRegistryPathAdded(const FString& Path)
 
 void SFavoritePathView::OnAssetRegistryPathRemoved(const FString& Path)
 {
-	ContentBrowserUtils::RemoveFavoriteFolder(Path);
+	CodeBrowserUtils::RemoveFavoriteFolder(Path);
 	Populate();
 
 }
 
-void SFavoritePathView::ExecuteTreeDropMove(TArray<FAssetData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
+void SFavoritePathView::ExecuteTreeDropMove(TArray<FFileData> AssetList, TArray<FString> AssetPaths, FString DestinationPath)
 {
 	if (AssetList.Num() > 0)
 	{
 		TArray<UObject*> DroppedObjects;
-		ContentBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
-		ContentBrowserUtils::MoveAssets(DroppedObjects, DestinationPath);
+		CodeBrowserUtils::GetObjectsInAssetData(AssetList, DroppedObjects);
+		CodeBrowserUtils::MoveAssets(DroppedObjects, DestinationPath);
 	}
 
 	// Prepare to fixup any asset paths that are favorites
@@ -1951,7 +1951,7 @@ void SFavoritePathView::ExecuteTreeDropMove(TArray<FAssetData> AssetList, TArray
 	}
 
 	FixupFavoritesFromExternalChange(MovedFolders);
-	ContentBrowserUtils::MoveFolders(AssetPaths, DestinationPath);
+	CodeBrowserUtils::MoveFolders(AssetPaths, DestinationPath);
 }
 
 void SFavoritePathView::FixupFavoritesFromExternalChange(const TArray<FMovedContentFolder>& MovedFolders)
@@ -1961,11 +1961,11 @@ void SFavoritePathView::FixupFavoritesFromExternalChange(const TArray<FMovedCont
 		if (EnumHasAnyFlags(MovedFolder.Flags, EMovedContentFolderFlags::Favorite))
 		{
 			// Remove the original path
-			ContentBrowserUtils::RemoveFavoriteFolder(MovedFolder.OldPath, false);
+			CodeBrowserUtils::RemoveFavoriteFolder(MovedFolder.OldPath, false);
 
 			// Add the new path to favorites instead
 			const FString NewPath = MovedFolder.NewPath;
-			ContentBrowserUtils::AddFavoriteFolder(NewPath, false);
+			CodeBrowserUtils::AddFavoriteFolder(NewPath, false);
 			TSharedPtr<FTreeItem> Item = FindItemRecursive(NewPath);
 			if (Item.IsValid())
 			{

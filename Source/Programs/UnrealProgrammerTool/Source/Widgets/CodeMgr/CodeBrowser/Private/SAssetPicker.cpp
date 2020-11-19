@@ -18,10 +18,10 @@
 #include "SAssetSearchBox.h"
 #include "SFilterList.h"
 #include "SAssetView.h"
-#include "SContentBrowser.h"
+#include "SCodeBrowser.h"
 #include "Framework/Commands/GenericCommands.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 SAssetPicker::~SAssetPicker()
 {
@@ -113,7 +113,7 @@ void SAssetPicker::Construct( const FArguments& InArgs )
 				.OnGetMenuContent( this, &SAssetPicker::MakeAddFilterMenu )
 				.HasDownArrow( true )
 				.ContentPadding( FMargin( 1, 0 ) )
-				.AddMetaData<FTagMetaData>(FTagMetaData(TEXT("ContentBrowserFiltersCombo")))
+				.AddMetaData<FTagMetaData>(FTagMetaData(TEXT("CodeBrowserFiltersCombo")))
 				.ButtonContent()
 				[
 					SNew( STextBlock )
@@ -127,7 +127,7 @@ void SAssetPicker::Construct( const FArguments& InArgs )
 		.FillWidth(1.0f)
 		[
 			SAssignNew( SearchBoxPtr, SAssetSearchBox )
-			.HintText(NSLOCTEXT( "ContentBrowser", "SearchBoxHint", "Search Assets" ))
+			.HintText(NSLOCTEXT( "CodeBrowser", "SearchBoxHint", "Search Assets" ))
 			.OnTextChanged( this, &SAssetPicker::OnSearchBoxChanged )
 			.OnTextCommitted( this, &SAssetPicker::OnSearchBoxCommitted )
 			.DelayChangeNotificationsWhileTyping( true )
@@ -144,7 +144,7 @@ void SAssetPicker::Construct( const FArguments& InArgs )
 			.IsChecked( this, &SAssetPicker::GetShowOtherDevelopersCheckState )
 			[
 				SNew( SImage )
-				.Image( FEditorStyle::GetBrush("ContentBrowser.ColumnViewDeveloperFolderIcon") )
+				.Image( FEditorStyle::GetBrush("CodeBrowser.ColumnViewDeveloperFolderIcon") )
 			]
 		];
 
@@ -168,8 +168,8 @@ void SAssetPicker::Construct( const FArguments& InArgs )
 				.AutoHeight()
 				[
 					SNew(SButton)
-						.ButtonStyle( FEditorStyle::Get(), "ContentBrowser.NoneButton" )
-						.TextStyle( FEditorStyle::Get(), "ContentBrowser.NoneButtonText" )
+						.ButtonStyle( FEditorStyle::Get(), "CodeBrowser.NoneButton" )
+						.TextStyle( FEditorStyle::Get(), "CodeBrowser.NoneButtonText" )
 						.Text( LOCTEXT("NoneButtonText", "( None )") )
 						.ToolTipText( LOCTEXT("NoneButtonTooltip", "Clears the asset selection.") )
 						.HAlign(HAlign_Center)
@@ -328,7 +328,7 @@ FReply SAssetPicker::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InK
 {
 	if (InKeyEvent.GetKey() == EKeys::Enter)
 	{
-		TArray<FAssetData> SelectionSet = AssetViewPtr->GetSelectedAssets();
+		TArray<FFileData> SelectionSet = AssetViewPtr->GetSelectedAssets();
 		HandleAssetsActivated(SelectionSet, EAssetTypeActivationMethod::Opened);
 
 		return FReply::Handled();
@@ -387,7 +387,7 @@ void SAssetPicker::OnSearchBoxCommitted(const FText& InSearchText, ETextCommit::
 
 	if (CommitInfo == ETextCommit::OnEnter)
 	{
-		TArray<FAssetData> SelectionSet = AssetViewPtr->GetSelectedAssets();
+		TArray<FFileData> SelectionSet = AssetViewPtr->GetSelectedAssets();
 		if ( SelectionSet.Num() == 0 )
 		{
 			AssetViewPtr->AdjustActiveSelection(1);
@@ -440,7 +440,7 @@ void SAssetPicker::OnFilterChanged()
 
 FReply SAssetPicker::OnNoneButtonClicked()
 {
-	OnAssetSelected.ExecuteIfBound(FAssetData());
+	OnAssetSelected.ExecuteIfBound(FFileData());
 	if (AssetViewPtr.IsValid())
 	{
 		AssetViewPtr->ClearSelection(true);
@@ -448,7 +448,7 @@ FReply SAssetPicker::OnNoneButtonClicked()
 	return FReply::Handled();
 }
 
-void SAssetPicker::HandleAssetSelectionChanged(const FAssetData& InAssetData, ESelectInfo::Type InSelectInfo)
+void SAssetPicker::HandleAssetSelectionChanged(const FFileData& InAssetData, ESelectInfo::Type InSelectInfo)
 {
 	if(InSelectInfo != ESelectInfo::Direct)
 	{
@@ -456,7 +456,7 @@ void SAssetPicker::HandleAssetSelectionChanged(const FAssetData& InAssetData, ES
 	}
 }
 
-void SAssetPicker::HandleAssetsActivated(const TArray<FAssetData>& ActivatedAssets, EAssetTypeActivationMethod::Type ActivationMethod)
+void SAssetPicker::HandleAssetsActivated(const TArray<FFileData>& ActivatedAssets, EAssetTypeActivationMethod::Type ActivationMethod)
 {
 	if (ActivationMethod == EAssetTypeActivationMethod::DoubleClicked)
 	{
@@ -473,12 +473,12 @@ void SAssetPicker::HandleAssetsActivated(const TArray<FAssetData>& ActivatedAsse
 	OnAssetsActivated.ExecuteIfBound( ActivatedAssets, ActivationMethod );
 }
 
-void SAssetPicker::SyncToAssets(const TArray<FAssetData>& AssetDataList)
+void SAssetPicker::SyncToAssets(const TArray<FFileData>& AssetDataList)
 {
 	AssetViewPtr->SyncToAssets(AssetDataList);
 }
 
-TArray< FAssetData > SAssetPicker::GetCurrentSelection()
+TArray< FFileData > SAssetPicker::GetCurrentSelection()
 {
 	return AssetViewPtr->GetSelectedAssets();
 }
@@ -519,7 +519,7 @@ ECheckBoxState SAssetPicker::GetShowOtherDevelopersCheckState() const
 
 void SAssetPicker::OnRenameRequested() const
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetViewPtr->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetViewPtr->GetSelectedAssets();
 	TArray< FString > SelectedFolders = AssetViewPtr->GetSelectedFolders();
 
 	if ( AssetViewSelectedAssets.Num() == 1 && SelectedFolders.Num() == 0 )
@@ -538,7 +538,7 @@ void SAssetPicker::OnRenameRequested() const
 
 bool SAssetPicker::CanExecuteRenameRequested()
 {
-	TArray< FAssetData > AssetViewSelectedAssets = AssetViewPtr->GetSelectedAssets();
+	TArray< FFileData > AssetViewSelectedAssets = AssetViewPtr->GetSelectedAssets();
 	TArray< FString > SelectedFolders = AssetViewPtr->GetSelectedFolders();
 
 	const bool bCanRenameFolder = ( AssetViewSelectedAssets.Num() == 0 && SelectedFolders.Num() == 1 );
@@ -566,10 +566,10 @@ void SAssetPicker::LoadSettings()
 		// Load all our data using the settings string as a key in the user settings ini
 		if (FilterListPtr.IsValid())
 		{
-			FilterListPtr->LoadSettings(GEditorPerProjectIni, SContentBrowser::SettingsIniSection, SettingsString);
+			FilterListPtr->LoadSettings(GEditorPerProjectIni, SCodeBrowser::SettingsIniSection, SettingsString);
 		}
 		
-		AssetViewPtr->LoadSettings(GEditorPerProjectIni, SContentBrowser::SettingsIniSection, SettingsString);
+		AssetViewPtr->LoadSettings(GEditorPerProjectIni, SCodeBrowser::SettingsIniSection, SettingsString);
 	}
 }
 
@@ -582,10 +582,10 @@ void SAssetPicker::SaveSettings() const
 		// Save all our data using the settings string as a key in the user settings ini
 		if (FilterListPtr.IsValid())
 		{
-			FilterListPtr->SaveSettings(GEditorPerProjectIni, SContentBrowser::SettingsIniSection, SettingsString);
+			FilterListPtr->SaveSettings(GEditorPerProjectIni, SCodeBrowser::SettingsIniSection, SettingsString);
 		}
 
-		AssetViewPtr->SaveSettings(GEditorPerProjectIni, SContentBrowser::SettingsIniSection, SettingsString);
+		AssetViewPtr->SaveSettings(GEditorPerProjectIni, SCodeBrowser::SettingsIniSection, SettingsString);
 	}
 }
 

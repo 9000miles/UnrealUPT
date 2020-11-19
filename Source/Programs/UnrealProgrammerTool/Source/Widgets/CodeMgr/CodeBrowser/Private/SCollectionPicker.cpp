@@ -3,7 +3,7 @@
 #include "SCollectionPicker.h"
 #include "SCollectionView.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowser"
+#define LOCTEXT_NAMESPACE "CodeBrowser"
 
 void SCollectionPicker::Construct( const FArguments& InArgs )
 {
