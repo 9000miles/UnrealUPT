@@ -49,7 +49,7 @@ public class FileViewport : ModuleRules
                 "PropertyEditor",
                 "KismetCompiler",
                 "BlueprintGraph",
-                "SimpleTest"
+                //"SimpleTest"
 				// ... add private dependencies that you statically link with here ...
 			}
             );

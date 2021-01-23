@@ -1,7 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "FileViewport.h"
-#include "SimpleTestDefine.h"
+//#include "SimpleTestDefine.h"
 #include "TabManager.h"
 #include "SDockTab.h"
 #include "MGC_TextEditorWidget.h"
@@ -170,30 +170,30 @@ void FFileViewportModule::OnSelectedLineCounterItem(TSharedPtr<FString>Item, ESe
 	LINE_COUNTER->SetItemSelection(Item, false);
 }
 
-IMPLEMENT_CODE_TEST_OBJECT(FFileViewportTest, "FFileViewportTest", UFileViewportObject);
-void FFileViewportTest::RunTest()
-{
-	FString File = GetObject<UFileViewportObject>()->FilePath;
-	FFileViewportModule& M = FModuleManager::LoadModuleChecked<FFileViewportModule>("FileViewport");
-
-	FString Script;
-	if (FFileHelper::LoadFileToString(Script, *File))
-	{
-		M.Script = Script;
-			M.FileView->SCRIPT_EDITOR->SetText( FText::FromString(Script));
-		TArray<FString> Lines;
-		if (FFileHelper::LoadFileToStringArray(Lines, *File))
-		{
-			M.FileView->LineCount.Empty();
-			for (int32 i=0;i<Lines.Num();++i)
-			{
-				M.FileView->LineCount.Add(MakeShareable(new FString( FString::FromInt(i))));
-			}
-		}
-	}
-
-	FGlobalTabmanager::Get()->InvokeTab(PTMTool_TAB);
-}
+//IMPLEMENT_CODE_TEST_OBJECT(FFileViewportTest, "FFileViewportTest", UFileViewportObject);
+//void FFileViewportTest::RunTest()
+//{
+//	FString File = GetObject<UFileViewportObject>()->FilePath;
+//	FFileViewportModule& M = FModuleManager::LoadModuleChecked<FFileViewportModule>("FileViewport");
+//
+//	FString Script;
+//	if (FFileHelper::LoadFileToString(Script, *File))
+//	{
+//		M.Script = Script;
+//			M.FileView->SCRIPT_EDITOR->SetText( FText::FromString(Script));
+//		TArray<FString> Lines;
+//		if (FFileHelper::LoadFileToStringArray(Lines, *File))
+//		{
+//			M.FileView->LineCount.Empty();
+//			for (int32 i=0;i<Lines.Num();++i)
+//			{
+//				M.FileView->LineCount.Add(MakeShareable(new FString( FString::FromInt(i))));
+//			}
+//		}
+//	}
+//
+//	FGlobalTabmanager::Get()->InvokeTab(PTMTool_TAB);
+//}
 
 #undef LOCTEXT_NAMESPACE
 

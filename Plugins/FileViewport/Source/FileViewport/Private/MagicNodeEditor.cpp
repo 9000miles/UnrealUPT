@@ -1,7 +1,8 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
+#include "MagicNodeEditor.h"
 #include "FileViewport.h"
-#include "SimpleTestDefine.h"
+//#include "SimpleTestDefine.h"
 #include "TabManager.h"
 #include "SDockTab.h"
 #include "MGC_TextEditorWidget.h"
@@ -18,25 +19,21 @@
 #include "SComboBox.h"
 #include "SlateEnums.h"
 #include "SlateApplication.h"
-#include "MagicNodeEditor.h"
 
 #define LOCTEXT_NAMESPACE "FFileView"
-
 
 TSharedRef<SDockTab> SFileView::OnSpawnPTMToolTab(const FSpawnTabArgs& SpawnTabArgs)
 {
 	TSharedRef<SDockTab>TAB = SNew(SDockTab).TabRole(ETabRole::PanelTab);
-
 
 	//
 	//
 	return TAB;
 }
 
-
 void SFileView::Construct(const FArguments& InArgs)
 {
-			TSharedPtr<SScrollBar> VS_SCROLL;
+	TSharedPtr<SScrollBar> VS_SCROLL;
 	TSharedPtr<SScrollBar>	HS_SCROLL;
 
 	TSharedPtr<FMGC_TextSyntaxHighlighter>MARSHALL = FMGC_TextSyntaxHighlighter::Create(
@@ -57,22 +54,21 @@ void SFileView::Construct(const FArguments& InArgs)
 	ChildSlot
 		[
 
-	//TSharedRef<SMGC_TextEditorWidget> Wi = SNew(SMGC_TextEditorWidget)
-	//	//.OnTextChanged(this, &SKMGC_MagicNodeWidget::OnScriptTextChanged, ETextCommit::Default)
-	//	//.OnTextCommitted(this, &SKMGC_MagicNodeWidget::OnScriptTextComitted)
-	//	//.Visibility(this, &SKMGC_MagicNodeWidget::GetScriptPanelVisibility)
-	//	//.OnInvokeSearch(this, &SKMGC_MagicNodeWidget::OnInvokedSearch)
-	//	//.OnAutoComplete(this, &SKMGC_MagicNodeWidget::OnAutoComplete)
-	//	//.IsEnabled(this, &SKMGC_MagicNodeWidget::HasScript)
-	//	.Text(FText::FromString(Script))
-	//	.VScrollBar(VS_SCROLL).HScrollBar(HSS_SCROLL)
-	//	.Marshaller(MARSHALL.ToSharedRef())
-	//	.CanKeyboardFocus(true)
-	//	.IsReadOnly(false);
+			//TSharedRef<SMGC_TextEditorWidget> Wi = SNew(SMGC_TextEditorWidget)
+			//	//.OnTextChanged(this, &SKMGC_MagicNodeWidget::OnScriptTextChanged, ETextCommit::Default)
+			//	//.OnTextCommitted(this, &SKMGC_MagicNodeWidget::OnScriptTextComitted)
+			//	//.Visibility(this, &SKMGC_MagicNodeWidget::GetScriptPanelVisibility)
+			//	//.OnInvokeSearch(this, &SKMGC_MagicNodeWidget::OnInvokedSearch)
+			//	//.OnAutoComplete(this, &SKMGC_MagicNodeWidget::OnAutoComplete)
+			//	//.IsEnabled(this, &SKMGC_MagicNodeWidget::HasScript)
+			//	.Text(FText::FromString(Script))
+			//	.VScrollBar(VS_SCROLL).HScrollBar(HSS_SCROLL)
+			//	.Marshaller(MARSHALL.ToSharedRef())
+			//	.CanKeyboardFocus(true)
+			//	.IsReadOnly(false);
 
-
-	SAssignNew(OverlayWidget, SOverlay)
-		+ SOverlay::Slot()
+			SAssignNew(OverlayWidget, SOverlay)
+			+ SOverlay::Slot()
 		[
 			SNew(SVerticalBox)
 			+ SVerticalBox::Slot()
@@ -129,16 +125,15 @@ void SFileView::Construct(const FArguments& InArgs)
 		];
 }
 
-
 TSharedRef<ITableRow> SFileView::OnGenerateLineCounter(TSharedPtr<FString>Item, const TSharedRef<STableViewBase>& OwnerTable) {
 	return
 		SNew(SComboRow<TSharedRef<FString>>, OwnerTable)
 		[
-		//	SNew(SBorder)
-		//	.BorderImage(FEditorStyle::GetBrush("Graph.Node.Body"))
-		//.ColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f))
-		//.Padding(FMargin(5.f, 0.f, 5.f, 0.f))
-		//[
+			//	SNew(SBorder)
+			//	.BorderImage(FEditorStyle::GetBrush("Graph.Node.Body"))
+			//.ColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f))
+			//.Padding(FMargin(5.f, 0.f, 5.f, 0.f))
+			//[
 			SNew(STextBlock)
 			.Text(FText::FromString(*Item.Get()))
 		.ColorAndOpacity(FSlateColor(FLinearColor(FColor(75, 185, 245, 225))))
