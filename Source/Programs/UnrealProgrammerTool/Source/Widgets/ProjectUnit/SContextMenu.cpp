@@ -76,6 +76,15 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 			FCanExecuteAction()
 		));
 
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Add Code File", "Add Code File"),
+		LOCTEXT("Add Code File Tip", "Add Code File Tip"),
+		FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),
+		FUIAction(
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnAddNewCodeFile.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FCanExecuteAction()
+		));
+
 	ChildSlot
 		[
 			MenuBuilder.MakeWidget()

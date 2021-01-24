@@ -28,9 +28,14 @@ public class UnrealUPT : ModuleRules
                 Path.Combine(ModuleDirectory, "Source/Widgets/ProjectUnit"),
                 Path.Combine(ModuleDirectory, "Source/Widgets/Settings"),
 
-
                 Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/CodeBrowser/Public"),
                 Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/CodeBrowser/Private"),
+
+                Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/CreateCodeFile/Public"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/CreateCodeFile/Private"),
+
+                Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/FileViewport/Public"),
+                Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/FileViewport/Private"),
             }
             );
 
@@ -55,6 +60,8 @@ public class UnrealUPT : ModuleRules
         {
             "Core",
             "SlateReflector",
+            "EngineSettings",
+            "DesktopPlatform",
         });
 
         DynamicallyLoadedModuleNames.AddRange(new string[]

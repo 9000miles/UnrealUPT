@@ -17,7 +17,6 @@ public:
 
 	void Initialize();
 
-
 	/*
 	*	获取所有引擎根目录
 	*/
@@ -62,10 +61,13 @@ public:
 	}
 
 	TSharedRef<SDockTab> SpawnCodeMgrWindow(const FSpawnTabArgs& Args, FName TabIdentifier);
+	TSharedRef<SDockTab> SpawnAddNewCodeFileWindow(const FSpawnTabArgs& Args, FName TabIdentifier);
+
 	void OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info);
+	void AddNewCodeFile(TSharedRef<FProjectInfo> Info);
 
 private:
-	TSharedPtr<FJsonObject> LoadProjectFile(const FString &FileName);
+	TSharedPtr<FJsonObject> LoadProjectFile(const FString& FileName);
 
 private:
 	TWeakPtr<FProjectInfo> CurrentSelectedProject;

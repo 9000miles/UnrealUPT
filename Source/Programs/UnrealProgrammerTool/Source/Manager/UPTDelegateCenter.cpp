@@ -12,7 +12,8 @@ FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnClearSolution;
 
 FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnOpenCodeMgrWindow;
 
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnAddNewCodeFile;
+
 FSimpleDelegate FUPTDelegateCenter::OnRefresh;
 
 FSimpleMulticastDelegate FUPTDelegateCenter::OnExit;
-

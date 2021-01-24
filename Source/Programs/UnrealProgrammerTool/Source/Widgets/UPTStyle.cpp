@@ -32,6 +32,11 @@ FName FUPTStyle::GetStyleSetName()
 	return StyleSetName;
 }
 
+const FSlateBrush* FUPTStyle::GetBrush(FName PropertyName, const ANSICHAR* Specifier /*= NULL*/)
+{
+	return nullptr;
+}
+
 #define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( Style->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
 #define BOX_BRUSH( RelativePath, ... ) FSlateBoxBrush( Style->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
 #define BORDER_BRUSH( RelativePath, ... ) FSlateBorderBrush( Style->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )

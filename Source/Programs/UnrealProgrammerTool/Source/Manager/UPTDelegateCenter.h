@@ -16,6 +16,7 @@ public:
 	static FOnProjectOperation OnShowInExplorer;
 	static FOnProjectOperation OnClearSolution;
 	static FOnProjectOperation OnOpenCodeMgrWindow;
+	static FOnProjectOperation OnAddNewCodeFile;
 
 	static FSimpleDelegate OnRefresh;
 

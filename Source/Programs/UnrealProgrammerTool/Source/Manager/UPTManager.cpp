@@ -23,10 +23,12 @@
 #include "TabManager.h"
 #include "SCodeMgr.h"
 #include "SDockTab.h"
+#include "CreateCodeFileWidget.h"
 
 #define LOCTEXT_NAMESPACE "FEPManager"
 
 static const FName CodeMgrWindow("CodeMgrWindow");
+static const FName AddNewCodeFileWindow("AddNewCodeFileWindow");
 
 TSharedPtr<FUPTManager> FUPTManager::Get()
 {
@@ -42,10 +44,13 @@ void FUPTManager::Initialize()
 	FUPTDelegateCenter::OnShowInExplorer.BindLambda([this](TSharedRef<FProjectInfo> Info) { ShowInExplorer(Info); });
 	FUPTDelegateCenter::OnClearSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenClearSolutionWindow(Info); });
 	FUPTDelegateCenter::OnOpenCodeMgrWindow.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenManagedCodeWindow(Info); });
+	FUPTDelegateCenter::OnAddNewCodeFile.BindLambda([this](TSharedRef<FProjectInfo> Info) { AddNewCodeFile(Info); });
 
 	FGlobalTabmanager::Get()->RegisterTabSpawner(CodeMgrWindow, FOnSpawnTab::CreateRaw(this, &FUPTManager::SpawnCodeMgrWindow, CodeMgrWindow))
-		.SetDisplayName((LOCTEXT("CodeMgrTabTile", "Code Mgr")))
-		;
+		.SetDisplayName((LOCTEXT("CodeMgrTabTile", "Code Mgr")));
+
+	FGlobalTabmanager::Get()->RegisterTabSpawner(AddNewCodeFileWindow, FOnSpawnTab::CreateRaw(this, &FUPTManager::SpawnAddNewCodeFileWindow, AddNewCodeFileWindow))
+		.SetDisplayName((LOCTEXT("AddNewCodeFileTabTile", "Add New Code File")));
 }
 
 TArray<FString> FUPTManager::GetAllEngineRootDir()
@@ -80,9 +85,9 @@ TArray<FString> FUPTManager::GetProjectPathsByEngineRootDir(const FString& RootD
 	FDesktopPlatformModule::Get()->EnumerateProjectsKnownByEngine(Identifer, false, OutProjectFileNames);
 
 	OutProjectFileNames.RemoveAll([](const FString& ProjectFileName)
-	{
-		return !FPlatformFileManager::Get().GetPlatformFile().FileExists(*ProjectFileName);
-	});
+		{
+			return !FPlatformFileManager::Get().GetPlatformFile().FileExists(*ProjectFileName);
+		});
 
 	return OutProjectFileNames;
 }
@@ -163,10 +168,10 @@ TSharedPtr<FSlateBrush> FUPTManager::GetProjectThumbnail(const FString& ProjectP
 		{
 			if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(RawFileData.GetData(), RawFileData.Num()))
 			{
-				const TArray<uint8>* RawData = NULL;
+				TArray<uint8> RawData;
 				if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, RawData))
 				{
-					if (FSlateApplication::Get().GetRenderer()->GenerateDynamicImageResource(*ImagePath, ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), *RawData))
+					if (FSlateApplication::Get().GetRenderer()->GenerateDynamicImageResource(*ImagePath, ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), RawData))
 					{
 						Brush = MakeShareable(new FSlateDynamicImageBrush(*ImagePath, FVector2D(ImageWrapper->GetWidth(), ImageWrapper->GetHeight())));
 						bSucceeded = true;
@@ -325,7 +330,6 @@ bool FUPTManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
 
 void FUPTManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
 {
-
 }
 
 TSharedRef<SDockTab> FUPTManager::SpawnCodeMgrWindow(const FSpawnTabArgs& Args, FName TabIdentifier)
@@ -342,12 +346,31 @@ TSharedRef<SDockTab> FUPTManager::SpawnCodeMgrWindow(const FSpawnTabArgs& Args, 
 	return  SNew(SDockTab);
 }
 
+TSharedRef<SDockTab> FUPTManager::SpawnAddNewCodeFileWindow(const FSpawnTabArgs& Args, FName TabIdentifier)
+{
+	if (TabIdentifier == AddNewCodeFileWindow)
+	{
+		const TSharedRef<SDockTab> DockTab = SNew(SDockTab)
+			.TabRole(ETabRole::PanelTab);
+
+		DockTab->SetContent(SNew(SCreateCodeFileWidget));
+		return DockTab;
+	}
+
+	return  SNew(SDockTab);
+}
+
 void FUPTManager::OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info)
 {
 	FGlobalTabmanager::Get()->InvokeTab(CodeMgrWindow);
 }
 
-TSharedPtr<FJsonObject> FUPTManager::LoadProjectFile(const FString &FileName)
+void FUPTManager::AddNewCodeFile(TSharedRef<FProjectInfo> Info)
+{
+	FGlobalTabmanager::Get()->InvokeTab(AddNewCodeFileWindow);
+}
+
+TSharedPtr<FJsonObject> FUPTManager::LoadProjectFile(const FString& FileName)
 {
 	FString FileContents;
 
