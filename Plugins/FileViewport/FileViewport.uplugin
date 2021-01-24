@@ -20,7 +20,7 @@
       "LoadingPhase": "Default"
     },
     {
-      "Name": "NewModuleTest",
+      "Name": "CreateCodeFile",
       "Type": "Runtime",
       "LoadingPhase": "Default"
     }

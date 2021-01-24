@@ -3,9 +3,9 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class NewModuleTest : ModuleRules
+public class CreateCodeFile : ModuleRules
 {
-    public NewModuleTest(ReadOnlyTargetRules Target) : base(Target)
+    public CreateCodeFile(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -35,8 +35,17 @@ public class NewModuleTest : ModuleRules
                 "Core",
                 "CoreUObject",
                 "Engine",
+                "InputCore",
                 "GameProjectGeneration",
-                "EngineSettings"
+                "EngineSettings",
+                "Projects",
+                "UnrealEd",
+                "Slate",
+                "SlateCore",
+                "EditorStyle",
+                "ToolMenus",
+                "AppFramework",
+                "DesktopPlatform",
             }
             );
 

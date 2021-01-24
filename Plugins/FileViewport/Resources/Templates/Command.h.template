@@ -1,0 +1,26 @@
+%COPYRIGHT_LINE%
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Framework/Commands/Commands.h"
+#include "EditorStyleSet.h"
+%BASE_CLASS_INCLUDE_DIRECTIVE%
+
+/**
+ * %CURSORFOCUSLOCATION%
+ */
+class %PREFIXED_CLASS_NAME% : public TCommands<%PREFIXED_CLASS_NAME%>
+{
+public:
+	%PREFIXED_CLASS_NAME%()
+        : TCommands<%PREFIXED_CLASS_NAME%>(TEXT("ModuleGeneration"), NSLOCTEXT("Contexts", "%PREFIXED_CLASS_NAME%", "%PREFIXED_CLASS_NAME%Commands"), NAME_None, FEditorStyle::GetStyleSetName())
+    {}
+    void RegisterCommands() override;
+    
+
+public:
+    TSharedPtr<FUICommandInfo> NewCommand;
+};
+
+

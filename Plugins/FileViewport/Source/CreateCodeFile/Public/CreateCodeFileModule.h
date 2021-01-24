@@ -4,15 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
-#include "NewModuleTest.generated.h"
+#include "CreateCodeFileModule.generated.h"
 
-class FNewModuleTest : public IModuleInterface
+class FCreateCodeFileModule : public IModuleInterface
 {
 public:
 
 	/** IModuleInterface implementation */
 	void StartupModule() override;
 	void ShutdownModule() override;
+	void OpenNewFile();
+private:
+	TSharedPtr<class FUICommandList> PluginCommands;
 };
 
 UCLASS()
