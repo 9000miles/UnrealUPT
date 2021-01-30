@@ -27,8 +27,12 @@ public:
 	void Refresh(TArray<FString> Names);
 	void SetActiveTab(const FString TabName);
 
+protected:
+	FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+
 private:
 	TSharedRef<SWidget> CreateTab(FString Version);
+	TSharedRef<SWidget> MakeMenuContent();
 
 	void OnEngineTabChanged(ECheckBoxState NewState, FString EngineVersion);
 	ECheckBoxState GetEngineTabCheckedState(FString EngineVersion) const;
@@ -39,6 +43,7 @@ private:
 
 private:
 	FString ActiveEngineTab;
+	FString ActiveEngineVersion;
 	TArray<FString> TabNames;
 	TSharedPtr<SVerticalBox> TabBox;
 

@@ -36,9 +36,13 @@ public class UnrealUPT : ModuleRules
 
                 Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/FileViewport/Public"),
                 Path.Combine(ModuleDirectory, "Source/Widgets/CodeMgr/FileViewport/Private"),
+
+                Path.Combine(ModuleDirectory, "Source/PrintHelper/Public"),
+                Path.Combine(ModuleDirectory, "Source/PrintHelper/Private"),
             }
             );
 
+        System.Console.WriteLine("----------" + Path.Combine(ModuleDirectory, "Source/PrintHelper/Private"));
         PrivateIncludePaths.Add(System.IO.Path.Combine(EngineDirectory, "Source/Runtime/Launch/Private"));      // For LaunchEngineLoop.cpp include
 
         PrivateDependencyModuleNames.AddRange(new string[]
@@ -46,6 +50,7 @@ public class UnrealUPT : ModuleRules
             "Core",
             "CoreUObject",
             "InputCore",
+            //"Engine",
             "AppFramework",
             "ApplicationCore",
             "Projects",
@@ -54,6 +59,7 @@ public class UnrealUPT : ModuleRules
             "StandaloneRenderer",
             "SourceCodeAccess",
             "EditorStyle",
+            //"PrintHelper",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]

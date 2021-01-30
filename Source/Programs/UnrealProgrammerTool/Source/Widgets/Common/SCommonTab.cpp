@@ -8,8 +8,23 @@
 #include "SImage.h"
 #include "UPTStyle.h"
 #include "EditorStyleSet.h"
+#include "SEngineContextMenu.h"
+#include "PrintHelper.h"
 
 #define LOCTEXT_NAMESPACE "SEngineTab"
+
+FReply SCommonTab::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+	if (MouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		//FWidgetPath WidgetPath = MouseEvent.GetEventPath() != nullptr ? *MouseEvent.GetEventPath() : FWidgetPath();
+		//FSlateApplication::Get().PushMenu(AsShared(), WidgetPath, MenuContent.ToSharedRef(), SummonLocation, FPopupTransitionEffect(FPopupTransitionEffect::ContextMenu));
+		FReply Reply = FReply::Handled().ReleaseMouseCapture();
+		return Reply;
+	}
+	return FReply::Unhandled();
+}
+
 void SCommonTab::Construct(const FArguments& InArgs)
 {
 	TabNames = InArgs._TabNames;
@@ -21,14 +36,14 @@ void SCommonTab::Construct(const FArguments& InArgs)
 		[
 			SNew(SBorder)
 			.BorderImage(FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
-			.Padding(FMargin(5))
-			[
-				SNew(SScrollBox)
-				+ SScrollBox::Slot()
-				[
-					SAssignNew(TabBox, SVerticalBox)
-				]
-			]
+		.Padding(FMargin(5))
+		[
+			SNew(SScrollBox)
+			+ SScrollBox::Slot()
+		[
+			SAssignNew(TabBox, SVerticalBox)
+		]
+		]
 		];
 
 	Refresh(TabNames);
@@ -41,7 +56,7 @@ void SCommonTab::Refresh(TArray<FString> Names)
 	for (const FString TabName : Names)
 	{
 		TabBox->AddSlot()
-		.HAlign(HAlign_Fill)
+			.HAlign(HAlign_Fill)
 			[
 				CreateTab(TabName)
 			];
@@ -66,33 +81,39 @@ TSharedRef<SWidget> SCommonTab::CreateTab(FString TabName)
 		.OnCheckStateChanged(this, &SCommonTab::OnEngineTabChanged, TabName)
 		.IsChecked(this, &SCommonTab::GetEngineTabCheckedState, TabName)
 		.ToolTipText(this, &SCommonTab::TabToolTipText, TabName, bSourceEngine)
+		.OnGetMenuContent(this, &SCommonTab::MakeMenuContent)
 		[
 			SNew(SHorizontalBox)
 			+ SHorizontalBox::Slot()
-			.VAlign(VAlign_Fill)
-			.HAlign(HAlign_Left)
-			.AutoWidth()
-			[
-				SNew(SImage)
-				.Image(this, &SCommonTab::GetActiveTabIamge, TabName)
-			]
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(5, 0))
-			.AutoWidth()
-			[
-				SNew(SImage)
-				.Image(SourceBinaryBrush)
-			]
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(6, 0, 15, 0))
-			.VAlign(VAlign_Center)
-			.HAlign(HAlign_Fill)
-			[
-				SNew(STextBlock)
-				.Text(FText::FromString(TabName))
-			]
+		.VAlign(VAlign_Fill)
+		.HAlign(HAlign_Left)
+		.AutoWidth()
+		[
+			SNew(SImage)
+			.Image(this, &SCommonTab::GetActiveTabIamge, TabName)
+		]
+	+ SHorizontalBox::Slot()
+		.Padding(FMargin(5, 0))
+		.AutoWidth()
+		[
+			SNew(SImage)
+			.Image(SourceBinaryBrush)
+		]
+	+ SHorizontalBox::Slot()
+		.Padding(FMargin(6, 0, 15, 0))
+		.VAlign(VAlign_Center)
+		.HAlign(HAlign_Fill)
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString(TabName))
+		]
 		]
 	;
+}
+
+TSharedRef<SWidget> SCommonTab::MakeMenuContent()
+{
+	return SNew(SSEngineContextMenu, ActiveEngineVersion);
 }
 
 void SCommonTab::OnEngineTabChanged(ECheckBoxState NewState, FString EngineVersion)
@@ -150,4 +171,3 @@ FText SCommonTab::TabToolTipText(FString EngineVersion, bool bSource) const
 	return TipText.IsEmpty() ? LOCTEXT("NotFound", "Not found engine directory") : TipText;
 }
 #undef LOCTEXT_NAMESPACE
-

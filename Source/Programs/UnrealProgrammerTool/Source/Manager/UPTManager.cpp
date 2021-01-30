@@ -24,6 +24,11 @@
 #include "SCodeMgr.h"
 #include "SDockTab.h"
 #include "CreateCodeFileWidget.h"
+#include "UtilityTool.h"
+#include "PrintHelper.h"
+#include <Async.h>
+#include "SNotificationList.h"
+//#include "Engine.h"
 
 #define LOCTEXT_NAMESPACE "FEPManager"
 
@@ -51,6 +56,8 @@ void FUPTManager::Initialize()
 
 	FGlobalTabmanager::Get()->RegisterTabSpawner(AddNewCodeFileWindow, FOnSpawnTab::CreateRaw(this, &FUPTManager::SpawnAddNewCodeFileWindow, AddNewCodeFileWindow))
 		.SetDisplayName((LOCTEXT("AddNewCodeFileTabTile", "Add New Code File")));
+
+	FUPTDelegateCenter::OnRequestAddNotification.BindRaw(this, &FUPTManager::AddNotification);
 }
 
 TArray<FString> FUPTManager::GetAllEngineRootDir()
@@ -280,7 +287,7 @@ bool FUPTManager::OpenCodeIDE(TSharedRef<FProjectInfo> Info)
 	return true;
 }
 
-bool FUPTManager::GenerateSolution(TSharedRef<FProjectInfo> Info)
+void FUPTManager::GenerateSolution(TSharedRef<FProjectInfo> Info)
 {
 	FString ProjectFileName = Info->GetProjectPath();
 
@@ -291,30 +298,22 @@ bool FUPTManager::GenerateSolution(TSharedRef<FProjectInfo> Info)
 	if (!IPlatformFile::GetPlatformPhysical().DirectoryExists(*SourceDir))
 	{
 		FPlatformMisc::MessageBoxExt(EAppMsgType::Ok, TEXT("This project does not have any source code. You need to add C++ source files to the project from the Editor before you can generate project files."), TEXT("Error"));
-		return false;
 	}
 
 	// Get the engine root directory
 	FString RootDir = Info->GetEnginePath();
 
-	// Start capturing the log output
-	FStringOutputDevice LogCapture;
-	LogCapture.SetAutoEmitLineTerminator(true);
-	GLog->AddOutputDevice(&LogCapture);
-
-	// Generate project files
-	FFeedbackContext* Warn = DesktopPlatform->GetNativeFeedbackContext();
-	bool bResult = DesktopPlatform->GenerateProjectFiles(RootDir, ProjectFileName, Warn, FString::Printf(TEXT("%s/Saved/Logs/%s-%s.log"), *FPaths::GetPath(ProjectFileName), FPlatformProcess::ExecutableName(), *FDateTime::Now().ToString()));
-	GLog->RemoveOutputDevice(&LogCapture);
-
-	// Display an error dialog if we failed
-	if (!bResult)
-	{
-		FPlatformMisc::MessageBoxExt(EAppMsgType::Ok, TEXT("Failed to generate project files."), TEXT("Error"));
-		return false;
-	}
-
-	return true;
+	AsyncTask(ENamedThreads::GameThread, [DesktopPlatform, RootDir, ProjectFileName]()
+		{
+			// Generate project files
+			FFeedbackContext* Warn = DesktopPlatform->GetNativeFeedbackContext();
+			const bool bResult = DesktopPlatform->GenerateProjectFiles(RootDir, ProjectFileName, Warn, FString::Printf(TEXT("%s/Saved/Logs/%s-%s.log"), *FPaths::GetPath(ProjectFileName), FPlatformProcess::ExecutableName(), *FDateTime::Now().ToString()));
+			if (!bResult)
+			{
+				// Display an error dialog if we failed
+				FPlatformMisc::MessageBoxExt(EAppMsgType::Ok, TEXT("Failed to generate project files."), TEXT("Error"));
+			}
+		});
 }
 
 bool FUPTManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
@@ -330,6 +329,22 @@ bool FUPTManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
 
 void FUPTManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
 {
+	EAppReturnType::Type ReturnType = FPlatformMisc::MessageBoxExt(EAppMsgType::YesNoCancel, TEXT("Are you sure you want to clear the solution."), TEXT("Clear Solution"));
+	if (ReturnType != EAppReturnType::Yes)
+		return;
+
+	TArray<FString> Files;
+	Files.Add(FPaths::GetPath(Info->GetProjectPath()) / TEXT("Binaries"));
+	Files.Add(FPaths::GetPath(Info->GetProjectPath()) / TEXT("Intermediate"));
+
+	for (const FString File : Files)
+	{
+		FOnFileDirectoryActionFinished OnFinished = FOnFileDirectoryActionFinished::CreateLambda([File](const bool bSuccess)
+			{
+				PRINT_LOG(FString::Printf(TEXT("delete directory %s is %s."), *File, *(bSuccess ? FCoreTexts::Get().True.ToString() : FCoreTexts::Get().False.ToString())));
+			});
+		UPTUtility::AsyncDeleteDirectory(OnFinished, File, true, true);
+	}
 }
 
 TSharedRef<SDockTab> FUPTManager::SpawnCodeMgrWindow(const FSpawnTabArgs& Args, FName TabIdentifier)
@@ -362,12 +377,12 @@ TSharedRef<SDockTab> FUPTManager::SpawnAddNewCodeFileWindow(const FSpawnTabArgs&
 
 void FUPTManager::OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info)
 {
-	FGlobalTabmanager::Get()->InvokeTab(CodeMgrWindow);
+	FGlobalTabmanager::Get()->TryInvokeTab(CodeMgrWindow);
 }
 
 void FUPTManager::AddNewCodeFile(TSharedRef<FProjectInfo> Info)
 {
-	FGlobalTabmanager::Get()->InvokeTab(AddNewCodeFileWindow);
+	FGlobalTabmanager::Get()->TryInvokeTab(AddNewCodeFileWindow);
 }
 
 TSharedPtr<FJsonObject> FUPTManager::LoadProjectFile(const FString& FileName)
@@ -387,6 +402,11 @@ TSharedPtr<FJsonObject> FUPTManager::LoadProjectFile(const FString& FileName)
 	}
 
 	return JsonObject;
+}
+
+TSharedRef<SNotificationItem> FUPTManager::AddNotification(FNotificationInfo Info)
+{
+	return NotificationListPtr->AddNotification(Info);
 }
 
 #undef LOCTEXT_NAMESPACE

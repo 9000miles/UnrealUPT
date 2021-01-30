@@ -142,7 +142,9 @@ void SetAppIcon()
 
 void OnExit()
 {
-	GIsRequestingExit = true;
+	//GIsRequestingExit = true;
+	//IsEngineExitRequested();
+	RequestEngineExit(TEXT("ExitEngine"));
 }
 
 int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR, _In_ int nCmdShow)
@@ -185,7 +187,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInInstance, _In_opt_ HINSTANCE hPrevInstance,
 	StartupMainFrame();
 
 	// loop while the server does the rest
-	while (!GIsRequestingExit)
+	while (!IsEngineExitRequested())
 	{
 		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
 		FStats::AdvanceFrame(false);

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ProjectInfo.h"
+#include "SNotificationList.h"
 
 class FUPTDelegateCenter
 {
@@ -17,6 +18,9 @@ public:
 	static FOnProjectOperation OnClearSolution;
 	static FOnProjectOperation OnOpenCodeMgrWindow;
 	static FOnProjectOperation OnAddNewCodeFile;
+
+	DECLARE_DELEGATE_RetVal_OneParam(TSharedRef<SNotificationItem>, FOnRequestAddNotification, FNotificationInfo /*NotificationInfo*/);
+	static FOnRequestAddNotification OnRequestAddNotification;
 
 	static FSimpleDelegate OnRefresh;
 

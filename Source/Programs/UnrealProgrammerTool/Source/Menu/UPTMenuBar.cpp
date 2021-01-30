@@ -32,17 +32,17 @@ void FUPTMenuBar::FillFileMenuBarEntries(FMenuBuilder& MenuBuilder)
 
 void FUPTMenuBar::FillWindowsMenuBarEntries(FMenuBuilder& MenuBuilder)
 {
-	MenuBuilder.AddMenuEntry(LOCTEXT("Widget Reflector", "Widget Reflector"), LOCTEXT("Widget Reflector Tip", "Widget Reflector"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->InvokeTab(FTabId("WidgetReflector")); })));
-	MenuBuilder.AddMenuEntry(LOCTEXT("UPT Tool", "UPT Tool"), LOCTEXT("UPT Tool Tip", "UPT Tool"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->InvokeTab(FTabId("UPTTool")); })));
-	MenuBuilder.AddMenuEntry(LOCTEXT("Settings", "Settings"), LOCTEXT("Settings Tip", "Settings"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->InvokeTab(FTabId("UPTSettings")); })));
-	MenuBuilder.AddMenuEntry(LOCTEXT("Engine information", "Engine information"), LOCTEXT("Engine information Tip", "Engine information"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->InvokeTab(FTabId("EngineInfomation")); })));
-	MenuBuilder.AddMenuEntry(LOCTEXT("Engine Projects", "Engine Projects"), LOCTEXT("Engine Projects Tip", "Engine Projects"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->InvokeTab(FTabId("UPTWindowTab")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("Widget Reflector", "Widget Reflector"), LOCTEXT("Widget Reflector Tip", "Widget Reflector"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("WidgetReflector")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("UPT Tool", "UPT Tool"), LOCTEXT("UPT Tool Tip", "UPT Tool"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("UPTTool")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("Settings", "Settings"), LOCTEXT("Settings Tip", "Settings"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("UPTSettings")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("Engine information", "Engine information"), LOCTEXT("Engine information Tip", "Engine information"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("EngineInfomation")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("Engine Projects", "Engine Projects"), LOCTEXT("Engine Projects Tip", "Engine Projects"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("UPTWindowTab")); })));
 }
 
 void FUPTMenuBar::FillHelpMenuBarEntries(FMenuBuilder& MenuBuilder)
 {
-	MenuBuilder.AddMenuEntry(LOCTEXT("Documentation", "Documentation"), LOCTEXT("Documentation Tip", "Documentation"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->InvokeTab(FTabId("Documentation")); })));
-	MenuBuilder.AddMenuEntry(LOCTEXT("About UPT", "About UPT"), LOCTEXT("About UPT Tip", "About UPT"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->InvokeTab(FTabId("AboutUPT")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("Documentation", "Documentation"), LOCTEXT("Documentation Tip", "Documentation"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("Documentation")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("About UPT", "About UPT"), LOCTEXT("About UPT Tip", "About UPT"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("AboutUPT")); })));
 
 }
 

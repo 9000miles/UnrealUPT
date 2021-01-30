@@ -24,6 +24,8 @@ private:
 	TSharedRef<SWidget> CreateProjectsHeader();
 	TSharedRef<SWidget> CreateProjectsBody();
 
+	FReply OpenEngine();
+
 	FText GetEnginePath() const;
 	FText GetProjectCount() const;
 

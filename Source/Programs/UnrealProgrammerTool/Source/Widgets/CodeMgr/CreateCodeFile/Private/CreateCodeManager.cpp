@@ -3,6 +3,10 @@
 #include "GeneralProjectSettings.h"
 #include "FileHelper.h"
 #include "UPTDefine.h"
+#include <SNotificationList.h>
+#include <UPTDelegateCenter.h>
+
+#define LOCTEXT_NAMESPACE "SEngineProjects"
 
 FCreateCodeManager::FCreateCodeManager()
 {
@@ -313,6 +317,10 @@ const bool FCreateCodeManager::CreateClassHeaderFile(FString NewHeaderFileName, 
 
 	if (FFileHelper::SaveStringToFile(FinalOutput, *NewHeaderFileName))
 	{
+		FNotificationInfo Info(FText::Format(LOCTEXT("CreateHederFileNotification", "Create file successfully: {0}"), FText::FromString(NewHeaderFileName)));
+		Info.ExpireDuration = 3;
+		Info.bUseLargeFont = false;
+		FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
 		return true;
 	}
 
@@ -371,6 +379,10 @@ const bool FCreateCodeManager::CreateClassCPPFile(FString NewCppFileName, ECodeT
 
 	if (FFileHelper::SaveStringToFile(FinalOutput, *NewCppFileName))
 	{
+		FNotificationInfo Info(FText::Format(LOCTEXT("CreateCppFileNotification", "Create file successfully: {0}"), FText::FromString(NewCppFileName)));
+		Info.ExpireDuration = 3;
+		Info.bUseLargeFont = false;
+		FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
 		return true;
 	}
 
@@ -479,3 +491,4 @@ FString FCreateCodeManager::GetTemplateFile(ECodeTemplateType CodeType, ECodeFil
 }
 
 TSharedPtr<FCreateCodeManager> FCreateCodeManager::Singleton = nullptr;
+#undef LOCTEXT_NAMESPACE

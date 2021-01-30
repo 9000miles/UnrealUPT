@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "SlateBrush.h"
+#include "UPTDelegateCenter.h"
+#include "SNotificationList.h"
 
 struct FProjectInfo;
 
@@ -45,7 +47,7 @@ public:
 
 	bool OpenProject(TSharedRef<FProjectInfo> Info);
 	bool OpenCodeIDE(TSharedRef<FProjectInfo> Info);
-	bool GenerateSolution(TSharedRef<FProjectInfo> Info);
+	void GenerateSolution(TSharedRef<FProjectInfo> Info);
 	bool ShowInExplorer(TSharedRef<FProjectInfo> Info);
 	//弹出清理Binares和Immediate文件夹窗口
 	void OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info);
@@ -66,9 +68,16 @@ public:
 	void OpenManagedCodeWindow(TSharedRef<FProjectInfo> Info);
 	void AddNewCodeFile(TSharedRef<FProjectInfo> Info);
 
+	void SetNotificationList(TSharedRef<SNotificationList> NotificationList)
+	{
+		NotificationListPtr = NotificationList;
+	}
+
 private:
 	TSharedPtr<FJsonObject> LoadProjectFile(const FString& FileName);
+	TSharedRef<SNotificationItem> AddNotification(FNotificationInfo Info);
 
 private:
 	TWeakPtr<FProjectInfo> CurrentSelectedProject;
+	TSharedPtr<SNotificationList> NotificationListPtr;
 };

@@ -29,6 +29,7 @@ private:
 private:
 	TSharedPtr<SCommonTab> EngineTab;
 	TSharedPtr<SEngineProjects> EngineProjects;
+	TSharedPtr<SNotificationList> NotificationListPtr;
 
 	//Key：引擎路径，Value：工程信息
 	TMap<FString, TArray<TSharedPtr<FProjectInfo>>> Map;

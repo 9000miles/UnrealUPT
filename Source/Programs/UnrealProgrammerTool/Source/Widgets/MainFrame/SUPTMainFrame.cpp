@@ -14,6 +14,7 @@
 #include "UPTStyle.h"
 #include "SCommonTab.h"
 #include "UPTManager.h"
+#include "SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "SUPTMainFrame"
 
@@ -30,20 +31,35 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 	ChildSlot
 	.Padding(FMargin(2))
 	[
-		SNew(SSplitter)
-		.Orientation(Orient_Horizontal)
-		+SSplitter::Slot()
-		.Value(0.3f)
+		SNew(SOverlay)
+		+SOverlay::Slot()
 		[
-			EngineTab->AsShared()
+			SNew(SSplitter)
+			.Orientation(Orient_Horizontal)
+			+SSplitter::Slot()
+			.Value(0.3f)
+			[
+				EngineTab->AsShared()
+			]
+			+SSplitter::Slot()
+			[
+				SAssignNew(EngineProjects, SEngineProjects)
+			]
 		]
-		+SSplitter::Slot()
+
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Right)
+		.VAlign(VAlign_Bottom)
+		.Padding(15)
 		[
-			SAssignNew(EngineProjects, SEngineProjects)
+			SAssignNew(NotificationListPtr, SNotificationList)
+			.Visibility(EVisibility::SelfHitTestInvisible)
 		]
 	];
 
 	RequestRefresh(AllProjects);
+
+	FUPTManager::Get()->SetNotificationList(NotificationListPtr.ToSharedRef());
 }
 
 void SUPTMainFrame::RequestRefresh(TArray<TSharedPtr<FProjectInfo>>& AllProjects)
