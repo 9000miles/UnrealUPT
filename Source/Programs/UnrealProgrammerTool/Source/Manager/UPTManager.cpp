@@ -213,10 +213,16 @@ bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 	FString EngineDir = Info->GetEnginePath();
 	FString ProjectFile = Info->GetProjectPath();
 
+	FNotificationInfo NInfo(FText::Format(LOCTEXT("OpenProjectNotification", "Open Project {0} Succeed"), FText::FromString(FPaths::GetBaseFilename(ProjectFile))));
+	NInfo.ExpireDuration = 5;
+	NInfo.bUseLargeFont = false;
+
 	//判断工程路径是不是.uproject文件
 	if (ProjectFile.IsEmpty() || !ProjectFile.EndsWith(TEXT(".uproject")))
 	{
 		UE_LOG(UPTLog, Error, TEXT("Project path is error"));
+		NInfo.Text = FText::Format(LOCTEXT("OpenProjectNotification", "Open Project {0} Failed"), FText::FromString(FPaths::GetBaseFilename(ProjectFile)));
+		FUPTDelegateCenter::OnRequestAddNotification.Execute(NInfo);
 		return 0;
 	}
 
@@ -230,6 +236,8 @@ bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 		UE_LOG(UPTLog, Error, TEXT("Engine path is error"));
 		return 0;
 	}
+
+	FUPTDelegateCenter::OnRequestAddNotification.Execute(NInfo);
 
 #if PLATFORM_WINDOWS
 	//使用CMD打开工程
