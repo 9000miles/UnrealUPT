@@ -21,6 +21,7 @@
 #include "UPTDefine.h"
 #include "UPTToolBar.h"
 #include "UPTCommands.h"
+#include "PrintHelper.h"
 
 IMPLEMENT_APPLICATION(UnrealUPT, "UnrealProgrammerTool");
 
@@ -33,8 +34,11 @@ namespace UPTMeun
 
 void SetProjectDir()
 {
-	const FString ProjectDir = FString::Printf(TEXT("../../../UnrealUPT/Programs/%s/"), FApp::GetProjectName());
-	FPlatformMisc::SetOverrideProjectDir(ProjectDir);
+	FString ProjectDirectory = FPaths::ConvertRelativePathToFull(FPaths::GetPath(FPaths::GetPath(FPaths::GetPath(FPlatformProcess::BaseDir()))));
+	const FString ProgramProjectDirectory = ProjectDirectory / FString::Printf(TEXT("Programs/%s/"), FApp::GetProjectName());
+	PRINT_LOG("---------------------" << ProgramProjectDirectory);
+	UE_LOG(LogTemp, Log, TEXT("===================================**********************--------------------"));
+	FPlatformMisc::SetOverrideProjectDir(ProgramProjectDirectory);
 }
 
 TSharedRef<SDockTab> SpawnMainTab(const FSpawnTabArgs& Args, FName TabIdentifier)
@@ -72,13 +76,13 @@ TSharedRef<SDockTab> SpawnMainWindown(const FSpawnTabArgs& Args)
 		[
 			FUPTMenuBar::MakeMenuBar(UPTTabManager.ToSharedRef())
 		]
-		+ SVerticalBox::Slot()
+	+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(FMargin(2, 2))
 		[
 			FUPTToolBar::MakeUPTToolBar()
 		]
-		+ SVerticalBox::Slot()
+	+ SVerticalBox::Slot()
 		.FillHeight(1.0f)
 		[
 			SAssignNew(UPTMainFrame, SUPTMainFrame, ProjectInfos)
@@ -100,7 +104,6 @@ void OnRefreshMainFrame()
 
 void CreateMainFrameWindow()
 {
-	
 	FGlobalTabmanager::Get()->RegisterTabSpawner("UPTMainWindow", FOnSpawnTab::CreateStatic(&SpawnMainWindown));
 
 	TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout("UPT_Layout")
@@ -120,7 +123,6 @@ void CreateMainFrameWindow()
 			)
 		)
 		;
-
 
 	FGlobalTabmanager::Get()->RestoreFrom(Layout, TSharedPtr<SWindow>());
 }

@@ -209,13 +209,13 @@ void UPTUtility::AsyncDeleteDirectory(FOnFileDirectoryActionFinished OnFilished,
 			bool Result = false;
 			if (IFileManager::Get().DirectoryExists(*Directory))
 			{
-				if (bDeleteAllSubDirectory)
-				{
-					FDeleteHelper* DeleteHelper = new FDeleteHelper();
-					Result = DeleteHelper->DeleteAllSubDirectory(Directory, bMustExist, bDeleteAllSubDirectory);
-				}
-				else
-					Result = IFileManager::Get().DeleteDirectory(*Directory, bMustExist, bDeleteAllSubDirectory);
+				//if (bDeleteAllSubDirectory)
+				//{
+				//	FDeleteHelper* DeleteHelper = new FDeleteHelper();
+				//	Result = DeleteHelper->DeleteAllSubDirectory(Directory, bMustExist, bDeleteAllSubDirectory);
+				//}
+				//else
+				Result = IFileManager::Get().DeleteDirectory(*Directory, bMustExist, bDeleteAllSubDirectory);
 			}
 
 			if (OnFilished.IsBound())

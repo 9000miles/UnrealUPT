@@ -27,27 +27,27 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 		.OnTabActive(this, &SUPTMainFrame::OnEngineTabChanged)
 		.OnGetTabBrush(this, &SUPTMainFrame::GetSourceOrBinaryImage)
 		.OnGetToolTipText(this, &SUPTMainFrame::OnGetEngineDir);
-	
+
 	ChildSlot
-	.Padding(FMargin(2))
-	[
-		SNew(SOverlay)
-		+SOverlay::Slot()
+		.Padding(FMargin(2))
+		[
+			SNew(SOverlay)
+			+ SOverlay::Slot()
 		[
 			SNew(SSplitter)
 			.Orientation(Orient_Horizontal)
-			+SSplitter::Slot()
-			.Value(0.3f)
-			[
-				EngineTab->AsShared()
-			]
-			+SSplitter::Slot()
-			[
-				SAssignNew(EngineProjects, SEngineProjects)
-			]
+		+ SSplitter::Slot()
+		.Value(0.3f)
+		[
+			EngineTab->AsShared()
+		]
+	+ SSplitter::Slot()
+		[
+			SAssignNew(EngineProjects, SEngineProjects)
+		]
 		]
 
-		+ SOverlay::Slot()
+	+ SOverlay::Slot()
 		.HAlign(HAlign_Right)
 		.VAlign(VAlign_Bottom)
 		.Padding(15)
@@ -55,7 +55,7 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 			SAssignNew(NotificationListPtr, SNotificationList)
 			.Visibility(EVisibility::SelfHitTestInvisible)
 		]
-	];
+		];
 
 	RequestRefresh(AllProjects);
 
@@ -91,7 +91,7 @@ void SUPTMainFrame::InitEngineProjects(TArray<TSharedPtr<FProjectInfo>>& AllProj
 	}
 
 	//根据引擎版本排序
-	Map.KeySort([](const FString& A, const FString& B) -> bool	{ return A < B; });
+	Map.KeySort([](const FString& A, const FString& B) -> bool { return A < B; });
 }
 
 
@@ -131,6 +131,6 @@ const FText SUPTMainFrame::OnGetEngineDir(const FString& EngineVersion)
 			return FText::FromString(Map[EngineVersion][0]->GetEnginePath());
 		}
 	}
-	return LOCTEXT("not found engine","not found engine");
+	return LOCTEXT("not found engine", "not found engine");
 }
 #undef LOCTEXT_NAMESPACE

@@ -342,6 +342,11 @@ void FUPTManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
 		FOnFileDirectoryActionFinished OnFinished = FOnFileDirectoryActionFinished::CreateLambda([File](const bool bSuccess)
 			{
 				PRINT_LOG(FString::Printf(TEXT("delete directory %s is %s."), *File, *(bSuccess ? FCoreTexts::Get().True.ToString() : FCoreTexts::Get().False.ToString())));
+				FNotificationInfo Info(FText::Format(LOCTEXT("ClearSolutionNotification", "Delecte {0} is {1}"), FText::FromString(File), bSuccess ? FCoreTexts::Get().True : FCoreTexts::Get().False));
+				Info.ExpireDuration = 5;
+				Info.bUseLargeFont = false;
+				Info.bUseSuccessFailIcons = bSuccess;
+				FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
 			});
 		UPTUtility::AsyncDeleteDirectory(OnFinished, File, true, true);
 	}
