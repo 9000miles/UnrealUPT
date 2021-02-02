@@ -23,6 +23,15 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 	FMenuBuilder MenuBuilder(bInShouldCloseWindowAfterSelection, Commands, Extender, true);
 
 	MenuBuilder.AddMenuEntry(
+		LOCTEXT("LaunchGame", "Launch Game"),
+		LOCTEXT("LaunchGameTip", "Launch Game"),
+		FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),
+		FUIAction(
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnLaunchGame.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FCanExecuteAction()
+		));
+
+	MenuBuilder.AddMenuEntry(
 		LOCTEXT("OpenProject", "Open Project"),
 		LOCTEXT("OpenProjectTip", "Open Project"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),

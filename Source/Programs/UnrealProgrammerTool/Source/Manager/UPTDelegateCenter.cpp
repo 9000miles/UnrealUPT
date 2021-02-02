@@ -1,5 +1,7 @@
 #include "UPTDelegateCenter.h"
 
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnLaunchGame;
+
 FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnOpenProject;
 
 FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnOpenIDE;

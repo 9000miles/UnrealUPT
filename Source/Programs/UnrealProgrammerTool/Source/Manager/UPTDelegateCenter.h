@@ -11,6 +11,7 @@ class FUPTDelegateCenter
 public:
 	DECLARE_DELEGATE_OneParam(FOnProjectOperation, TSharedRef<FProjectInfo> /*ProjectInfo*/);
 
+	static FOnProjectOperation OnLaunchGame;
 	static FOnProjectOperation OnOpenProject;
 	static FOnProjectOperation OnOpenIDE;
 	static FOnProjectOperation OnGenerateSolution;

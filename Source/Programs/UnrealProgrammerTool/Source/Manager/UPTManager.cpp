@@ -43,6 +43,7 @@ TSharedPtr<FUPTManager> FUPTManager::Get()
 
 void FUPTManager::Initialize()
 {
+	FUPTDelegateCenter::OnLaunchGame.BindLambda([this](TSharedRef<FProjectInfo> Info) { LaunchGame(Info); });
 	FUPTDelegateCenter::OnOpenProject.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenProject(Info); });
 	FUPTDelegateCenter::OnOpenIDE.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenCodeIDE(Info); });
 	FUPTDelegateCenter::OnGenerateSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { GenerateSolution(Info); });
@@ -206,6 +207,51 @@ const bool FUPTManager::EngineIsDistribution(const FString& Identifer)
 	FString EngineDir;
 	FDesktopPlatformModule::Get()->GetEngineRootDirFromIdentifier(Identifer, EngineDir);
 	return FDesktopPlatformModule::Get()->IsSourceDistribution(EngineDir);
+}
+
+bool FUPTManager::LaunchGame(TSharedRef<FProjectInfo> Info)
+{
+	FString EngineDir = Info->GetEnginePath();
+	FString ProjectFile = Info->GetProjectPath();
+
+	FNotificationInfo NInfo(FText::Format(LOCTEXT("LaunchGameNotification", "Launch Game {0} Succeed"), FText::FromString(FPaths::GetBaseFilename(ProjectFile))));
+	NInfo.ExpireDuration = 5;
+	NInfo.bUseLargeFont = false;
+
+	//判断工程路径是不是.uproject文件
+	if (ProjectFile.IsEmpty() || !ProjectFile.EndsWith(TEXT(".uproject")))
+	{
+		UE_LOG(UPTLog, Error, TEXT("Project path is error"));
+		NInfo.Text = FText::Format(LOCTEXT("LaunchGameNotification", "Launch Game {0} Failed"), FText::FromString(FPaths::GetBaseFilename(ProjectFile)));
+		FUPTDelegateCenter::OnRequestAddNotification.Execute(NInfo);
+		return 0;
+	}
+
+	FString ExeFilename;
+	ExeFilename = EngineDir + "/Engine/Binaries/Win64/UE4Editor.exe";
+	GLog->Log(ExeFilename);
+
+	//判断UE4Editor.exe是否存在
+	if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*ExeFilename))
+	{
+		UE_LOG(UPTLog, Error, TEXT("Engine path is error"));
+		return 0;
+	}
+
+	FUPTDelegateCenter::OnRequestAddNotification.Execute(NInfo);
+
+#if PLATFORM_WINDOWS
+	//使用CMD打开工程
+	FString Cmd = FString::Printf(TEXT("%s"), *(ProjectFile + TEXT(" -game")));
+	FProcHandle Handle = FPlatformProcess::CreateProc(*ExeFilename, *Cmd, true, false, false, NULL, 0, NULL, NULL);
+	if (!Handle.IsValid())
+	{
+		UE_LOG(UPTLog, Error, TEXT("Failed to create process"));
+		return 0;
+	}
+	FPlatformProcess::CloseProc(Handle);
+#endif
+	return true;
 }
 
 bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)

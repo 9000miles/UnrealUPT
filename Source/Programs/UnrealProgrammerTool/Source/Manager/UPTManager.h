@@ -45,6 +45,7 @@ public:
 	*/
 	const bool EngineIsDistribution(const FString& Identifer);
 
+	bool LaunchGame(TSharedRef<FProjectInfo> Info);
 	bool OpenProject(TSharedRef<FProjectInfo> Info);
 	bool OpenCodeIDE(TSharedRef<FProjectInfo> Info);
 	void GenerateSolution(TSharedRef<FProjectInfo> Info);
