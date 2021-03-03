@@ -13,21 +13,22 @@ class FUPTManager :public TSharedFromThis<FUPTManager>
 {
 public:
 	FUPTManager()
-	{	}
+	{
+	}
 
 	static TSharedPtr<FUPTManager> Get();
 
 	void Initialize();
 
 	/*
-	*	»ñÈ¡ËùÓĞÒıÇæ¸ùÄ¿Â¼
+	*	è·å–æ‰€æœ‰å¼•æ“æ ¹ç›®å½•
 	*/
 	TArray<FString> GetAllEngineRootDir();
 
 	void GetEngineVersion(TArray<FString>& EngineDirs, TArray<FString>& Versions);
 
 	/*
-	*	¸ù¾İÒıÇæ¸ùÄ¿Â¼»ñÈ¡¸Ã°æ±¾ÒıÇæµÄËùÓĞ¹¤³ÌÂ·¾¶
+	*	æ ¹æ®å¼•æ“æ ¹ç›®å½•è·å–è¯¥ç‰ˆæœ¬å¼•æ“çš„æ‰€æœ‰å·¥ç¨‹è·¯å¾„
 	*/
 	TArray<FString> GetProjectPathsByEngineRootDir(const FString& RootDir);
 
@@ -36,21 +37,22 @@ public:
 	TArray<TSharedPtr<FProjectInfo>> GetAllProjectInfos();
 
 	/*
-	*	¸ù¾İ¹¤³ÌÂ·¾¶»ñÈ¡ÏîÄ¿ËõÂÔÍ¼
+	*	æ ¹æ®å·¥ç¨‹è·¯å¾„è·å–é¡¹ç›®ç¼©ç•¥å›¾
 	*/
 	TSharedPtr<FSlateBrush> GetProjectThumbnail(const FString& ProjectPath);
 
 	/*
-	*	ÒıÇæÊÇ·ñÊÇÔ´Âë°æ£¬·µ»Øtrue
+	*	å¼•æ“æ˜¯å¦æ˜¯æºç ç‰ˆï¼Œè¿”å›true
 	*/
 	const bool EngineIsDistribution(const FString& Identifer);
+	const bool EngineIsDistributionByRootDir(const FString& EngineDir);
 
 	bool LaunchGame(TSharedRef<FProjectInfo> Info);
 	bool OpenProject(TSharedRef<FProjectInfo> Info);
 	bool OpenCodeIDE(TSharedRef<FProjectInfo> Info);
 	void GenerateSolution(TSharedRef<FProjectInfo> Info);
 	bool ShowInExplorer(TSharedRef<FProjectInfo> Info);
-	//µ¯³öÇåÀíBinaresºÍImmediateÎÄ¼ş¼Ğ´°¿Ú
+	//å¼¹å‡ºæ¸…ç†Binareså’ŒImmediateæ–‡ä»¶å¤¹çª—å£
 	void OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info);
 
 	void SetCurrentSelectedProject(TSharedPtr<FProjectInfo> Info)

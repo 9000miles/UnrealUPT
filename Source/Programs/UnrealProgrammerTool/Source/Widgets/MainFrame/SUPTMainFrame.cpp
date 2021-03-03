@@ -28,6 +28,8 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 		.OnGetTabBrush(this, &SUPTMainFrame::GetSourceOrBinaryImage)
 		.OnGetToolTipText(this, &SUPTMainFrame::OnGetEngineDir);
 
+	SAssignNew(EngineProjects, SEngineProjects);
+
 	ChildSlot
 		.Padding(FMargin(2))
 		[
@@ -43,7 +45,7 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 		]
 	+ SSplitter::Slot()
 		[
-			SAssignNew(EngineProjects, SEngineProjects)
+			EngineProjects.ToSharedRef()
 		]
 		]
 
@@ -84,16 +86,16 @@ void SUPTMainFrame::InitEngineProjects(TArray<TSharedPtr<FProjectInfo>>& AllProj
 	for (TSharedPtr<FProjectInfo> Info : AllProjects)
 	{
 		const FString Version = Info->GetEngineVersion();
+
 		if (Map.Contains(Version))
 			Map[Version].Add(Info);
 		else
 			Map.Add(Version, { Info });
 	}
 
-	//根据引擎版本排序
+	//鏍规嵁寮曟搸鐗堟湰鎺掑簭
 	Map.KeySort([](const FString& A, const FString& B) -> bool { return A < B; });
 }
-
 
 void SUPTMainFrame::OnEngineTabChanged(const FString& EngineVersion)
 {
@@ -108,16 +110,21 @@ void SUPTMainFrame::OnEngineTabChanged(const FString& EngineVersion)
 
 const FSlateBrush* SUPTMainFrame::GetSourceOrBinaryImage(const FString& EngineVersion, bool& bSource)
 {
+	FString RootDir;
 	if (Map.Contains(EngineVersion))
 	{
 		if (Map[EngineVersion].Num() > 0)
 		{
-			if (Map[EngineVersion][0]->GetEnginePath().IsEmpty())
-				return FUPTStyle::Get().GetBrush(FName("UPT.Tab.NotFound"));
+			TSharedPtr<FProjectInfo> Info = Map[EngineVersion][0];
+			if (Info.IsValid())
+			{
+				RootDir = Info->GetEnginePath();
+				if (RootDir.IsEmpty()) return FUPTStyle::Get().GetBrush(FName("UPT.Tab.NotFound"));
+			}
 		}
 	}
 
-	bSource = FUPTManager::Get()->EngineIsDistribution(EngineVersion);
+	bSource = FUPTManager::Get()->EngineIsDistributionByRootDir(RootDir);
 	FName BrushName = bSource ? FName("UPT.Tab.Source") : FName("UPT.Tab.Binary");
 	return FUPTStyle::Get().GetBrush(BrushName);
 }

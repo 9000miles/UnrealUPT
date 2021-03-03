@@ -124,7 +124,7 @@ TArray<TSharedPtr<FProjectInfo>> FUPTManager::GetAllProjectInfos()
 		}
 	}
 
-	//Êı×éÈ¥ÖØ
+	//æ•°ç»„å»é‡
 	TSet<FString> ArrayToTeavy(TempProjects);
 
 	for (const FString Project : ArrayToTeavy)
@@ -209,6 +209,11 @@ const bool FUPTManager::EngineIsDistribution(const FString& Identifer)
 	return FDesktopPlatformModule::Get()->IsSourceDistribution(EngineDir);
 }
 
+const bool FUPTManager::EngineIsDistributionByRootDir(const FString& EngineDir)
+{
+	return FDesktopPlatformModule::Get()->IsSourceDistribution(EngineDir);
+}
+
 bool FUPTManager::LaunchGame(TSharedRef<FProjectInfo> Info)
 {
 	FString EngineDir = Info->GetEnginePath();
@@ -218,7 +223,7 @@ bool FUPTManager::LaunchGame(TSharedRef<FProjectInfo> Info)
 	NInfo.ExpireDuration = 5;
 	NInfo.bUseLargeFont = false;
 
-	//ÅĞ¶Ï¹¤³ÌÂ·¾¶ÊÇ²»ÊÇ.uprojectÎÄ¼ş
+	//åˆ¤æ–­å·¥ç¨‹è·¯å¾„æ˜¯ä¸æ˜¯.uprojectæ–‡ä»¶
 	if (ProjectFile.IsEmpty() || !ProjectFile.EndsWith(TEXT(".uproject")))
 	{
 		UE_LOG(UPTLog, Error, TEXT("Project path is error"));
@@ -231,7 +236,7 @@ bool FUPTManager::LaunchGame(TSharedRef<FProjectInfo> Info)
 	ExeFilename = EngineDir + "/Engine/Binaries/Win64/UE4Editor.exe";
 	GLog->Log(ExeFilename);
 
-	//ÅĞ¶ÏUE4Editor.exeÊÇ·ñ´æÔÚ
+	//åˆ¤æ–­UE4Editor.exeæ˜¯å¦å­˜åœ¨
 	if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*ExeFilename))
 	{
 		UE_LOG(UPTLog, Error, TEXT("Engine path is error"));
@@ -241,7 +246,7 @@ bool FUPTManager::LaunchGame(TSharedRef<FProjectInfo> Info)
 	FUPTDelegateCenter::OnRequestAddNotification.Execute(NInfo);
 
 #if PLATFORM_WINDOWS
-	//Ê¹ÓÃCMD´ò¿ª¹¤³Ì
+	//ä½¿ç”¨CMDæ‰“å¼€å·¥ç¨‹
 	FString Cmd = FString::Printf(TEXT("%s"), *(ProjectFile + TEXT(" -game")));
 	FProcHandle Handle = FPlatformProcess::CreateProc(*ExeFilename, *Cmd, true, false, false, NULL, 0, NULL, NULL);
 	if (!Handle.IsValid())
@@ -263,7 +268,7 @@ bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 	NInfo.ExpireDuration = 5;
 	NInfo.bUseLargeFont = false;
 
-	//ÅĞ¶Ï¹¤³ÌÂ·¾¶ÊÇ²»ÊÇ.uprojectÎÄ¼ş
+	//åˆ¤æ–­å·¥ç¨‹è·¯å¾„æ˜¯ä¸æ˜¯.uprojectæ–‡ä»¶
 	if (ProjectFile.IsEmpty() || !ProjectFile.EndsWith(TEXT(".uproject")))
 	{
 		UE_LOG(UPTLog, Error, TEXT("Project path is error"));
@@ -276,7 +281,7 @@ bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 	ExeFilename = EngineDir + "/Engine/Binaries/Win64/UE4Editor.exe";
 	GLog->Log(ExeFilename);
 
-	//ÅĞ¶ÏUE4Editor.exeÊÇ·ñ´æÔÚ
+	//åˆ¤æ–­UE4Editor.exeæ˜¯å¦å­˜åœ¨
 	if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*ExeFilename))
 	{
 		UE_LOG(UPTLog, Error, TEXT("Engine path is error"));
@@ -286,7 +291,7 @@ bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 	FUPTDelegateCenter::OnRequestAddNotification.Execute(NInfo);
 
 #if PLATFORM_WINDOWS
-	//Ê¹ÓÃCMD´ò¿ª¹¤³Ì
+	//ä½¿ç”¨CMDæ‰“å¼€å·¥ç¨‹
 	FString PendingProjName = FString::Printf(TEXT("\"%s\""), *ProjectFile);
 	FString Cmd = FString::Printf(TEXT("%s %s"), *PendingProjName, FCommandLine::Get());
 	FProcHandle Handle = FPlatformProcess::CreateProc(*ExeFilename, *Cmd, true, false, false, NULL, 0, NULL, NULL);
