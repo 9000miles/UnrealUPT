@@ -375,6 +375,9 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 		]
 
 		]];
+
+
+		CppDirectoryComboBox->SetSelectedItem(MakeShareable(new ECppDirectory(ECppDirectory::Only_H)));
 }
 
 void SCreateCodeFileWidget::PopulateAvailableModules()
@@ -495,6 +498,8 @@ void SCreateCodeFileWidget::OnClickFinish()
 
 	FString CppFile;
 	TSharedPtr<ECppDirectory> CppDirectoryType = CppDirectoryComboBox->GetSelectedItem();
+	if(!CppDirectoryType.IsValid()) return;
+
 	FString HFile = HPathEditBox->GetText().ToString();
 	switch (*CppDirectoryType.Get())
 	{
@@ -514,7 +519,8 @@ void SCreateCodeFileWidget::OnClickFinish()
 
 	FString ParentName = ParentEditBox->GetText().ToString();
 	FCreateCodeManager::Get()->CreateFile(ParentName, SelectedHostType, HFile, CppFile);
-	//CloseContainingWindow();
+
+	CloseContainingWindow();
 }
 
 FText SCreateCodeFileWidget::OnGetModuleName() const

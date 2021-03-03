@@ -315,7 +315,7 @@ const bool FCreateCodeManager::CreateClassHeaderFile(FString NewHeaderFileName, 
 	FString OutSyncLocation;
 	HarvestCursorSyncLocation(FinalOutput, OutSyncLocation);
 
-	if (FFileHelper::SaveStringToFile(FinalOutput, *NewHeaderFileName))
+	if (FFileHelper::SaveStringToFile(FinalOutput, *NewHeaderFileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
 	{
 		FNotificationInfo Info(FText::Format(LOCTEXT("CreateHederFileNotification", "Create file successfully: {0}"), FText::FromString(NewHeaderFileName)));
 		Info.ExpireDuration = 3;
@@ -377,7 +377,7 @@ const bool FCreateCodeManager::CreateClassCPPFile(FString NewCppFileName, ECodeT
 
 	HarvestCursorSyncLocation(FinalOutput, OutSyncLocation);
 
-	if (FFileHelper::SaveStringToFile(FinalOutput, *NewCppFileName))
+	if (FFileHelper::SaveStringToFile(FinalOutput, *NewCppFileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
 	{
 		FNotificationInfo Info(FText::Format(LOCTEXT("CreateCppFileNotification", "Create file successfully: {0}"), FText::FromString(NewCppFileName)));
 		Info.ExpireDuration = 3;
