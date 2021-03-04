@@ -15,6 +15,7 @@
 #include "SCommonTab.h"
 #include "UPTManager.h"
 #include "SNotificationList.h"
+#include "PrintHelper.h"
 
 #define LOCTEXT_NAMESPACE "SUPTMainFrame"
 
@@ -140,4 +141,15 @@ const FText SUPTMainFrame::OnGetEngineDir(const FString& EngineVersion)
 	}
 	return LOCTEXT("not found engine", "not found engine");
 }
+
+FReply SUPTMainFrame::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (InKeyEvent.IsControlDown() && InKeyEvent.IsShiftDown() && InKeyEvent.GetKey() == EKeys::W)
+	{
+		PRINT_LOG(InKeyEvent.GetKey());
+		FGlobalTabmanager::Get()->TryInvokeTab(FTabId("WidgetReflector"));
+	}
+	return FReply::Handled();
+}
+
 #undef LOCTEXT_NAMESPACE

@@ -63,6 +63,7 @@ public:
 	inline FPrintTool& operator<<(FMatrix info) { OutputString.Append(info.ToString()); return *this; }
 	inline FPrintTool& operator<<(FColor info) { OutputString.Append(info.ToString()); return *this; }
 	inline FPrintTool& operator<<(FLinearColor info) { OutputString.Append(info.ToString()); return *this; }
+	inline FPrintTool& operator<<(FKey info) { OutputString.Append(info.ToString()); return *this; }
 
 	inline void operator<<(FPrintTool& Helper) { Helper.Output(); }
 

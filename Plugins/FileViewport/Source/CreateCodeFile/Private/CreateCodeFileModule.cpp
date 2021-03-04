@@ -294,6 +294,7 @@ void UCreateCodeFilesBPLirary::CreateCodeFile()
 
 	FString UnusedSyncLocation;
 	FText OutFailReason;
+#if 0
 
 	FModuleContextInfo NewModuleInfo;
 	NewModuleInfo.ModuleName = FString(TEXT("NewModule"));
@@ -390,4 +391,5 @@ void UCreateCodeFilesBPLirary::CreateCodeFile()
 			OutFailReason
 		);
 	}
+#endif
 }

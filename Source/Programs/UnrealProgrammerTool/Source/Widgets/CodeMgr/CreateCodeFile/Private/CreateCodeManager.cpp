@@ -88,26 +88,26 @@ FString FCreateCodeManager::GetClassPrefixCPP(ECodeTemplateType ClassType)
 {
 	switch (ClassType)
 	{
-	case ECodeTemplateType::ActorClass:
-	case ECodeTemplateType::CharacterClass:
-	case ECodeTemplateType::PawnClass:
-		return TEXT("A");
+		case ECodeTemplateType::ActorClass:
+		case ECodeTemplateType::CharacterClass:
+		case ECodeTemplateType::PawnClass:
+			return TEXT("A");
 
-	case ECodeTemplateType::ActorComponentClass:
-	case ECodeTemplateType::InterfaceClass:
-	case ECodeTemplateType::UObjectClass:
-		return TEXT("U");
+		case ECodeTemplateType::ActorComponentClass:
+		case ECodeTemplateType::InterfaceClass:
+		case ECodeTemplateType::UObjectClass:
+			return TEXT("U");
 
-	case ECodeTemplateType::Command:
-	case ECodeTemplateType::EmptyClass:
-	case ECodeTemplateType::SlateWidgetStyle:
-		return TEXT("F");
+		case ECodeTemplateType::Command:
+		case ECodeTemplateType::EmptyClass:
+		case ECodeTemplateType::SlateWidgetStyle:
+			return TEXT("F");
 
-	case ECodeTemplateType::SlateWidget:
-		return TEXT("S");
+		case ECodeTemplateType::SlateWidget:
+			return TEXT("S");
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return TEXT("");
 }
@@ -115,23 +115,23 @@ FString FCreateCodeManager::GetClassNameCPP(ECodeTemplateType ClassType)
 {
 	switch (ClassType)
 	{
-	case ECodeTemplateType::UObjectClass:
-		return TEXT("Object");
+		case ECodeTemplateType::UObjectClass:
+			return TEXT("Object");
 
-	case ECodeTemplateType::EmptyClass:
-		return TEXT("");
+		case ECodeTemplateType::EmptyClass:
+			return TEXT("");
 
-	case ECodeTemplateType::SlateWidget:
-		return TEXT("CompoundWidget");
+		case ECodeTemplateType::SlateWidget:
+			return TEXT("CompoundWidget");
 
-	case ECodeTemplateType::SlateWidgetStyle:
-		return TEXT("SlateWidgetStyle");
+		case ECodeTemplateType::SlateWidgetStyle:
+			return TEXT("SlateWidgetStyle");
 
-	case ECodeTemplateType::InterfaceClass:
-		return TEXT("Interface");
+		case ECodeTemplateType::InterfaceClass:
+			return TEXT("Interface");
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return TEXT("");
 }
@@ -317,7 +317,7 @@ const bool FCreateCodeManager::CreateClassHeaderFile(FString NewHeaderFileName, 
 
 	if (FFileHelper::SaveStringToFile(FinalOutput, *NewHeaderFileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
 	{
-		FNotificationInfo Info(FText::Format(LOCTEXT("CreateHederFileNotification", "Create file successfully: {0}"), FText::FromString(NewHeaderFileName)));
+		FNotificationInfo Info(FText::Format(LOCTEXT("CreateHederFileNotification", "Create file successfully: {0}"), FText::FromString(FPaths::GetCleanFilename(NewHeaderFileName))));
 		Info.ExpireDuration = 3;
 		Info.bUseLargeFont = false;
 		FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
@@ -379,7 +379,7 @@ const bool FCreateCodeManager::CreateClassCPPFile(FString NewCppFileName, ECodeT
 
 	if (FFileHelper::SaveStringToFile(FinalOutput, *NewCppFileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
 	{
-		FNotificationInfo Info(FText::Format(LOCTEXT("CreateCppFileNotification", "Create file successfully: {0}"), FText::FromString(NewCppFileName)));
+		FNotificationInfo Info(FText::Format(LOCTEXT("CreateCppFileNotification", "Create file successfully: {0}"), FText::FromString(FPaths::GetCleanFilename(NewCppFileName))));
 		Info.ExpireDuration = 3;
 		Info.bUseLargeFont = false;
 		FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);

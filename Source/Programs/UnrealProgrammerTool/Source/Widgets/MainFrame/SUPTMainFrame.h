@@ -15,6 +15,8 @@ public:
 	{	}
 		SLATE_END_ARGS()
 
+	FReply OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+
 public:
 	void Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& AllProjects);
 	void RequestRefresh(TArray<TSharedPtr<FProjectInfo>>& AllProjects);

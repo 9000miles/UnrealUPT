@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "UnrealUPTDemo",
+			"Name": "UPTProject",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
