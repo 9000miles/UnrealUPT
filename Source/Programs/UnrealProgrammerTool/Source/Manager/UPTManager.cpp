@@ -392,22 +392,35 @@ void FUPTManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
 	if (ReturnType != EAppReturnType::Yes)
 		return;
 
-	TArray<FString> Files;
-	Files.Add(FPaths::GetPath(Info->GetProjectPath()) / TEXT("Binaries"));
-	Files.Add(FPaths::GetPath(Info->GetProjectPath()) / TEXT("Intermediate"));
+	TArray<FString> Directorys;
+	const FString ProjectDirectory = FPaths::GetPath(Info->GetProjectPath());
+	const FString PluginsDirectory = ProjectDirectory / TEXT("Plugins");
 
-	for (const FString File : Files)
+	const FString Binaries(TEXT("Binaries"));
+	const FString Intermediate(TEXT("Intermediate"));
+
+	Directorys.Add(ProjectDirectory / Binaries);
+	Directorys.Add(ProjectDirectory / TEXT("Intermediate"));
+	TArray<FString> Plugins;
+	IFileManager::Get().FindFiles(Plugins, *(PluginsDirectory / TEXT("*")), false, true);
+	for (const FString PluginName : Plugins)
 	{
-		FOnFileDirectoryActionFinished OnFinished = FOnFileDirectoryActionFinished::CreateLambda([File](const bool bSuccess)
+		Directorys.Add(PluginsDirectory / PluginName / Binaries);
+		Directorys.Add(PluginsDirectory / PluginName / Intermediate);
+	}
+
+	for (const FString Directory : Directorys)
+	{
+		FOnFileDirectoryActionFinished OnFinished = FOnFileDirectoryActionFinished::CreateLambda([Directory](const bool bSuccess)
 			{
-				PRINT_LOG(FString::Printf(TEXT("delete directory %s is %s."), *File, *(bSuccess ? FCoreTexts::Get().True.ToString() : FCoreTexts::Get().False.ToString())));
-				FNotificationInfo Info(FText::Format(LOCTEXT("ClearSolutionNotification", "Delecte {0} is {1}"), FText::FromString(FPaths::GetCleanFilename(File)), bSuccess ? FCoreTexts::Get().True : FCoreTexts::Get().False));
+				PRINT_LOG(FString::Printf(TEXT("delete directory %s is %s."), *Directory, *(bSuccess ? FCoreTexts::Get().True.ToString() : FCoreTexts::Get().False.ToString())));
+				FNotificationInfo Info(FText::Format(LOCTEXT("ClearSolutionNotification", "Delecte {0} is {1}"), FText::FromString(FPaths::GetCleanFilename(Directory)), bSuccess ? FCoreTexts::Get().True : FCoreTexts::Get().False));
 				Info.ExpireDuration = 5;
 				Info.bUseLargeFont = false;
 				Info.bUseSuccessFailIcons = bSuccess;
 				FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
 			});
-		UPTUtility::AsyncDeleteDirectory(OnFinished, File, true, true);
+		UPTUtility::AsyncDeleteDirectory(OnFinished, Directory, true, true);
 	}
 }
 
