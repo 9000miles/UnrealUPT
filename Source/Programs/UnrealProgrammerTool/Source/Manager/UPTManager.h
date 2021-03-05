@@ -53,7 +53,7 @@ public:
 	void GenerateSolution(TSharedRef<FProjectInfo> Info);
 	bool ShowInExplorer(TSharedRef<FProjectInfo> Info);
 	//弹出清理Binares和Immediate文件夹窗口
-	void OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info);
+	void OpenClearProjectWindow(TSharedRef<FProjectInfo> Info);
 
 	void SetCurrentSelectedProject(TSharedPtr<FProjectInfo> Info)
 	{

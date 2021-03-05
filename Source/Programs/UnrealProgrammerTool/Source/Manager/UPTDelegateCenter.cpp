@@ -10,7 +10,7 @@ FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnGenerateSolution;
 
 FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnShowInExplorer;
 
-FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnClearSolution;
+FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnClearProject;
 
 FUPTDelegateCenter::FOnProjectOperation FUPTDelegateCenter::OnOpenCodeMgrWindow;
 

@@ -16,7 +16,7 @@ public:
 	static FOnProjectOperation OnOpenIDE;
 	static FOnProjectOperation OnGenerateSolution;
 	static FOnProjectOperation OnShowInExplorer;
-	static FOnProjectOperation OnClearSolution;
+	static FOnProjectOperation OnClearProject;
 	static FOnProjectOperation OnOpenCodeMgrWindow;
 	static FOnProjectOperation OnAddNewCodeFile;
 

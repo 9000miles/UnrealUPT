@@ -59,11 +59,11 @@ void SContextMenu::Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> 
 		));
 
 	MenuBuilder.AddMenuEntry(
-		LOCTEXT("Clear Solution", "Clear Solution"),
-		LOCTEXT("Clear SolutionTip", "Clear Solution"),
+		LOCTEXT("Clear Project", "Clear Project"),
+		LOCTEXT("Clear ProjectTip", "Clear Project"),
 		FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),
 		FUIAction(
-			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnClearSolution.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
+			FExecuteAction::CreateLambda([this]() { FUPTDelegateCenter::OnClearProject.ExecuteIfBound(ProjectInfo.ToSharedRef()); }),
 			FCanExecuteAction()
 		));
 

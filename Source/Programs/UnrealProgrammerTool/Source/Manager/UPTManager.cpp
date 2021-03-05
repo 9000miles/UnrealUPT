@@ -48,7 +48,7 @@ void FUPTManager::Initialize()
 	FUPTDelegateCenter::OnOpenIDE.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenCodeIDE(Info); });
 	FUPTDelegateCenter::OnGenerateSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { GenerateSolution(Info); });
 	FUPTDelegateCenter::OnShowInExplorer.BindLambda([this](TSharedRef<FProjectInfo> Info) { ShowInExplorer(Info); });
-	FUPTDelegateCenter::OnClearSolution.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenClearSolutionWindow(Info); });
+	FUPTDelegateCenter::OnClearProject.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenClearProjectWindow(Info); });
 	FUPTDelegateCenter::OnOpenCodeMgrWindow.BindLambda([this](TSharedRef<FProjectInfo> Info) { OpenManagedCodeWindow(Info); });
 	FUPTDelegateCenter::OnAddNewCodeFile.BindLambda([this](TSharedRef<FProjectInfo> Info) { AddNewCodeFile(Info); });
 
@@ -386,7 +386,7 @@ bool FUPTManager::ShowInExplorer(TSharedRef<FProjectInfo> Info)
 	return false;
 }
 
-void FUPTManager::OpenClearSolutionWindow(TSharedRef<FProjectInfo> Info)
+void FUPTManager::OpenClearProjectWindow(TSharedRef<FProjectInfo> Info)
 {
 	EAppReturnType::Type ReturnType = FPlatformMisc::MessageBoxExt(EAppMsgType::YesNoCancel, TEXT("Are you sure you want to clear the solution."), TEXT("Clear Solution"));
 	if (ReturnType != EAppReturnType::Yes)
