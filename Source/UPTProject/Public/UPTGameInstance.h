@@ -21,6 +21,10 @@ private:
 public:
 	void Shutdown() override;
 
+	FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params) override;
+
+	void StartGameInstance() override;
+
 protected:
-	void OnStart() override;
+	void OnStartInitialize();
 };

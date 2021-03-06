@@ -19,6 +19,7 @@ public:
 	static TSharedPtr<FUPTManager> Get();
 
 	void Initialize();
+	void Deinitialize();
 
 	/*
 	*	获取所有引擎根目录

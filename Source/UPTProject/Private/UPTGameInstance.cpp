@@ -4,17 +4,10 @@
 #include "Launcher/UPTLaucher.h"
 #include "SButton.h"
 #include "Kismet/GameplayStatics.h"
+#include "PrintHelper.h"
 
-void UUPTGameInstance::Shutdown()
+void UUPTGameInstance::OnStartInitialize()
 {
-	Super::Shutdown();
-	if (UPTLaucher.IsValid())
-		UPTLaucher->Shutdown();
-}
-
-void UUPTGameInstance::OnStart()
-{
-	Super::OnStart();
 	UPTLaucher = MakeShared<FUPTLaucher>();
 	UPTLaucher->Initialize();
 
@@ -30,4 +23,24 @@ void UUPTGameInstance::OnStart()
 
 	//Content = SNew(SButton);
 	GEngine->GameViewport->AddViewportWidgetContent(Content.ToSharedRef());
+}
+
+void UUPTGameInstance::Shutdown()
+{
+	Super::Shutdown();
+	if (UPTLaucher.IsValid())
+		UPTLaucher->Shutdown();
+}
+
+FGameInstancePIEResult UUPTGameInstance::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params)
+{
+	FGameInstancePIEResult Result = Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
+	OnStartInitialize();
+	return Result;
+}
+
+void UUPTGameInstance::StartGameInstance()
+{
+	Super::StartGameInstance();
+	OnStartInitialize();
 }

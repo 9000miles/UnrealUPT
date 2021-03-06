@@ -45,6 +45,7 @@ void FUPTLaucher::Initialize()
 
 void FUPTLaucher::Shutdown()
 {
+	FUPTManager::Get()->Deinitialize();
 	//FUPTStyle::Shutdown();
 	//FCoreDelegates::OnExit.Broadcast();
 	//FSlateApplication::Shutdown();

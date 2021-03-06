@@ -19,6 +19,7 @@ public class UPTProject : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(
             new string[] {
+                "PrintHelper",
             });
 
         // Uncomment if you are using Slate UI

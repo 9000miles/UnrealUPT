@@ -95,6 +95,12 @@ void FUPTManager::Initialize()
 #endif
 }
 
+void FUPTManager::Deinitialize()
+{
+	FGlobalTabmanager::Get()->UnregisterTabSpawner(CodeMgrWindow);
+	FGlobalTabmanager::Get()->UnregisterTabSpawner(AddNewCodeFileWindow);
+}
+
 TArray<FString> FUPTManager::GetAllEngineRootDir()
 {
 	TMap<FString, FString> OutInstallations;
