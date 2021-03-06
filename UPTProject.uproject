@@ -1,13 +1,22 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{8E40B27E-4B7E-1B4E-0C52-548DFFB6614C}",
+	"EngineAssociation": "{9C3DD9F0-4EF1-829D-37D4-CEADD73631C5}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
 		{
 			"Name": "UPTProject",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "UnrealUPT",
+			"Enabled": true
 		}
 	]
 }
