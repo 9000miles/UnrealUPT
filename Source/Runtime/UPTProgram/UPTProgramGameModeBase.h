@@ -10,7 +10,7 @@
  *
  */
 UCLASS()
-class UPTPROJECT_API AUPTProjectGameModeBase : public AGameModeBase
+class UPTPROGRAM_API AUPTProgramGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 };

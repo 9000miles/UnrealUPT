@@ -3,12 +3,12 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class UPTProjectTarget : TargetRules
+public class UPTProgramTarget : TargetRules
 {
-	public UPTProjectTarget(TargetInfo Target) : base(Target)
+	public UPTProgramTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 
-		ExtraModuleNames.AddRange( new string[] { "UPTProject" } );
+		ExtraModuleNames.AddRange( new string[] { "UPTProgram" } );
 	}
 }
