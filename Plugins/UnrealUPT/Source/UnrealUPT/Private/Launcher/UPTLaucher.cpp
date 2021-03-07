@@ -20,6 +20,7 @@
 #include "UPTToolBar.h"
 #include "UPTCommands.h"
 #include "PrintHelper.h"
+#include "SScaleBox.h"
 
 //IMPLEMENT_APPLICATION(UnrealUPT, "UnrealProgrammerTool");
 
@@ -79,23 +80,17 @@ TSharedRef<SDockTab> FUPTLaucher::SpawnMainTab(const FSpawnTabArgs& Args, FName 
 
 TSharedPtr<SWidget> FUPTLaucher::CreateWidget()
 {
-	//TSharedRef<SDockTab> UPTTab =
-	//	SNew(SDockTab)
-	//	.TabRole(ETabRole::MajorTab)
-	//	.Label(LOCTEXT("UPTLabel", "UPT"))
-	//	.ToolTipText(LOCTEXT("UPTTabToolTip", "A tool that unreal programmers really want to use."));
-
-	//UPTTabManager = FGlobalTabmanager::Get()->NewTabManager(UPTTab);
-
-	//UPTTab->SetContent
-	//(
 	return
-		SNew(SVerticalBox)
-		+ SVerticalBox::Slot()
+		SNew(SScaleBox)
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Fill)
+		[
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(FMargin(2, 0))
 		[
-			FUPTMenuBar::MakeMenuBar(/*UPTTabManager.ToSharedRef()*/)
+			FUPTMenuBar::MakeMenuBar()
 		]
 	+ SVerticalBox::Slot()
 		.AutoHeight()
@@ -107,9 +102,8 @@ TSharedPtr<SWidget> FUPTLaucher::CreateWidget()
 		.FillHeight(1.0f)
 		[
 			SAssignNew(UPTMainFrame, SUPTMainFrame, ProjectInfos)
+		]
 		];
-	//);
-	//return UPTTab;
 }
 
 void FUPTLaucher::OnRefreshMainFrame()

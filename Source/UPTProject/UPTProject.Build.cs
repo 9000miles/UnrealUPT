@@ -7,7 +7,7 @@ public class UPTProject : ModuleRules
     public UPTProject(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
+        OptimizeCode = CodeOptimization.Never;
         PublicDependencyModuleNames.AddRange(
             new string[] {
                 "Core",
@@ -26,7 +26,8 @@ public class UPTProject : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[] {
                 "Slate",
-                "SlateCore"
+                "SlateCore",
+                "UMG"
             });
 
         // Uncomment if you are using online features
