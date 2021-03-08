@@ -10,6 +10,7 @@
 #include "UPTDefine.h"
 #include "Editor/EditorStyle/Public/EditorStyleSet.h"
 #include "SUnitToolTip.h"
+#include "Widgets/UPTStyle.h"
 
 void SProjectThumbnail::Construct(const FArguments& InArgs, const FSlateBrush* Brush)
 {
@@ -46,7 +47,7 @@ void SProjectUnit::Construct(const FArguments& InArgs, const TSharedRef<FProject
 	ChildSlot
 		[
 			SNew(SBorder)
-			.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+			.BorderImage(FUPTStyle::GetBrush("NoBorder"))
 			[
 				SNew(SVerticalBox)
 				+ SVerticalBox::Slot()

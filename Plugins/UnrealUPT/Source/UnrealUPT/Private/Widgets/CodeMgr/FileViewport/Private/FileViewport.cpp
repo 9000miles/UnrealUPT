@@ -91,7 +91,7 @@
 //	//		[
 //	//			SNew(SBorder)
 //	//			.VAlign(VAlign_Fill).HAlign(HAlign_Fill)
-//	//			.BorderImage(FEditorStyle::GetBrush("ToolPanel.DarkGroupBorder"))
+//	//			.BorderImage(FUPTStyle::GetBrush("ToolPanel.DarkGroupBorder"))
 //	//			[
 //	//				SAssignNew(VS_SCROLL_BOX, SScrollBox)
 //	//				//.OnUserScrolled(this, &SMGC_CodeEditorCore::OnVerticalScroll)
@@ -105,7 +105,7 @@
 //	//					[
 //	//						SNew(SBorder)
 //	//						.VAlign(VAlign_Fill).HAlign(HAlign_Fill)
-//	//						.BorderImage(FEditorStyle::GetBrush("Graph.Node.Body"))
+//	//						.BorderImage(FUPTStyle::GetBrush("Graph.Node.Body"))
 //	//						[
 //	//							SAssignNew(LINE_COUNTER, SListView<TSharedPtr<FString>>)
 //	//							.OnSelectionChanged(this, &FFileViewportModule::OnSelectedLineCounterItem)
@@ -146,7 +146,7 @@
 //		SNew(SComboRow<TSharedRef<FString>>, OwnerTable)
 //		[
 //			SNew(SBorder)
-//			.BorderImage(FEditorStyle::GetBrush("Graph.Node.Body"))
+//			.BorderImage(FUPTStyle::GetBrush("Graph.Node.Body"))
 //			.ColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f))
 //			.Padding(FMargin(5.f, 0.f, 5.f, 0.f))
 //			[

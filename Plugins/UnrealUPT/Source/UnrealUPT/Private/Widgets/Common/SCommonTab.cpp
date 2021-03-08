@@ -35,7 +35,7 @@ void SCommonTab::Construct(const FArguments& InArgs)
 	ChildSlot
 		[
 			SNew(SBorder)
-			.BorderImage(FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
+			//.BorderImage(FUPTStyle::GetBrush("ToolPanel.GroupBorder"))
 		.Padding(FMargin(5))
 		[
 			SNew(SScrollBox)
@@ -77,7 +77,7 @@ TSharedRef<SWidget> SCommonTab::CreateTab(FString TabName)
 	const FSlateBrush* SourceBinaryBrush = GetSourceOrBinaryImage(TabName, bSourceEngine);
 	return
 		SNew(SCheckBox)
-		.Style(FEditorStyle::Get(), "PlacementBrowser.Tab")
+		.Style(FUPTStyle::Get(), "PlacementBrowser.Tab")
 		.OnCheckStateChanged(this, &SCommonTab::OnEngineTabChanged, TabName)
 		.IsChecked(this, &SCommonTab::GetEngineTabCheckedState, TabName)
 		.ToolTipText(this, &SCommonTab::TabToolTipText, TabName, bSourceEngine)
@@ -138,7 +138,7 @@ const FSlateBrush* SCommonTab::GetActiveTabIamge(FString EngineVersion) const
 	if (ActiveEngineTab == EngineVersion)
 	{
 		static FName PlacementBrowserActiveTabBarBrush("PlacementBrowser.ActiveTabBar");
-		return FEditorStyle::GetBrush(PlacementBrowserActiveTabBarBrush);
+		return FUPTStyle::GetBrush(PlacementBrowserActiveTabBarBrush);
 	}
 	else
 	{

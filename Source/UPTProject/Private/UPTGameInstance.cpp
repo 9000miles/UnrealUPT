@@ -32,12 +32,14 @@ void UUPTGameInstance::Shutdown()
 		UPTLaucher->Shutdown();
 }
 
+#if WITH_EDITOR
 FGameInstancePIEResult UUPTGameInstance::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params)
 {
 	FGameInstancePIEResult Result = Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
 	OnStartInitialize();
 	return Result;
 }
+#endif
 
 void UUPTGameInstance::StartGameInstance()
 {

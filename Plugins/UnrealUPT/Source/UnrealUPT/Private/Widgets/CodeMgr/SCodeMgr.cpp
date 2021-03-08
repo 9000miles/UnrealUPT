@@ -9,6 +9,7 @@
 #include "SFileViewport.h"
 #include "SCodeDetails.h"
 #include "SCodeMgrState.h"
+#include "Widgets/UPTStyle.h"
 
 #define LOCTEXT_NAMESPACE "SCodeMgr"
 
@@ -19,24 +20,22 @@ static const FName CodeDetailsTabID("CodeDetails");
 
 void SCodeMgr::Construct(const FArguments& InArgs, const TSharedRef<SDockTab>& ConstructUnderMajorTab, const TSharedPtr<SWindow>& ConstructUnderWindow)
 {
-
-
 	TabManager = FGlobalTabmanager::Get()->NewTabManager(ConstructUnderMajorTab);
 	TSharedRef<FWorkspaceItem> AppMenuGroup = TabManager->AddLocalWorkspaceMenuCategory(LOCTEXT("UPTCodeMgrMenuGroupName", "UPTCodeMgr"));
 
 	TabManager->RegisterTabSpawner(DirectoryTreeTabID, FOnSpawnTab::CreateRaw(this, &SCodeMgr::HandleTabManagerSpawnTab, DirectoryTreeTabID))
 		.SetDisplayName(LOCTEXT("DirectoryTreeTabTitle", "Directory Tree"))
-		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "SessionFrontEnd.Tabs.Tools"))
+		.SetIcon(FSlateIcon(FUPTStyle::GetStyleSetName(), "SessionFrontEnd.Tabs.Tools"))
 		.SetGroup(AppMenuGroup);
 
 	TabManager->RegisterTabSpawner(FileViewportTabID, FOnSpawnTab::CreateRaw(this, &SCodeMgr::HandleTabManagerSpawnTab, FileViewportTabID))
 		.SetDisplayName(LOCTEXT("FileViewportTabTitle", "File Viewport"))
-		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "SessionFrontEnd.Tabs.Tools"))
+		.SetIcon(FSlateIcon(FUPTStyle::GetStyleSetName(), "SessionFrontEnd.Tabs.Tools"))
 		.SetGroup(AppMenuGroup);
 
 	TabManager->RegisterTabSpawner(CodeDetailsTabID, FOnSpawnTab::CreateRaw(this, &SCodeMgr::HandleTabManagerSpawnTab, CodeDetailsTabID))
 		.SetDisplayName(LOCTEXT("CodeDetailsTabTitle", "Code Details"))
-		.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(), "SessionFrontEnd.Tabs.Tools"))
+		.SetIcon(FSlateIcon(FUPTStyle::GetStyleSetName(), "SessionFrontEnd.Tabs.Tools"))
 		.SetGroup(AppMenuGroup);
 
 	// create tab layout
@@ -78,7 +77,6 @@ void SCodeMgr::Construct(const FArguments& InArgs, const TSharedRef<SDockTab>& C
 				->SetSizeCoefficient(0.25f)
 			)
 		);
-
 
 	ChildSlot
 		[

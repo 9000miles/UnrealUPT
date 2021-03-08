@@ -6,7 +6,6 @@
 #include "Widgets/Docking/SDockTab.h"
 #include "Slate/Public/Framework/Docking/WorkspaceItem.h"
 #include "Slate/Public/Framework/Docking/TabManager.h"
-#include "StandaloneRenderer/Public/StandaloneRenderer.h"
 #include "ISourceCodeAccessModule.h"
 #include "ProjectInfo.h"
 #include "SUPTMainFrame.h"

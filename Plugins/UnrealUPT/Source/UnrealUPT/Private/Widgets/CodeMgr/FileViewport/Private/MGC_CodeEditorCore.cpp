@@ -47,7 +47,7 @@
 //	/*if (!NavigationBar.IsValid()) {
 //	SAssignNew(NavigationBar,SBorder)
 //	.Visibility(this,&SMGC_CodeEditorCore::HiddenIfGraphReadOnly)
-//	.BorderImage(FEditorStyle::GetBrush(TEXT("Graph.TitleBackground")))
+//	.BorderImage(FUPTStyle::GetBrush(TEXT("Graph.TitleBackground")))
 //	.HAlign(HAlign_Fill)
 //	[
 //		SNew(SHorizontalBox)
@@ -68,7 +68,7 @@
 //			//SNew(STextBlock).Margin(8.f)
 //			//.Text(FText::FromString(TEXT("EeeeeeeeeeeeeeEEERPP !!!!")))
 //			//.Text(ViewModel.ToSharedRef(),&FNiagaraScriptGraphViewModel::GetDisplayName)
-//			//.TextStyle(FEditorStyle::Get(),TEXT("GraphBreadcrumbButtonText"))
+//			//.TextStyle(FUPTStyle::Get(),TEXT("GraphBreadcrumbButtonText"))
 //			//.Justification(ETextJustify::Center)
 //		]
 //	];}*/
@@ -77,7 +77,7 @@
 //	/*if (!ToolBox.IsValid()) {
 //		SAssignNew(ToolBox,SBorder)
 //		.Visibility(this,&SMGC_CodeEditorCore::HiddenIfGraphReadOnly)
-//		.BorderImage(FEditorStyle::GetBrush(TEXT("Graph.TitleBackground")))
+//		.BorderImage(FUPTStyle::GetBrush(TEXT("Graph.TitleBackground")))
 //		.HAlign(HAlign_Fill)
 //		[
 //			SNew(SHorizontalBox)
@@ -92,13 +92,13 @@
 //			.VAlign(VAlign_Center)
 //			[
 //				SNew(SButton)
-//				.ButtonStyle(FEditorStyle::Get(),"FlatButton.Default")
+//				.ButtonStyle(FUPTStyle::Get(),"FlatButton.Default")
 //				//.OnClicked(this,&SQLPreviewButtonWidget::OnButtonClicked)
 //				.ForegroundColor(FSlateColor::UseForeground())
 //				.HAlign(HAlign_Fill).VAlign(VAlign_Center)
 //				[
 //					SNew(STextBlock).Margin(FMargin(10.f))
-//					.Font(FEditorStyle::GetFontStyle(TEXT("BoldFont")))
+//					.Font(FUPTStyle::GetFontStyle(TEXT("BoldFont")))
 //					.Text(FText::FromString(TEXT("Click ME !!!")))
 //					.Justification(ETextJustify::Center)
 //					//.ToolTipText(Tooltip)
@@ -122,7 +122,7 @@
 //		[
 //			SNew(SBorder)
 //			.VAlign(VAlign_Fill).HAlign(HAlign_Fill)
-//		.BorderImage(FEditorStyle::GetBrush("ToolPanel.DarkGroupBorder"))
+//		.BorderImage(FUPTStyle::GetBrush("ToolPanel.DarkGroupBorder"))
 //		[
 //			SAssignNew(VS_SCROLL_BOX, SScrollBox)
 //			.OnUserScrolled(this, &SMGC_CodeEditorCore::OnVerticalScroll)
@@ -136,7 +136,7 @@
 //		[
 //			SNew(SBorder)
 //			.VAlign(VAlign_Fill).HAlign(HAlign_Fill)
-//		.BorderImage(FEditorStyle::GetBrush("Graph.Node.Body"))
+//		.BorderImage(FUPTStyle::GetBrush("Graph.Node.Body"))
 //		[
 //			SAssignNew(LINE_COUNTER, SListView<TSharedPtr<FString>>)
 //			.OnSelectionChanged(this, &SMGC_CodeEditorCore::OnSelectedLineCounterItem)
@@ -182,7 +182,7 @@
 //	[
 //		SNew(STextBlock)
 //		.Visibility(this,&SMGC_CodeEditorCore::VisibleIfGraphReadOnly)
-//		.TextStyle(FEditorStyle::Get(),"Graph.SimulatingText")
+//		.TextStyle(FUPTStyle::Get(),"Graph.SimulatingText")
 //		.Text(FText::FromString(TEXT("|PIIIE EeEEERPP !!!!")))
 //		//.Text( PIENotifyText )
 //	]
@@ -333,7 +333,7 @@
 //		SNew(SComboRow<TSharedRef<FString>>, OwnerTable)
 //		[
 //			SNew(SBorder)
-//			.BorderImage(FEditorStyle::GetBrush("Graph.Node.Body"))
+//			.BorderImage(FUPTStyle::GetBrush("Graph.Node.Body"))
 //			.ColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f))
 //			.Padding(FMargin(5.f, 0.f, 5.f, 0.f))
 //			[

@@ -6,6 +6,7 @@
 #include "SProjectUnit.h"
 #include "STextBlock.h"
 #include "SSeparator.h"
+#include "Widgets/UPTStyle.h"
 
 #define LOCTEXT_NAMESPACE "SUnitToolTip"
 
@@ -45,7 +46,7 @@ TSharedRef<SWidget> SUnitToolTip::CreateToolTipWidget()
 
 	return
 		SNew(SBorder)
-		.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+		.BorderImage(FUPTStyle::GetBrush("NoBorder"))
 		.Padding(FMargin(10))
 		[
 			SNew(SVerticalBox)

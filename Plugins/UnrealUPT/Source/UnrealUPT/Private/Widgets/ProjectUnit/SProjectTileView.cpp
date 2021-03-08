@@ -6,6 +6,7 @@
 #include "UPTDefine.h"
 #include "EditorStyleSet.h"
 #include "UPTManager.h"
+#include "Widgets/UPTStyle.h"
 
 #define LOCTEXT_NAMESPACE "SProjectTileView"
 
@@ -15,7 +16,7 @@ void SProjectTileView::Construct(const FArguments& InArgs, TArray<TSharedPtr<FPr
 	[
 		SNew(SBorder)
 		.Padding(FMargin(10))
-		.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+		.BorderImage(FUPTStyle::GetBrush("NoBorder"))
 		[
 			SAssignNew(TileView, STileView<TSharedPtr<SProjectUnit>>)
 			.ItemWidth(PROJECT_UNIT_WIDTH)
@@ -44,7 +45,7 @@ void SProjectTileView::Refresh(TArray<TSharedPtr<FProjectInfo>> Infos)
 
 void SProjectTileView::CreateUnits(TArray<TSharedPtr<FProjectInfo>> Infos)
 {
-	//工程根据名字排序
+	//宸ョ▼鏍规嵁鍚嶅瓧鎺掑簭
 	Infos.Sort([](const TSharedPtr<FProjectInfo>& A, const TSharedPtr<FProjectInfo>& B) -> bool { return A->GetProjectName() < B->GetProjectName(); });
 
 	for (TSharedPtr<FProjectInfo> Info : Infos)
@@ -72,7 +73,6 @@ TSharedPtr<SWidget> SProjectTileView::MakeProjectContextMenu()
 
 	return SNullWidget::NullWidget;
 }
-
 
 void SProjectTileView::OnSelectionChanged(TSharedPtr<SProjectUnit> Unit, ESelectInfo::Type Type)
 {

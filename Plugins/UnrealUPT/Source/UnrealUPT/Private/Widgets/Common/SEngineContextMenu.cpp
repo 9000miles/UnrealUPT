@@ -4,6 +4,7 @@
 #include "SlateOptMacros.h"
 #include "EditorStyleSet.h"
 #include "PrintHelper.h"
+#include "Widgets/UPTStyle.h"
 
 #define LOCTEXT_NAMESPACE "SSEngineContextMenu"
 
@@ -19,7 +20,7 @@ void SSEngineContextMenu::Construct(const FArguments& InArgs, const FString Engi
 	MenuBuilder.AddMenuEntry(
 		LOCTEXT("OpenEngine", "Open Engine"),
 		LOCTEXT("OpenEngineTip", "Open Engine"),
-		FSlateIcon(FEditorStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),
+		FSlateIcon(FUPTStyle::GetStyleSetName(), "CodeBrowser.NewFolderIcon"),
 		FUIAction(
 			FExecuteAction::CreateLambda([EnginePath]() { PRINT_LOG(EnginePath); }),
 			FCanExecuteAction()

@@ -13,7 +13,7 @@ class FCreateCodeFileCommand : public TCommands<FCreateCodeFileCommand>
 {
 public:
 	FCreateCodeFileCommand()
-		: TCommands<FCreateCodeFileCommand>(TEXT("CreateCodeFile"), NSLOCTEXT("Contexts", "FCreateCodeFileCommand", "FCreateCodeFileCommandCommands"), NAME_None, FEditorStyle::GetStyleSetName())
+		: TCommands<FCreateCodeFileCommand>(TEXT("CreateCodeFile"), NSLOCTEXT("Contexts", "FCreateCodeFileCommand", "FCreateCodeFileCommandCommands"), NAME_None, FUPTStyle::GetStyleSetName())
 	{}
 	void RegisterCommands() override;
 

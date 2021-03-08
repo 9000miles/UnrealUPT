@@ -6,6 +6,7 @@
 #include "AppFramework/Public/Widgets/Workflow/SWizard.h"
 #include "CreateCodeDefine.h"
 #include "SEditableTextBox.h"
+#include "SComboBox.h"
 DECLARE_DELEGATE_ThreeParams(FOnRequestNewFile, const FString& /*OutputDirectory*/, const FString& /*ClassPath*/, const FString& /* ErrorCallback */);
 
 /**

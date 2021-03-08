@@ -9,7 +9,6 @@
 
 void FUnrealUPTModule::StartupModule()
 {
-	PRINT_ERROR("");
 	FUPTStyle::Initialize();
 	FUPTStyle::ReloadTextures();
 	FUPTCommands::Register();

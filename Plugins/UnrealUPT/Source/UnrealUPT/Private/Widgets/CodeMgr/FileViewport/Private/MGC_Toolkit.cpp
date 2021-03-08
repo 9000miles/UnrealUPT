@@ -66,7 +66,7 @@
 //	BindCommands();*/
 //	//
 //	/*ToolBoxWidget = SNew(SBorder)
-//		.BorderImage(FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
+//		.BorderImage(FUPTStyle::GetBrush("ToolPanel.GroupBorder"))
 //		.Padding(0.f);*/
 //	//
 //	//
@@ -167,7 +167,7 @@
 //		[
 //			SNew(STextBlock).Text(Label)
 //			.Visibility(EVisibility::HitTestInvisible)
-//			.TextStyle(FEditorStyle::Get(),"Graph.CornerText")
+//			.TextStyle(FUPTStyle::Get(),"Graph.CornerText")
 //		]
 //	];
 //}
@@ -196,7 +196,7 @@
 //		[
 //			SNew(STextBlock).Text(Label)
 //			.Visibility(EVisibility::HitTestInvisible)
-//			.TextStyle(FEditorStyle::Get(),"Graph.CornerText")
+//			.TextStyle(FUPTStyle::Get(),"Graph.CornerText")
 //		]
 //	];
 //}
@@ -225,7 +225,7 @@
 //		[
 //			SNew(STextBlock).Text(Label)
 //			.Visibility(EVisibility::HitTestInvisible)
-//			.TextStyle(FEditorStyle::Get(),"Graph.CornerText")
+//			.TextStyle(FUPTStyle::Get(),"Graph.CornerText")
 //		]
 //	];
 //}
@@ -234,7 +234,7 @@
 //	TSharedPtr<FMGC_Toolkit>FCodeEditor = SharedThis(this);
 //	//
 //	return SNew(SDockTab)
-//	.Icon(FEditorStyle::GetBrush("LevelEditor.Tabs.Details"))
+//	.Icon(FUPTStyle::GetBrush("LevelEditor.Tabs.Details"))
 //	.Label(LOCTEXT("MGC_DetailsTitle","Details"))
 //	[
 //		SNew(SMGC_PropertyTab,FCodeEditor)
@@ -247,22 +247,22 @@
 //	FAssetEditorToolkit::RegisterTabSpawners(TBManager);
 //	//
 //	TBManager->RegisterTabSpawner(FCodeEditorTAB::TAB_Details,FOnSpawnTab::CreateSP(this,&FMGC_Toolkit::TABSpawn_Details))
-//	.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
+//	.SetIcon(FSlateIcon(FUPTStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
 //	.SetDisplayName(LOCTEXT("MGC_Details_TabName","Details"))
 //	.SetGroup(WorkspaceMenuCategoryRef);
 //	//
 //	TBManager->RegisterTabSpawner(FCodeEditorTAB::TAB_Script,FOnSpawnTab::CreateSP(this,&FMGC_Toolkit::TABSpawn_Script))
-//	.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
+//	.SetIcon(FSlateIcon(FUPTStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
 //	.SetDisplayName(LOCTEXT("MGC_Script_TabName","Script"))
 //	.SetGroup(WorkspaceMenuCategoryRef);
 //	//
 //	TBManager->RegisterTabSpawner(FCodeEditorTAB::TAB_Header,FOnSpawnTab::CreateSP(this,&FMGC_Toolkit::TABSpawn_Header))
-//	.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
+//	.SetIcon(FSlateIcon(FUPTStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
 //	.SetDisplayName(LOCTEXT("MGC_Header_TabName","Header"))
 //	.SetGroup(WorkspaceMenuCategoryRef);
 //	//
 //	TBManager->RegisterTabSpawner(FCodeEditorTAB::TAB_Types,FOnSpawnTab::CreateSP(this,&FMGC_Toolkit::TABSpawn_Types))
-//	.SetIcon(FSlateIcon(FEditorStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
+//	.SetIcon(FSlateIcon(FUPTStyle::GetStyleSetName(),"LevelEditor.Tabs.Viewports"))
 //	.SetDisplayName(LOCTEXT("MGC_Types_TabName","Types"))
 //	.SetGroup(WorkspaceMenuCategoryRef);
 //}

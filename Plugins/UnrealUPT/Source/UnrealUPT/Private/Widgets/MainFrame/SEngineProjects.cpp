@@ -15,6 +15,7 @@
 #include "PrintHelper.h"
 #include "SNotificationList.h"
 #include "UPTDelegateCenter.h"
+#include "Widgets/UPTStyle.h"
 
 #define LOCTEXT_NAMESPACE "SEngineProjects"
 void SEngineProjects::Construct(const FArguments& InArgs)
@@ -41,7 +42,7 @@ void SEngineProjects::Refresh(TArray<TSharedPtr<FProjectInfo>>& Projects)
 	ProjectTileView->Refresh(Projects);
 }
 
-void SEngineProjects::Init(TArray<TSharedPtr<FProjectInfo>> &Projects)
+void SEngineProjects::Init(TArray<TSharedPtr<FProjectInfo>>& Projects)
 {
 	ProjectCount = Projects.Num();
 	if (Projects.Num() > 0)
@@ -55,7 +56,7 @@ TSharedRef<SWidget> SEngineProjects::CreateProjectsHeader()
 	return
 	SNew(SBorder)
 	.Padding(FMargin(5))
-	.BorderImage(FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
+	.BorderImage(FUPTStyle::GetBrush("ToolPanel.GroupBorder"))
 	[
 		SNew(SHorizontalBox)
 		+ SHorizontalBox::Slot()
@@ -110,15 +111,15 @@ FReply SEngineProjects::OpenEngine()
 		FString ExeFilename;
 		ExeFilename = EnginePath + "/Engine/Binaries/Win64/UE4Editor.exe";
 
-		//判断UE4Editor.exe是否存在
+		//鍒ゆ柇UE4Editor.exe鏄惁瀛樺湪
 		if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*ExeFilename))
 		{
 			PRINT_ERROR("Engine path is error");
 			return FReply::Unhandled();
 		}
 
-	#if PLATFORM_WINDOWS
-		//使用CMD打开引擎
+#if PLATFORM_WINDOWS
+		//浣跨敤CMD鎵撳紑寮曟搸
 		FProcHandle Handle = FPlatformProcess::CreateProc(*ExeFilename, TEXT(""), true, false, false, NULL, 0, NULL, NULL);
 		if (!Handle.IsValid())
 		{
@@ -134,7 +135,7 @@ FReply SEngineProjects::OpenEngine()
 
 		if (FUPTDelegateCenter::OnRequestAddNotification.IsBound())
 			FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
-	#endif
+#endif
 	}
 	return FReply::Unhandled();
 }
