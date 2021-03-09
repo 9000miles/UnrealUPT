@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "UPTProjectGameModeBase.generated.h"
+#include "UPTProgramGameModeBase.generated.h"
 
 /**
  *
