@@ -5,15 +5,12 @@
 #include "SButton.h"
 #include "Kismet/GameplayStatics.h"
 #include "PrintHelper.h"
+#include "Manager/UPTDelegateCenter.h"
 
 void UUPTGameInstance::OnStartInitialize()
 {
 	UPTLaucher = MakeShared<FUPTLaucher>();
 	UPTLaucher->Initialize();
-
-	FSpawnTabArgs Arg(nullptr, FTabId());
-
-	TSharedPtr<SWidget> Content = UPTLaucher->CreateWidget();
 
 	APlayerController* Player = UGameplayStatics::GetPlayerController(this, 0);
 	Player->SetShowMouseCursor(true);
@@ -21,8 +18,10 @@ void UUPTGameInstance::OnStartInitialize()
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	Player->SetInputMode(InputMode);
 
-	//Content = SNew(SButton);
-	GEngine->GameViewport->AddViewportWidgetContent(Content.ToSharedRef());
+	FUPTDelegateCenter::OnExit.AddLambda([this, Player]()
+		{
+			UKismetSystemLibrary::QuitGame(GetWorld(), Player, EQuitPreference::Quit, false);
+		});
 }
 
 void UUPTGameInstance::Shutdown()

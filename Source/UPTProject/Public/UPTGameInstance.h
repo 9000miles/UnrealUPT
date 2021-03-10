@@ -15,23 +15,17 @@ UCLASS()
 class UPTPROJECT_API UUPTGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-
-private:
-	TSharedPtr<FUPTLaucher> UPTLaucher;
 public:
-	void Shutdown() override; 
+	void Shutdown() override;
 
 #if WITH_EDITOR
 	FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params) override;
 #endif
 	void StartGameInstance() override;
 
-
-
-	            
-
 protected:
 	void OnStartInitialize();
 
-
+private:
+	TSharedPtr<FUPTLaucher> UPTLaucher;
 };

@@ -15,21 +15,17 @@ public:
 	void Initialize();
 	void Shutdown();
 
-	void SetProjectDir();
-	TSharedRef<SDockTab> SpawnMainTab(const FSpawnTabArgs& Args, FName TabIdentifier);
-
 	TSharedPtr<SWidget> CreateWidget();
 
 	void OnRefreshMainFrame();
 	void CreateMainFrameWindow();
-	void StartupMainFrame();
-
-	void SetAppIcon();
 
 	void OnExit();
 
 private:
+	void OnWindowClose(const TSharedRef<SWindow>& Window);
+
+private:
 	TArray<TSharedPtr<FProjectInfo>> ProjectInfos;
-	TSharedPtr<FTabManager> UPTTabManager;
 	TSharedPtr<SUPTMainFrame> UPTMainFrame;
 };

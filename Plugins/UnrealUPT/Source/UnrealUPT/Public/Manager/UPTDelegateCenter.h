@@ -6,7 +6,7 @@
 #include "ProjectInfo.h"
 #include "SNotificationList.h"
 
-class FUPTDelegateCenter
+class UNREALUPT_API FUPTDelegateCenter
 {
 public:
 	DECLARE_DELEGATE_OneParam(FOnProjectOperation, TSharedRef<FProjectInfo> /*ProjectInfo*/);

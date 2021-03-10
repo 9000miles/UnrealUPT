@@ -372,14 +372,17 @@ bool FUPTManager::OpenCodeIDE(TSharedRef<FProjectInfo> Info)
 	}
 
 	ISourceCodeAccessModule& SourceCodeAccessModule = FModuleManager::LoadModuleChecked<ISourceCodeAccessModule>("SourceCodeAccess");
-	bool bCanOpenProjectSolution = SourceCodeAccessModule.GetAccessor().OpenSolutionAtPath(FPaths::Combine(SolutionFolder, SolutionFilenameWithoutExtension));
+	FString Filename = FPaths::Combine(SolutionFolder, SolutionFilenameWithoutExtension);
+	bool bCanOpenProjectSolution = SourceCodeAccessModule.GetAccessor().OpenSolutionAtPath(Filename);
 
+	//  !!! false
 	if (!bCanOpenProjectSolution)
 	{
 		FFormatNamedArguments Args;
 		Args.Add(TEXT("AccessorName"), SourceCodeAccessModule.GetAccessor().GetNameText());
 		OutFailReason = FText::Format(LOCTEXT("OpenCodeIDE_FailedToOpen", "Failed to open selected source code accessor '{AccessorName}'"), Args);
 		UE_LOG(UPTLog, Log, TEXT("Could not find file for image: %s"), *(OutFailReason.ToString()));
+		//  !!! UPTLog: Could not find file for image: Failed to open selected source code accessor 'None'
 		return false;
 	}
 

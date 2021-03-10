@@ -8,6 +8,7 @@ public class UPTProject : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         OptimizeCode = CodeOptimization.Never;
+
         PublicDependencyModuleNames.AddRange(
             new string[] {
                 "Core",
@@ -17,17 +18,14 @@ public class UPTProject : ModuleRules
                 "UnrealUPT",
             });
 
-        PrivateDependencyModuleNames.AddRange(
-            new string[] {
-                "PrintHelper",
-            });
-
         // Uncomment if you are using Slate UI
         PrivateDependencyModuleNames.AddRange(
             new string[] {
                 "Slate",
                 "SlateCore",
-                "UMG"
+                "UMG",
+                "PrintHelper",
+                "ApplicationCore",
             });
 
         // Uncomment if you are using online features
