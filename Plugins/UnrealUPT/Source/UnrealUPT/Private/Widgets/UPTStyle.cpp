@@ -67,6 +67,7 @@ TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 	Style->Set("UPT.Tab.NotFound", new IMAGE_BRUSH(TEXT("NotFound"), Icon16x16));
 
 	FLinearColor DimBackground = FLinearColor(FColor(64, 64, 64));
+	FLinearColor Active = FLinearColor(FColor(241, 255, 64));
 	FLinearColor DimBackgroundHover = FLinearColor(FColor(50, 50, 50));
 	FLinearColor DarkBackground = FLinearColor(FColor(42, 42, 42));
 	Style->Set("UPT.PlacementBrowser.Tab", FCheckBoxStyle()
@@ -74,7 +75,7 @@ TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 		.SetUncheckedImage(BOX_BRUSH("Tab/Selection", 8.0f / 32.0f, DimBackground))
 		.SetUncheckedPressedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f))
 		.SetUncheckedHoveredImage(BOX_BRUSH("Tab/Selection", 8.0f / 32.0f, DimBackgroundHover))
-		.SetCheckedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f))
+		.SetCheckedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f,Active))
 		.SetCheckedHoveredImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f))
 		.SetCheckedPressedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f))
 		.SetPadding(8));
