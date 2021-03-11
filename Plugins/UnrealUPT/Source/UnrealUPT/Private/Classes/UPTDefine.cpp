@@ -1,5 +1,6 @@
 #include "UPTDefine.h"
 #include "App.h"
+#include "IPluginManager.h"
 
 const FString Get_UPT_Resource()
 {
@@ -10,9 +11,11 @@ const FString Get_UPT_Resource()
 	LaunchDir = FPaths::ConvertRelativePathToFull(FPaths::SourceConfigDir());
 	LaunchDir = FPaths::ConvertRelativePathToFull(FPaths::GameSourceDir());
 
-	FString ProjectDir = FPaths::ProjectDir();
-	FString ProjectPath = FString::Printf(TEXT("Programs/%s/"), FApp::GetProjectName());
-	FString ResourcePath = FString::Printf(TEXT("Source/Programs/%s/Resources"), FApp::GetProjectName());
-	FString ResourceDir = ProjectDir.Replace(*ProjectPath, *ResourcePath);
+	//FString ProjectDir = FPaths::ProjectDir();
+	//FString ProjectPath = FString::Printf(TEXT("Programs/%s/"), FApp::GetProjectName());
+	//FString ResourcePath = FString::Printf(TEXT("Source/Programs/%s/Resources"), FApp::GetProjectName());
+	//FString ResourceDir = ProjectDir.Replace(*ProjectPath, *ResourcePath);
+
+	FString ResourceDir = IPluginManager::Get().FindPlugin(TEXT("UnrealUPT"))->GetBaseDir() / TEXT("Resources");
 	return FPaths::ConvertRelativePathToFull(ResourceDir);
 }

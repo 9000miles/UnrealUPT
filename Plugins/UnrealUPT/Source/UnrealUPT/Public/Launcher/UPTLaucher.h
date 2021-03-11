@@ -13,6 +13,7 @@ class UNREALUPT_API FUPTLaucher
 {
 public:
 	void Initialize();
+	void SetAppIcon();
 	void Shutdown();
 
 	TSharedPtr<SWidget> CreateWidget();

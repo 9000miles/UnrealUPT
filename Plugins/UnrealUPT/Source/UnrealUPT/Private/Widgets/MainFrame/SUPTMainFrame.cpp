@@ -32,7 +32,7 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 	SAssignNew(EngineProjects, SEngineProjects);
 
 	ChildSlot
-		.Padding(FMargin(2))
+		//.Padding(FMargin(2))
 		[
 			SNew(SOverlay)
 			+ SOverlay::Slot()

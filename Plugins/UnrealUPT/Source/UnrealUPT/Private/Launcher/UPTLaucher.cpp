@@ -6,6 +6,7 @@
 #include "UPTManager.h"
 #include "Menu/UPTMenuBar.h"
 #include "Menu/UPTToolBar.h"
+#include "Widgets/UPTStyle.h"
 
 #define LOCTEXT_NAMESPACE "UnrealProgrammerTool"
 
@@ -18,10 +19,15 @@ void FUPTLaucher::Initialize()
 {
 	FUPTManager::Get()->Initialize();
 	ProjectInfos = FUPTManager::Get()->GetAllProjectInfos();
-
+	SetAppIcon();
 	CreateMainFrameWindow();
 
 	FUPTDelegateCenter::OnRefresh.BindRaw(this, &FUPTLaucher::OnRefreshMainFrame);
+}
+
+void FUPTLaucher::SetAppIcon()
+{
+	FSlateApplication::Get().SetAppIcon(FUPTStyle::Get().GetBrush("UPT.AppIcon"));
 }
 
 void FUPTLaucher::Shutdown()
@@ -35,13 +41,13 @@ TSharedPtr<SWidget> FUPTLaucher::CreateWidget()
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
-		.Padding(FMargin(2, 0))
+		//.Padding(FMargin(2, 0))
 		[
 			FUPTMenuBar::MakeMenuBar()
 		]
 	+ SVerticalBox::Slot()
 		.AutoHeight()
-		.Padding(FMargin(2, 2))
+		//.Padding(FMargin(2, 2))
 		[
 			FUPTToolBar::MakeUPTToolBar()
 		]
@@ -71,7 +77,8 @@ void FUPTLaucher::CreateMainFrameWindow()
 
 	TSharedRef<SWindow> Window = SNew(SWindow)
 		.Type(EWindowType::GameWindow)
-		//.Style(bUseBorderlessWindow ? &BorderlessStyle : &FCoreStyle::Get().GetWidgetStyle<FWindowStyle>("Window"))
+		//.Style(&FWindowStyle::GetDefault())
+		.Style(&FCoreStyle::Get().GetWidgetStyle<FWindowStyle>("Window"))
 		.ClientSize(FVector2D(ResX, ResY))
 		.AdjustInitialSizeAndPositionForDPIScale(true)
 		.Title(FText::FromString(TEXT("Unreal Programmer Tool")))

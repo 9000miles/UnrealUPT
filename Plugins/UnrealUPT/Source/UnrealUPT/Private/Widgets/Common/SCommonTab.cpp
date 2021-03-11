@@ -77,7 +77,7 @@ TSharedRef<SWidget> SCommonTab::CreateTab(FString TabName)
 	const FSlateBrush* SourceBinaryBrush = GetSourceOrBinaryImage(TabName, bSourceEngine);
 	return
 		SNew(SCheckBox)
-		.Style(FUPTStyle::Get(), "PlacementBrowser.Tab")
+		.Style(FUPTStyle::Get(), "UPT.PlacementBrowser.Tab")
 		.OnCheckStateChanged(this, &SCommonTab::OnEngineTabChanged, TabName)
 		.IsChecked(this, &SCommonTab::GetEngineTabCheckedState, TabName)
 		.ToolTipText(this, &SCommonTab::TabToolTipText, TabName, bSourceEngine)
@@ -137,7 +137,7 @@ const FSlateBrush* SCommonTab::GetActiveTabIamge(FString EngineVersion) const
 {
 	if (ActiveEngineTab == EngineVersion)
 	{
-		static FName PlacementBrowserActiveTabBarBrush("PlacementBrowser.ActiveTabBar");
+		static FName PlacementBrowserActiveTabBarBrush("UPT.PlacementBrowser.ActiveTabBar");
 		return FUPTStyle::GetBrush(PlacementBrowserActiveTabBarBrush);
 	}
 	else
