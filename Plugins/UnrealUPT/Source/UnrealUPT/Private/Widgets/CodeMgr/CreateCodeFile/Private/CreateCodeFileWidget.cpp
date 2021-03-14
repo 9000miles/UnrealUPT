@@ -89,7 +89,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 					.OnFinished(this, &SCreateCodeFileWidget::OnClickFinish)
 					.InitialPageIndex(0)
 					
-		// Error message at bottom
+					// Error message at bottom
 					.PageFooter()
 					[
 						SNew(SBorder)
@@ -123,7 +123,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 					[
 						SNew(SVerticalBox)
 						
-			// Title
+						// Title
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						.Padding(0)
@@ -133,7 +133,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 							.Text(LOCTEXT("NewModule_Title", "New File"))
 						]
 						
-	// Title spacer
+						// Title spacer
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						.Padding(0, 2, 0, 8)
@@ -141,7 +141,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 							SNew(SSeparator)
 						]
 						
-	// Page description and view options
+						// Page description and view options
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						.Padding(0, 10)
@@ -159,7 +159,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 							]
 						]
 						
-	// First page: name module, module type, and loading phase
+						// First page: name module, module type, and loading phase
 						+ SVerticalBox::Slot()
 						.Padding(2, 2)
 						.AutoHeight()
@@ -176,7 +176,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 								.AutoHeight()
 								.VAlign(VAlign_Center)
 								[
-			// Gray details panel
+									// Gray details panel
 									SNew(SBorder)
 									.BorderImage(FUPTStyle::GetBrush("DetailsView.CategoryTop"))
 									.BorderBackgroundColor(FLinearColor(0.6f, 0.6f, 0.6f, 1.0f))
@@ -191,7 +191,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 											SNew(SGridPanel)
 											.FillColumn(1, 1.0f)
 											
-		// Name label
+											// Name label
 											+ SGridPanel::Slot(0, 1)
 											.VAlign(VAlign_Center)
 											.Padding(0, 0, 12, 0)
@@ -201,7 +201,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 												.Text(LOCTEXT("CreateModule_NameLabel", "Parent"))
 											]
 											
-	// Name edit box
+											// Name edit box
 											+ SGridPanel::Slot(1, 1)
 											.Padding(0.0f, 3.0f)
 											.VAlign(VAlign_Center)
@@ -212,7 +212,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 													SAssignNew(ParentEditBox, SEditableTextBox)
 												]
 											]
-	// Host type and loading phase
+											// Host type and loading phase
 											+ SGridPanel::Slot(2, 1)
 											.Padding(0.0f, 3.0f)
 											.VAlign(VAlign_Center)
@@ -221,7 +221,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 												.HeightOverride(EditableTextHeight)
 												[
 													SNew(SHorizontalBox)
-			// Host type
+													// Host type
 													+ SHorizontalBox::Slot()
 													.AutoWidth()
 													.Padding(6.0f, 0.0f, 0.0f, 0.0f)
@@ -239,7 +239,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 														]
 													]
 													
-	// Cpp Directory
+													// Cpp Directory
 													+ SHorizontalBox::Slot()
 													.AutoWidth()
 													.Padding(6.0f, 0.0f, 0.0f, 0.0f)
@@ -259,7 +259,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 												
 											]
 											
-	// H Path label
+											// H Path label
 											+ SGridPanel::Slot(0, 2)
 											.VAlign(VAlign_Center)
 											.Padding(0, 0, 12, 0)
@@ -268,7 +268,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 												.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
 												.Text(LOCTEXT("CreateModule_PathLabel", "H Path"))
 											]
-	// Path edit box
+											// Path edit box
 											+ SGridPanel::Slot(1, 2)
 											.VAlign(VAlign_Center)
 											[
@@ -290,7 +290,7 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 													]
 												]
 											]
-	// Choose folder button
+											// Choose folder button
 											+ SGridPanel::Slot(2, 2)
 											.Padding(0.0f, 3.0f)
 											.VAlign(VAlign_Center)
@@ -306,66 +306,66 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 													[
 														SNew(SButton)
 														.VAlign(VAlign_Center)
-		//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
+														//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
 														.ToolTipText(LOCTEXT("CreateModule_ChooseFolderTooltip", "You can choose either the 'Source' folder in your project's root directory or of any plugin in the 'Plugins' folder."))
 														.Text(LOCTEXT("BrowseButtonText", "Choose folder"))
 													]
 												]
 											]
 											
-	//// CPP Path edit box
-	//+ SGridPanel::Slot(0, 3)
-	//	.VAlign(VAlign_Center)
-	//	.Padding(0, 0, 12, 0)
-	//	[
-	//		SNew(STextBlock)
-	//		.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
-	//	.Text(LOCTEXT("CreateModule_PathLabel_Cpp", "Cpp Path"))
-	//	]
-	//+ SGridPanel::Slot(1, 3)
-	//	.VAlign(VAlign_Center)
-	//	[
-	//		SNew(SVerticalBox)
-	//		+ SVerticalBox::Slot()
-	//	.Padding(0)
-	//	.AutoHeight()
-	//	[
-	//		SNew(SBox)
-	//		.HeightOverride(EditableTextHeight)
-	//	[
-	//		SNew(SHorizontalBox)
+											//// CPP Path edit box
+											//+ SGridPanel::Slot(0, 3)
+											//	.VAlign(VAlign_Center)
+											//	.Padding(0, 0, 12, 0)
+											//	[
+												//		SNew(STextBlock)
+												//		.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
+												//	.Text(LOCTEXT("CreateModule_PathLabel_Cpp", "Cpp Path"))
+											//	]
+											//+ SGridPanel::Slot(1, 3)
+											//	.VAlign(VAlign_Center)
+											//	[
+												//		SNew(SVerticalBox)
+												//		+ SVerticalBox::Slot()
+												//	.Padding(0)
+												//	.AutoHeight()
+												//	[
+													//		SNew(SBox)
+													//		.HeightOverride(EditableTextHeight)
+													//	[
+														//		SNew(SHorizontalBox)
 														
-	//		+ SHorizontalBox::Slot()
-	//	.FillWidth(1.0f)
-	//	[
-	//		SAssignNew(CppPathEditBox, SEditableTextBox)
-	//	]
-	//	]
-	//	]
-	//	]
-	// Choose folder button
-	//+SGridPanel::Slot(2, 3)
-	//	.Padding(0.0f, 3.0f)
-	//	.VAlign(VAlign_Center)
-	//	[
-	//		SNew(SBox)
-	//		.HeightOverride(EditableTextHeight)
-	//	[
-	//		SNew(SHorizontalBox)
-	//		+ SHorizontalBox::Slot()
-	//	.FillWidth(1.f)
-	//	.HAlign(HAlign_Fill)
-	//	.Padding(6.0f, 0.0f, 0.0f, 0.0f)
-	//	[
-	//		SNew(SButton)
-	//		.VAlign(VAlign_Center)
-	//	//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
-	//	.ToolTipText(LOCTEXT("CreateModule_ChooseFolderTooltip", "You can choose either the 'Source' folder in your project's root directory or of any plugin in the 'Plugins' folder."))
-	//	.Text(LOCTEXT("BrowseButtonText", "Choose folder"))
-	//	]
-	//	]
-	//	]
-	//	]
+														//		+ SHorizontalBox::Slot()
+														//	.FillWidth(1.0f)
+														//	[
+															//		SAssignNew(CppPathEditBox, SEditableTextBox)
+														//	]
+													//	]
+												//	]
+											//	]
+											// Choose folder button
+											//+SGridPanel::Slot(2, 3)
+											//	.Padding(0.0f, 3.0f)
+											//	.VAlign(VAlign_Center)
+											//	[
+												//		SNew(SBox)
+												//		.HeightOverride(EditableTextHeight)
+												//	[
+													//		SNew(SHorizontalBox)
+													//		+ SHorizontalBox::Slot()
+													//	.FillWidth(1.f)
+													//	.HAlign(HAlign_Fill)
+													//	.Padding(6.0f, 0.0f, 0.0f, 0.0f)
+													//	[
+														//		SNew(SButton)
+														//		.VAlign(VAlign_Center)
+														//	//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
+														//	.ToolTipText(LOCTEXT("CreateModule_ChooseFolderTooltip", "You can choose either the 'Source' folder in your project's root directory or of any plugin in the 'Plugins' folder."))
+														//	.Text(LOCTEXT("BrowseButtonText", "Choose folder"))
+													//	]
+												//	]
+											//	]
+//	]
 									]
 								]
 							]
