@@ -2,6 +2,4 @@
 
 void SCodeDetails::Construct(const FArguments& InArgs)
 {
-
 }
-

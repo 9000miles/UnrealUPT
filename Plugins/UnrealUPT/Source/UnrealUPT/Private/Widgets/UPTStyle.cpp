@@ -75,7 +75,7 @@ TSharedRef< FSlateStyleSet > FUPTStyle::Create()
 		.SetUncheckedImage(BOX_BRUSH("Tab/Selection", 8.0f / 32.0f, DimBackground))
 		.SetUncheckedPressedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f))
 		.SetUncheckedHoveredImage(BOX_BRUSH("Tab/Selection", 8.0f / 32.0f, DimBackgroundHover))
-		.SetCheckedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f,Active))
+		.SetCheckedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f, Active))
 		.SetCheckedHoveredImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f))
 		.SetCheckedPressedImage(BOX_BRUSH("Tab/TabActive", 8.0f / 32.0f))
 		.SetPadding(8));

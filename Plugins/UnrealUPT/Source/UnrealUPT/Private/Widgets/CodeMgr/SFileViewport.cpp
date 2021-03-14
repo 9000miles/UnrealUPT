@@ -2,6 +2,4 @@
 
 void SFileViewport::Construct(const FArguments& InArgs)
 {
-
 }
-

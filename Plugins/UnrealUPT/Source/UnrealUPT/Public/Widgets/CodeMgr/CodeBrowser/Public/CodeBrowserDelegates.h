@@ -11,9 +11,6 @@ struct FARFilter;
 struct FCollectionNameType;
 class FUICommandList;
 
-
-
-
 struct CONTENTBROWSER_API FMovedContentFolder
 {
 	FString OldPath;
@@ -29,10 +26,10 @@ DECLARE_DELEGATE_OneParam(FOnFindInAssetTreeRequested, const TArray<FFileData>& 
 DECLARE_DELEGATE_OneParam(FOnAssetRenameCommitted, const TArray<FFileData>& /*Assets*/);
 
 /** Called when a collection is selected in the collections view */
-DECLARE_DELEGATE_OneParam( FOnCollectionSelected, const FCollectionNameType& /*SelectedCollection*/);
+DECLARE_DELEGATE_OneParam(FOnCollectionSelected, const FCollectionNameType& /*SelectedCollection*/);
 
 /** Called to retrieve the tooltip for the specified asset */
-DECLARE_DELEGATE_RetVal_OneParam( TSharedRef< SToolTip >, FConstructToolTipForAsset, const FFileData& /*Asset*/);
+DECLARE_DELEGATE_RetVal_OneParam(TSharedRef< SToolTip >, FConstructToolTipForAsset, const FFileData& /*Asset*/);
 
 /** Called to check if an asset should be filtered out by external code. Return true to exclude the asset from the view. */
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnShouldFilterAsset, const FFileData& /*AssetData*/);
@@ -41,13 +38,13 @@ DECLARE_DELEGATE_RetVal_OneParam(bool, FOnShouldFilterAsset, const FFileData& /*
 DECLARE_DELEGATE_RetVal_TwoParams(bool, FOnShouldDisplayAssetTag, FName /*AssetType*/, FName /*TagName*/);
 
 /** Called to clear the selection of the specified assetdata or all selection if an invalid assetdata is passed */
-DECLARE_DELEGATE( FClearSelectionDelegate );
+DECLARE_DELEGATE(FClearSelectionDelegate);
 
 /** Called when thumbnail scale changes and the thumbnail scale is bound to a delegate */
-DECLARE_DELEGATE_OneParam( FOnThumbnailScaleChanged, const float /*NewScale*/);
+DECLARE_DELEGATE_OneParam(FOnThumbnailScaleChanged, const float /*NewScale*/);
 
 /** Called to retrieve an array of the currently selected asset data */
-DECLARE_DELEGATE_RetVal( TArray< FFileData >, FGetCurrentSelectionDelegate );
+DECLARE_DELEGATE_RetVal(TArray< FFileData >, FGetCurrentSelectionDelegate);
 
 /** Called to retrieve an array of the currently selected asset data */
 DECLARE_DELEGATE_OneParam(FSyncToAssetsDelegate, const TArray< FFileData >& /*AssetData*/);
@@ -62,7 +59,7 @@ DECLARE_DELEGATE_OneParam(FSetARFilterDelegate, const FARFilter& /*NewFilter*/);
 DECLARE_DELEGATE_OneParam(FSetPathPickerPathsDelegate, const TArray<FString>& /*NewPaths*/);
 
 /** Called to adjust the selection from the current assetdata, should be +1 to increment or -1 to decrement */
-DECLARE_DELEGATE_OneParam( FAdjustSelectionDelegate, const int32 /*direction*/ );
+DECLARE_DELEGATE_OneParam(FAdjustSelectionDelegate, const int32 /*direction*/);
 
 /** Called when an asset is selected in the asset view */
 DECLARE_DELEGATE_OneParam(FOnAssetSelected, const FFileData& /*AssetData*/);
@@ -74,7 +71,7 @@ DECLARE_DELEGATE_TwoParams(FOnAssetsActivated, const TArray<FFileData>& /*Activa
 DECLARE_DELEGATE_RetVal_OneParam(FReply, FOnAssetDragged, const TArray<FFileData>& /*AssetData*/);
 
 /** Called when an asset is clicked on in the asset view */
-DECLARE_DELEGATE_OneParam( FOnAssetClicked, const FFileData& /*AssetData*/ );
+DECLARE_DELEGATE_OneParam(FOnAssetClicked, const FFileData& /*AssetData*/);
 
 /** Called when an asset is double clicked in the asset view */
 DECLARE_DELEGATE_OneParam(FOnAssetDoubleClicked, const FFileData& /*AssetData*/);
@@ -110,7 +107,7 @@ DECLARE_DELEGATE_RetVal_ThreeParams(TSharedPtr<SWidget>, FOnGetFolderContextMenu
 DECLARE_DELEGATE_RetVal_OneParam(bool, FOnIsAssetValidForCustomToolTip, FFileData& /*AssetData*/);
 
 /** Called to request a custom asset item tooltip */
-DECLARE_DELEGATE_RetVal_OneParam( TSharedRef<SToolTip>, FOnGetCustomAssetToolTip, FFileData& /*AssetData*/);
+DECLARE_DELEGATE_RetVal_OneParam(TSharedRef<SToolTip>, FOnGetCustomAssetToolTip, FFileData& /*AssetData*/);
 
 /** Called to get string/text value for a custom column, will get converted as necessary */
 DECLARE_DELEGATE_RetVal_TwoParams(FString, FOnGetCustomAssetColumnData, FFileData& /*AssetData*/, FName /*ColumnName*/);
@@ -129,7 +126,7 @@ DECLARE_DELEGATE_RetVal_TwoParams(bool, FOnVisualizeAssetToolTip, const TSharedP
 DECLARE_DELEGATE(FOnAssetDialogCancelled);
 
 /** Called when an asset item's tooltip is closing */
-DECLARE_DELEGATE( FOnAssetToolTipClosing );
+DECLARE_DELEGATE(FOnAssetToolTipClosing);
 
 /** Called from the Asset Dialog when assets are chosen in non-modal Open dialogs */
 DECLARE_DELEGATE_OneParam(FOnAssetsChosenForOpen, const TArray<FFileData>& /*SelectedAssets*/);
@@ -205,7 +202,7 @@ struct FAssetViewCustomColumn
 	FOnGetCustomAssetColumnDisplayText OnGetColumnDisplayText;
 
 	FAssetViewCustomColumn()
-		: DataType(UObject::FAssetRegistryTag::TT_Alphabetical) 
+		: DataType(UObject::FAssetRegistryTag::TT_Alphabetical)
 	{ }
 
 	FAssetViewCustomColumn(FName InColumnName, const FText& InDisplayName, const FText& InTooltipText, UObject::FAssetRegistryTag::ETagType InDataType, const FOnGetCustomAssetColumnData& InOnGetColumnData, const FOnGetCustomAssetColumnDisplayText& InOnGetColumnDisplayText = FOnGetCustomAssetColumnDisplayText())

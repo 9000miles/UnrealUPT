@@ -15,7 +15,7 @@ public:
 	{ }
 	SLATE_END_ARGS()
 
-	void Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& Projects);
+		void Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& Projects);
 	void Refresh(TArray<TSharedPtr<FProjectInfo>> Infos);
 
 private:

@@ -2,6 +2,4 @@
 
 void SCodeMgrState::Construct(const FArguments& InArgs)
 {
-
 }
-

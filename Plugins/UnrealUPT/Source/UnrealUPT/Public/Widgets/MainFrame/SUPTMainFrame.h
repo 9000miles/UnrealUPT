@@ -13,9 +13,9 @@ class SUPTMainFrame :public SCompoundWidget
 public:
 	SLATE_BEGIN_ARGS(SUPTMainFrame)
 	{	}
-		SLATE_END_ARGS()
+	SLATE_END_ARGS()
 
-	FReply OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+		FReply OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 
 public:
 	void Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& AllProjects);

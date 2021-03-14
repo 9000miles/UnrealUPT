@@ -9,7 +9,7 @@
 /**
  *
  */
-class FUPTCommands: public TCommands<FUPTCommands>
+class FUPTCommands : public TCommands<FUPTCommands>
 {
 public:
 

@@ -6,7 +6,7 @@
 #include "UICommandList.h"
 #include "Commands.h"
 
-class FUPTToolBar:public TCommands<FUPTToolBar>
+class FUPTToolBar :public TCommands<FUPTToolBar>
 {
 public:
 	static TSharedRef<SWidget> MakeUPTToolBar();

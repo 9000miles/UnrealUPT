@@ -6,7 +6,6 @@
 
 struct FProjectInfo;
 
-
 class SContextMenu :public SCompoundWidget
 {
 public:

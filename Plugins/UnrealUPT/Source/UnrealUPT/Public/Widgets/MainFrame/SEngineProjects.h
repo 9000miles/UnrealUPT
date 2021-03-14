@@ -18,9 +18,8 @@ public:
 	void Construct(const FArguments& InArgs);
 	void Refresh(TArray<TSharedPtr<FProjectInfo>>& Projects);
 
-
 private:
-	void Init(TArray<TSharedPtr<FProjectInfo>> &Projects);
+	void Init(TArray<TSharedPtr<FProjectInfo>>& Projects);
 	TSharedRef<SWidget> CreateProjectsHeader();
 	TSharedRef<SWidget> CreateProjectsBody();
 
@@ -28,7 +27,6 @@ private:
 
 	FText GetEnginePath() const;
 	FText GetProjectCount() const;
-
 
 private:
 	FString EnginePath;

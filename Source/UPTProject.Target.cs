@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public class UPTProjectTarget : TargetRules
 {
-	public UPTProjectTarget(TargetInfo Target) : base(Target)
-	{
-		Type = TargetType.Game;
+    public UPTProjectTarget(TargetInfo Target) : base(Target)
+    {
+        Type = TargetType.Game;
 
-		ExtraModuleNames.AddRange( new string[] { "UPTProject" } );
-	}
+        ExtraModuleNames.AddRange(new string[] { "UPTProject" });
+    }
 }

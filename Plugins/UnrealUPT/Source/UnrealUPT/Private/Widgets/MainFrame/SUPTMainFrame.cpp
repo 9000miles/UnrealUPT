@@ -36,28 +36,28 @@ void SUPTMainFrame::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProje
 		[
 			SNew(SOverlay)
 			+ SOverlay::Slot()
-		[
-			SNew(SSplitter)
-			.Orientation(Orient_Horizontal)
-		+ SSplitter::Slot()
-		.Value(0.3f)
-		[
-			EngineTab->AsShared()
-		]
-	+ SSplitter::Slot()
-		[
-			EngineProjects.ToSharedRef()
-		]
-		]
-
-	+ SOverlay::Slot()
-		.HAlign(HAlign_Right)
-		.VAlign(VAlign_Bottom)
-		.Padding(15)
-		[
-			SAssignNew(NotificationListPtr, SNotificationList)
-			.Visibility(EVisibility::SelfHitTestInvisible)
-		]
+			[
+				SNew(SSplitter)
+				.Orientation(Orient_Horizontal)
+				+ SSplitter::Slot()
+				.Value(0.3f)
+				[
+					EngineTab->AsShared()
+				]
+				+ SSplitter::Slot()
+				[
+					EngineProjects.ToSharedRef()
+				]
+			]
+			
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Right)
+			.VAlign(VAlign_Bottom)
+			.Padding(15)
+			[
+				SAssignNew(NotificationListPtr, SNotificationList)
+				.Visibility(EVisibility::SelfHitTestInvisible)
+			]
 		];
 
 	RequestRefresh(AllProjects);

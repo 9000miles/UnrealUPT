@@ -13,24 +13,24 @@
 void SProjectTileView::Construct(const FArguments& InArgs, TArray<TSharedPtr<FProjectInfo>>& Projects)
 {
 	ChildSlot
-	[
-		SNew(SBorder)
-		.Padding(FMargin(10))
-		.BorderImage(FUPTStyle::GetBrush("NoBorder"))
 		[
-			SAssignNew(TileView, STileView<TSharedPtr<SProjectUnit>>)
-			.ItemWidth(PROJECT_UNIT_WIDTH)
-			.ItemHeight(PROJECT_UNIT_HEIGHT)
-			.ItemAlignment(EListItemAlignment::EvenlyDistributed)
-			.ScrollbarVisibility(EVisibility::Hidden)
-			.AllowOverscroll(EAllowOverscroll::No)
-			.ConsumeMouseWheel(EConsumeMouseWheel::Never)
-			.ListItemsSource(&ProjectUnits)
-			.OnGenerateTile(this, &SProjectTileView::OnGenerateProjectTile)
-			.OnContextMenuOpening(this, &SProjectTileView::MakeProjectContextMenu)
-			.OnSelectionChanged(this, &SProjectTileView::OnSelectionChanged)
-		]
-	];
+			SNew(SBorder)
+			.Padding(FMargin(10))
+			.BorderImage(FUPTStyle::GetBrush("NoBorder"))
+			[
+				SAssignNew(TileView, STileView<TSharedPtr<SProjectUnit>>)
+				.ItemWidth(PROJECT_UNIT_WIDTH)
+				.ItemHeight(PROJECT_UNIT_HEIGHT)
+				.ItemAlignment(EListItemAlignment::EvenlyDistributed)
+				.ScrollbarVisibility(EVisibility::Hidden)
+				.AllowOverscroll(EAllowOverscroll::No)
+				.ConsumeMouseWheel(EConsumeMouseWheel::Never)
+				.ListItemsSource(&ProjectUnits)
+				.OnGenerateTile(this, &SProjectTileView::OnGenerateProjectTile)
+				.OnContextMenuOpening(this, &SProjectTileView::MakeProjectContextMenu)
+				.OnSelectionChanged(this, &SProjectTileView::OnSelectionChanged)
+			]
+		];
 
 	Refresh(Projects);
 }

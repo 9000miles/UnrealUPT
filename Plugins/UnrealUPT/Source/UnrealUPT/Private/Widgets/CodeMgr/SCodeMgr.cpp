@@ -112,7 +112,7 @@ TSharedRef<SDockTab> SCodeMgr::HandleTabManagerSpawnTab(const FSpawnTabArgs& Arg
 		(
 			FileViewport,
 			SFileViewport,
-		);
+			);
 
 		TabWidget = FileViewport;
 	}

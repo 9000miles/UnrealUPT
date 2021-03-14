@@ -1,6 +1,5 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -17,19 +16,18 @@ class FMainMRUFavoritesList;
  */
 class FCodeBrowserModule : public IModuleInterface
 {
-
 public:
 
 	/**  */
-	DECLARE_MULTICAST_DELEGATE_TwoParams( FOnFilterChanged, const FARFilter& /*NewFilter*/, bool /*bIsPrimaryBrowser*/ );
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnFilterChanged, const FARFilter& /*NewFilter*/, bool /*bIsPrimaryBrowser*/);
 	/** */
-	DECLARE_MULTICAST_DELEGATE_TwoParams( FOnSearchBoxChanged, const FText& /*InSearchText*/, bool /*bIsPrimaryBrowser*/ );
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSearchBoxChanged, const FText& /*InSearchText*/, bool /*bIsPrimaryBrowser*/);
 	/** */
-	DECLARE_MULTICAST_DELEGATE_TwoParams( FOnAssetSelectionChanged, const TArray<FFileData>& /*NewSelectedAssets*/, bool /*bIsPrimaryBrowser*/ );
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAssetSelectionChanged, const TArray<FFileData>& /*NewSelectedAssets*/, bool /*bIsPrimaryBrowser*/);
 	/** */
-	DECLARE_MULTICAST_DELEGATE_OneParam( FOnSourcesViewChanged, bool /*bExpanded*/ );
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnSourcesViewChanged, bool /*bExpanded*/);
 	/** */
-	DECLARE_MULTICAST_DELEGATE_OneParam( FOnAssetPathChanged, const FString& /*NewPath*/ );
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnAssetPathChanged, const FString& /*NewPath*/);
 	/** */
 	DECLARE_MULTICAST_DELEGATE(FOnRequestNewFolder);
 	/** */
@@ -54,12 +52,12 @@ public:
 	virtual ICodeBrowserSingleton& Get() const;
 
 	/** Delegates to be called to extend the content browser menus */
-	virtual TArray<FCodeBrowserMenuExtender_SelectedPaths>& GetAllAssetContextMenuExtenders() {return AssetContextMenuExtenders;}
-	virtual TArray<FCodeBrowserMenuExtender_SelectedPaths>& GetAllPathViewContextMenuExtenders() {return PathViewContextMenuExtenders;}
-	virtual TArray<FCodeBrowserMenuExtender>& GetAllCollectionListContextMenuExtenders() {return CollectionListContextMenuExtenders;}
-	virtual TArray<FCodeBrowserMenuExtender>& GetAllCollectionViewContextMenuExtenders() {return CollectionViewContextMenuExtenders;}
-	virtual TArray<FCodeBrowserMenuExtender_SelectedAssets>& GetAllAssetViewContextMenuExtenders() {return AssetViewContextMenuExtenders;}
-	virtual TArray<FCodeBrowserMenuExtender>& GetAllAssetViewViewMenuExtenders() {return AssetViewViewMenuExtenders;}
+	virtual TArray<FCodeBrowserMenuExtender_SelectedPaths>& GetAllAssetContextMenuExtenders() { return AssetContextMenuExtenders; }
+	virtual TArray<FCodeBrowserMenuExtender_SelectedPaths>& GetAllPathViewContextMenuExtenders() { return PathViewContextMenuExtenders; }
+	virtual TArray<FCodeBrowserMenuExtender>& GetAllCollectionListContextMenuExtenders() { return CollectionListContextMenuExtenders; }
+	virtual TArray<FCodeBrowserMenuExtender>& GetAllCollectionViewContextMenuExtenders() { return CollectionViewContextMenuExtenders; }
+	virtual TArray<FCodeBrowserMenuExtender_SelectedAssets>& GetAllAssetViewContextMenuExtenders() { return AssetViewContextMenuExtenders; }
+	virtual TArray<FCodeBrowserMenuExtender>& GetAllAssetViewViewMenuExtenders() { return AssetViewViewMenuExtenders; }
 
 	/** Delegates to call to extend the command/keybinds for content browser */
 	virtual TArray<FCodeBrowserCommandExtender>& GetAllCodeBrowserCommandExtenders() { return CodeBrowserCommandExtenders; }
@@ -74,9 +72,9 @@ public:
 	virtual TArray<FAssetViewDragAndDropExtender>& GetAssetViewDragAndDropExtenders() { return AssetViewDragAndDropExtenders; }
 
 	/** Delegate accessors */
-	FOnFilterChanged& GetOnFilterChanged() { return OnFilterChanged; } 
-	FOnSearchBoxChanged& GetOnSearchBoxChanged() { return OnSearchBoxChanged; } 
-	FOnAssetSelectionChanged& GetOnAssetSelectionChanged() { return OnAssetSelectionChanged; } 
+	FOnFilterChanged& GetOnFilterChanged() { return OnFilterChanged; }
+	FOnSearchBoxChanged& GetOnSearchBoxChanged() { return OnSearchBoxChanged; }
+	FOnAssetSelectionChanged& GetOnAssetSelectionChanged() { return OnAssetSelectionChanged; }
 	FOnSourcesViewChanged& GetOnSourcesViewChanged() { return OnSourcesViewChanged; }
 	FOnAssetPathChanged& GetOnAssetPathChanged() { return OnAssetPathChanged; }
 	FOnRequestNewFolder& GetOnRequestNewFolder() { return OnRequestNewFolder; }

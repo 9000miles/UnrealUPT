@@ -3,4 +3,4 @@
 #include "UPTProject.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, UPTProject, "UnrealUPT" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, UPTProject, "UnrealUPT");

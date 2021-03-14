@@ -36,14 +36,14 @@ void SCommonTab::Construct(const FArguments& InArgs)
 		[
 			SNew(SBorder)
 			//.BorderImage(FUPTStyle::GetBrush("ToolPanel.GroupBorder"))
-		.Padding(FMargin(5))
-		[
-			SNew(SScrollBox)
-			+ SScrollBox::Slot()
-		[
-			SAssignNew(TabBox, SVerticalBox)
-		]
-		]
+			.Padding(FMargin(5))
+			[
+				SNew(SScrollBox)
+				+ SScrollBox::Slot()
+				[
+					SAssignNew(TabBox, SVerticalBox)
+				]
+			]
 		];
 
 	Refresh(TabNames);
@@ -85,28 +85,28 @@ TSharedRef<SWidget> SCommonTab::CreateTab(FString TabName)
 		[
 			SNew(SHorizontalBox)
 			+ SHorizontalBox::Slot()
-		.VAlign(VAlign_Fill)
-		.HAlign(HAlign_Left)
-		.AutoWidth()
-		[
-			SNew(SImage)
-			.Image(this, &SCommonTab::GetActiveTabIamge, TabName)
-		]
-	+ SHorizontalBox::Slot()
-		.Padding(FMargin(5, 0))
-		.AutoWidth()
-		[
-			SNew(SImage)
-			.Image(SourceBinaryBrush)
-		]
-	+ SHorizontalBox::Slot()
-		.Padding(FMargin(6, 0, 15, 0))
-		.VAlign(VAlign_Center)
-		.HAlign(HAlign_Fill)
-		[
-			SNew(STextBlock)
-			.Text(FText::FromString(TabName))
-		]
+			.VAlign(VAlign_Fill)
+			.HAlign(HAlign_Left)
+			.AutoWidth()
+			[
+				SNew(SImage)
+				.Image(this, &SCommonTab::GetActiveTabIamge, TabName)
+			]
+			+ SHorizontalBox::Slot()
+			.Padding(FMargin(5, 0))
+			.AutoWidth()
+			[
+				SNew(SImage)
+				.Image(SourceBinaryBrush)
+			]
+			+ SHorizontalBox::Slot()
+			.Padding(FMargin(6, 0, 15, 0))
+			.VAlign(VAlign_Center)
+			.HAlign(HAlign_Fill)
+			[
+				SNew(STextBlock)
+				.Text(FText::FromString(TabName))
+			]
 		]
 	;
 }

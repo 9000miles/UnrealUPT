@@ -6,8 +6,6 @@
 
 DEFINE_LOG_CATEGORY_STATIC(UPTLog, Log, All);
 
-
-
 #define PROJECT_UNIT_WIDTH 180.0f
 #define PROJECT_UNIT_HEIGHT 200.0f
 
@@ -18,4 +16,4 @@ DEFINE_LOG_CATEGORY_STATIC(UPTLog, Log, All);
 
 #define UPT_RESOURCE_PATH Get_UPT_Resource()
 
- const FString Get_UPT_Resource();
+const FString Get_UPT_Resource();

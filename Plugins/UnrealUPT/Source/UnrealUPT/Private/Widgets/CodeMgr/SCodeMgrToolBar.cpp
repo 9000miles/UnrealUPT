@@ -8,4 +8,3 @@ void SCodeMgrToolBar::Construct(const FArguments& InArgs)
 			SNew(SButton)
 		];
 }
-

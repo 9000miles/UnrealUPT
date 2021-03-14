@@ -22,7 +22,6 @@ typedef TFilterCollection<FAssetFilterType> FAssetFilterCollectionType;
 
 class UFactory;
 
-
 /** The view modes used in SAssetView */
 namespace EAssetViewType
 {
@@ -35,7 +34,6 @@ namespace EAssetViewType
 		MAX
 	};
 }
-
 
 /** A selection of items in the Content Browser */
 struct FCodeBrowserSelection
@@ -60,7 +58,6 @@ struct FCodeBrowserSelection
 		SelectedFolders.Empty();
 	}
 };
-
 
 /** A struct containing details about how the content browser should behave */
 struct FCodeBrowserConfig
@@ -120,7 +117,7 @@ struct FCodeBrowserConfig
 	bool bCanSetAsPrimaryBrowser;
 
 	FCodeBrowserConfig()
-		: ThumbnailLabel( EThumbnailLabel::ClassName )
+		: ThumbnailLabel(EThumbnailLabel::ClassName)
 		, ThumbnailScale(0.1f)
 		, InitialAssetViewType(EAssetViewType::Tile)
 		, bShowBottomToolbar(true)
@@ -129,7 +126,7 @@ struct FCodeBrowserConfig
 		, bExpandSourcesView(true)
 		, bShowAssetPathTree(true)
 		, bAlwaysShowCollections(false)
-		, SelectedCollectionName( NAME_None, ECollectionShareType::CST_Local )
+		, SelectedCollectionName(NAME_None, ECollectionShareType::CST_Local)
 		, bUsePathPicker(true)
 		, bCanShowFilters(true)
 		, bCanShowAssetSearch(true)
@@ -140,7 +137,6 @@ struct FCodeBrowserConfig
 		, bCanSetAsPrimaryBrowser(true)
 	{ }
 };
-
 
 /** A struct containing details about how the asset picker should behave */
 struct FAssetPickerConfig
@@ -224,7 +220,7 @@ struct FAssetPickerConfig
 	FOnShouldFilterAsset OnShouldFilterAsset;
 
 	/** This delegate will be called in Details view when a new asset registry searchable tag is encountered, to
-	    determine if it should be displayed or not.  If it returns true or isn't bound, the tag will be displayed normally. */
+		determine if it should be displayed or not.  If it returns true or isn't bound, the tag will be displayed normally. */
 	FOnShouldDisplayAssetTag OnAssetTagWantsToBeDisplayed;
 
 	/** The default view mode */
@@ -270,7 +266,7 @@ struct FAssetPickerConfig
 	bool bAddFilterUI;
 
 	/** If true, show path in column view */
-	bool bShowPathInColumnView; 
+	bool bShowPathInColumnView;
 	/** If true, show class in column view */
 	bool bShowTypeInColumnView;
 	/** If true, sort by path in column view. Only works if initial view type is Column */
@@ -280,8 +276,8 @@ struct FAssetPickerConfig
 	EAssetTypeCategories::Type DefaultFilterMenuExpansion;
 
 	FAssetPickerConfig()
-		: SelectionMode( ESelectionMode::Multi )
-		, ThumbnailLabel( EThumbnailLabel::ClassName )
+		: SelectionMode(ESelectionMode::Multi)
+		, ThumbnailLabel(EThumbnailLabel::ClassName)
 		, ThumbnailScale(0.1f)
 		, InitialAssetViewType(EAssetViewType::Tile)
 		, bFocusSearchBoxWhenOpened(true)
@@ -444,12 +440,12 @@ public:
 	 *
 	 * @return The newly created content browser widget
 	 */
-	virtual TSharedRef<class SWidget> CreateCodeBrowser( const FName InstanceName, TSharedPtr<SDockTab> ContainingTab, const FCodeBrowserConfig* CodeBrowserConfig ) = 0;
+	virtual TSharedRef<class SWidget> CreateCodeBrowser(const FName InstanceName, TSharedPtr<SDockTab> ContainingTab, const FCodeBrowserConfig* CodeBrowserConfig) = 0;
 
 	/**
 	 * Generates an asset picker widget locked to the specified FARFilter.
 	 *
-	 * @param AssetPickerConfig		A struct containing details about how the asset picker should behave				
+	 * @param AssetPickerConfig		A struct containing details about how the asset picker should behave
 	 * @return The asset picker widget
 	 */
 	virtual TSharedRef<class SWidget> CreateAssetPicker(const FAssetPickerConfig& AssetPickerConfig) = 0;
@@ -457,7 +453,7 @@ public:
 	/**
 	 * Generates a path picker widget.
 	 *
-	 * @param PathPickerConfig		A struct containing details about how the path picker should behave				
+	 * @param PathPickerConfig		A struct containing details about how the path picker should behave
 	 * @return The path picker widget
 	 */
 	virtual TSharedRef<class SWidget> CreatePathPicker(const FPathPickerConfig& PathPickerConfig) = 0;
@@ -465,7 +461,7 @@ public:
 	/**
 	 * Generates a collection picker widget.
 	 *
-	 * @param CollectionPickerConfig		A struct containing details about how the collection picker should behave				
+	 * @param CollectionPickerConfig		A struct containing details about how the collection picker should behave
 	 * @return The collection picker widget
 	 */
 	virtual TSharedRef<class SWidget> CreateCollectionPicker(const FCollectionPickerConfig& CollectionPickerConfig) = 0;
@@ -513,46 +509,46 @@ public:
 	/** Sets up an inline-name for the creation of a new asset in the primary content browser using the specified path and the specified class and/or factory */
 	virtual void CreateNewAsset(const FString& DefaultAssetName, const FString& PackagePath, UClass* AssetClass, UFactory* Factory) = 0;
 
-	/** 
-	 * Selects the supplied assets in the primary content browser. 
-     *
+	/**
+	 * Selects the supplied assets in the primary content browser.
+	 *
 	 * @param AssetList                     An array of AssetDataList structs to sync
 	 * @param bAllowLockedBrowsers 	        When true, even locked browsers may handle the sync. Only set to true if the sync doesn't seem external to the content browser
 	 * @param bFocusCodeBrowser          When true, brings the CodeBrowser into the foreground.
 	 * @param InstanceName					When supplied, will only sync the Content Browser with the matching InstanceName.  bAllowLockedBrowsers is ignored.
-	 */ 
+	 */
 	virtual void SyncBrowserToAssets(const TArray<struct FFileData>& AssetDataList, bool bAllowLockedBrowsers = false, bool bFocusCodeBrowser = true, const FName& InstanceName = FName(), bool bNewSpawnBrowser = false) = 0;
 
-	/** 
-	 * Selects the supplied assets in the primary content browser. 
-     *
+	/**
+	 * Selects the supplied assets in the primary content browser.
+	 *
 	 * @param AssetList                     An array of UObject pointers to sync
 	 * @param bAllowLockedBrowsers 	        When true, even locked browsers may handle the sync. Only set to true if the sync doesn't seem external to the content browser
 	 * @param bFocusCodeBrowser          When true, brings the CodeBrowser into the foreground.
 	 * @param InstanceName					When supplied, will only sync the Content Browser with the matching InstanceName.  bAllowLockedBrowsers is ignored.
-	 */ 
+	 */
 	virtual void SyncBrowserToAssets(const TArray<UObject*>& AssetList, bool bAllowLockedBrowsers = false, bool bFocusCodeBrowser = true, const FName& InstanceName = FName(), bool bNewSpawnBrowser = false) = 0;
 
-	/** 
-	 * Selects the supplied assets in the primary content browser. 
-     *
+	/**
+	 * Selects the supplied assets in the primary content browser.
+	 *
 	 * @param AssetList                     An array of strings represeting folder asset paths to sync
 	 * @param bAllowLockedBrowsers 	        When true, even locked browsers may handle the sync. Only set to true if the sync doesn't seem external to the content browser
 	 * @param bFocusCodeBrowser          When true, brings the CodeBrowser into the foreground.
 	 * @param InstanceName					When supplied, will only sync the Content Browser with the matching InstanceName.  bAllowLockedBrowsers is ignored.
 	 * @param bNewSpawnBrowser				When supplied, will spawn a new Content Browser instead of selecting the assets in an existing one.
-	 */ 
+	 */
 	virtual void SyncBrowserToFolders(const TArray<FString>& FolderList, bool bAllowLockedBrowsers = false, bool bFocusCodeBrowser = true, const FName& InstanceName = FName(), bool bNewSpawnBrowser = false) = 0;
 
-	/** 
-	 * Selects the supplied assets in the primary content browser. 
-     *
+	/**
+	 * Selects the supplied assets in the primary content browser.
+	 *
 	 * @param ItemSelection 				A struct containing AssetData and Folders to sync
 	 * @param bAllowLockedBrowsers 	        When true, even locked browsers may handle the sync. Only set to true if the sync doesn't seem external to the content browser
 	 * @param bFocusCodeBrowser          When true, brings the CodeBrowser into the foreground.
 	 * @param InstanceName					When supplied, will only sync the Content Browser with the matching InstanceName.  bAllowLockedBrowsers is ignored.
 	 * @param bNewSpawnBrowser				When supplied, will spawn a new Content Browser instead of selecting the assets in an existing one.
-	 */ 
+	 */
 	virtual void SyncBrowserTo(const FCodeBrowserSelection& ItemSelection, bool bAllowLockedBrowsers = false, bool bFocusCodeBrowser = true, const FName& InstanceName = FName(), bool bNewSpawnBrowser = false) = 0;
 
 	/** Generates a list of assets that are selected in the primary content browser */

@@ -23,12 +23,12 @@ void SEngineProjects::Construct(const FArguments& InArgs)
 	ChildSlot
 		[
 			SNew(SVerticalBox)
-			+SVerticalBox::Slot()
+			+ SVerticalBox::Slot()
 			.AutoHeight()
 			[
 				CreateProjectsHeader()
 			]
-			+SVerticalBox::Slot()
+			+ SVerticalBox::Slot()
 			.VAlign(VAlign_Fill)
 			[
 				CreateProjectsBody()
@@ -54,42 +54,42 @@ void SEngineProjects::Init(TArray<TSharedPtr<FProjectInfo>>& Projects)
 TSharedRef<SWidget> SEngineProjects::CreateProjectsHeader()
 {
 	return
-	SNew(SBorder)
-	.Padding(FMargin(5))
-	.BorderImage(FUPTStyle::GetBrush("ToolPanel.GroupBorder"))
-	[
-		SNew(SHorizontalBox)
-		+ SHorizontalBox::Slot()
-		.Padding(FMargin(5, 0))
-		.HAlign(HAlign_Left)
-		.VAlign(VAlign_Center)
+		SNew(SBorder)
+		.Padding(FMargin(5))
+		.BorderImage(FUPTStyle::GetBrush("ToolPanel.GroupBorder"))
 		[
-			SNew(STextBlock)
-			.Text(this, &SEngineProjects::GetProjectCount)
-		]
-
-		+ SHorizontalBox::Slot()
-		.HAlign(HAlign_Right)
-		.VAlign(VAlign_Center)
-		.AutoWidth()
-		.Padding(FMargin(5, 0))
-		[
-			SAssignNew(Hyperlink, SHyperlink)
-			.OnNavigate_Lambda([this] { FPlatformProcess::ExploreFolder(*(EnginePath)); })
-			.Text(this, &SEngineProjects::GetEnginePath)
-		]
-
-		+SHorizontalBox::Slot()
-		.HAlign(HAlign_Right)
-		.VAlign(VAlign_Center)
-		.AutoWidth()
-		.Padding(FMargin(5, 0))
-		[
-			SNew(SButton)
-			.Text(LOCTEXT("StartEngienButton", "Start Engine"))
-			.OnClicked(this, &SEngineProjects::OpenEngine)
-		]
-	];
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.Padding(FMargin(5, 0))
+			.HAlign(HAlign_Left)
+			.VAlign(VAlign_Center)
+			[
+				SNew(STextBlock)
+				.Text(this, &SEngineProjects::GetProjectCount)
+			]
+			
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Right)
+			.VAlign(VAlign_Center)
+			.AutoWidth()
+			.Padding(FMargin(5, 0))
+			[
+				SAssignNew(Hyperlink, SHyperlink)
+				.OnNavigate_Lambda([this] { FPlatformProcess::ExploreFolder(*(EnginePath)); })
+				.Text(this, &SEngineProjects::GetEnginePath)
+			]
+			
+			+ SHorizontalBox::Slot()
+			.HAlign(HAlign_Right)
+			.VAlign(VAlign_Center)
+			.AutoWidth()
+			.Padding(FMargin(5, 0))
+			[
+				SNew(SButton)
+				.Text(LOCTEXT("StartEngienButton", "Start Engine"))
+				.OnClicked(this, &SEngineProjects::OpenEngine)
+			]
+		];
 }
 
 TSharedRef<SWidget> SEngineProjects::CreateProjectsBody()
@@ -97,11 +97,11 @@ TSharedRef<SWidget> SEngineProjects::CreateProjectsBody()
 	TArray<TSharedPtr<FProjectInfo>> Projects;
 
 	return
-	SNew(SScrollBox)
-	+SScrollBox::Slot()
-	[
-		SAssignNew(ProjectTileView, SProjectTileView, Projects)
-	];
+		SNew(SScrollBox)
+		+ SScrollBox::Slot()
+		[
+			SAssignNew(ProjectTileView, SProjectTileView, Projects)
+		];
 }
 
 FReply SEngineProjects::OpenEngine()

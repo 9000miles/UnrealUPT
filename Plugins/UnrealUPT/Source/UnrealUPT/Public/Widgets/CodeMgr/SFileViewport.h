@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-class SFileViewport: public SCompoundWidget
+class SFileViewport : public SCompoundWidget
 {
 public:
 	SLATE_BEGIN_ARGS(SFileViewport)

@@ -59,7 +59,7 @@ public:
 	virtual void LoadSettings(const FString& IniFilename, const FString& IniSection, const FString& SettingsString) {}
 
 	// IFilter implementation
-	DECLARE_DERIVED_EVENT( FFrontendFilter, IFilter<FAssetFilterType>::FChangedEvent, FChangedEvent );
+	DECLARE_DERIVED_EVENT(FFrontendFilter, IFilter<FAssetFilterType>::FChangedEvent, FChangedEvent);
 	virtual FChangedEvent& OnChanged() override { return ChangedEvent; }
 
 	TSharedPtr<FFrontendFilterCategory> GetCategory() { return FilterCategory; }

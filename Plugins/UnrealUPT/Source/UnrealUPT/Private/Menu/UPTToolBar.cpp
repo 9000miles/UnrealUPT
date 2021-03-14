@@ -34,4 +34,3 @@ void FUPTToolBar::OnOpenCodeMgrWindow()
 		FUPTDelegateCenter::OnOpenCodeMgrWindow.ExecuteIfBound(SelectedProject.ToSharedRef());
 	}
 }
-

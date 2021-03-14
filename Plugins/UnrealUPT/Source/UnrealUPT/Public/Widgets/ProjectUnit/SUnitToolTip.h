@@ -14,9 +14,9 @@ public:
 		: _ProjectUnit()
 	{ }
 	SLATE_ARGUMENT(TSharedPtr<SProjectUnit>, ProjectUnit)
-	SLATE_END_ARGS()
+		SLATE_END_ARGS()
 
-	void Construct(const FArguments& InArgs);
+		void Construct(const FArguments& InArgs);
 
 	// IToolTip interface
 	virtual bool IsEmpty() const override;

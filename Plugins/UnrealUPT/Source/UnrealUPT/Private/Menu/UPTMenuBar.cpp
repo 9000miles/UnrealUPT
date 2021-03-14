@@ -25,7 +25,7 @@ TSharedRef<SWidget> FUPTMenuBar::MakeMenuBar(/*TSharedRef<FTabManager> TabManage
 
 void FUPTMenuBar::FillFileMenuBarEntries(FMenuBuilder& MenuBuilder)
 {
-	MenuBuilder.AddSubMenu(LOCTEXT("Recent Projects", "Recent Projects"), LOCTEXT("Recent Projects Tip", "Recently opened project"),FNewMenuDelegate::CreateLambda(&FUPTMenuBar::FillRecentProjectsSubMenu));
+	MenuBuilder.AddSubMenu(LOCTEXT("Recent Projects", "Recent Projects"), LOCTEXT("Recent Projects Tip", "Recently opened project"), FNewMenuDelegate::CreateLambda(&FUPTMenuBar::FillRecentProjectsSubMenu));
 	MenuBuilder.AddMenuEntry(LOCTEXT("Refresh", "Refresh"), LOCTEXT("Refresh Tip", "Regather the engine and project"), FSlateIcon(), FUIAction(FExecuteAction::CreateStatic(&FUPTMenuBar::OnRefresh)));
 	MenuBuilder.AddMenuEntry(LOCTEXT("Exit", "Exit"), LOCTEXT("Exit Tip", "Exit this program"), FSlateIcon(), FUIAction(FExecuteAction::CreateStatic(&FUPTMenuBar::OnExit)));
 }
@@ -43,12 +43,10 @@ void FUPTMenuBar::FillHelpMenuBarEntries(FMenuBuilder& MenuBuilder)
 {
 	MenuBuilder.AddMenuEntry(LOCTEXT("Documentation", "Documentation"), LOCTEXT("Documentation Tip", "Documentation"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("Documentation")); })));
 	MenuBuilder.AddMenuEntry(LOCTEXT("About UPT", "About UPT"), LOCTEXT("About UPT Tip", "About UPT"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("AboutUPT")); })));
-
 }
 
 void FUPTMenuBar::FillRecentProjectsSubMenu(FMenuBuilder& MenuBuilder)
 {
-
 }
 
 void FUPTMenuBar::OnRefresh()
