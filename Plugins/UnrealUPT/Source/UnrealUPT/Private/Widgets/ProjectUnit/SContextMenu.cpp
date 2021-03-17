@@ -15,6 +15,7 @@
 #include "Settings/UPTSettings.h"
 #include "MonitoredProcess.h"
 #include "TabManager.h"
+#include "Manager/UPTManager.h"
 
 #define LOCTEXT_NAMESPACE "SContextMenu"
 
@@ -197,7 +198,8 @@ void SContextMenu::PackageProject(TSharedPtr<FProjectInfo> Info)
 		TSharedPtr<FMonitoredProcess> UatProcess = MakeShareable(new FMonitoredProcess(CmdExe, FullCommandLine, true));
 		UatProcess->OnCanceled().BindRaw(this, &SContextMenu::HandleUatProcessCanceled);
 		UatProcess->OnCompleted().BindSP(this, &SContextMenu::HandleUatProcessCompleted);
-		UatProcess->OnOutput().BindSP(this, &SContextMenu::HandleUatProcessOutput);
+		UatProcess->OnOutput().BindLambda([](FString Log) {FUPTManager::Get()->PrintLog(Log); });
+		//UatProcess->OnOutput().BindStatic(&SContextMenu::HandleUatProcessOutput);
 
 		if (UatProcess->Launch())
 		{
@@ -238,6 +240,7 @@ void SContextMenu::CopyPackageFiles(TSharedPtr<FProjectInfo> Info)
 	FString DefaultEditorIni = ProjectDir + TEXT("/Config/DefaultEditor.ini");
 	if (FPaths::FileExists(DefaultEditorIni))
 	{
+		PRINT_LOG(FString::Printf(TEXT("DefaultEditorIni: %s"), *DefaultEditorIni));
 		TArray<FString> FileDirectorys;
 		GConfig->GetArray(TEXT("/PackageCompletedCopyResource"), TEXT("+FileDirectorys"), FileDirectorys, DefaultEditorIni);
 
@@ -256,7 +259,7 @@ void SContextMenu::CopyPackageFiles(TSharedPtr<FProjectInfo> Info)
 					if (IFileManager::Get().FileExists(*Src))
 					{
 						bool Result = IFileManager::Get().Copy(*Dest, *Src) == COPY_OK;
-						PRINT_LOG(FString::Printf(TEXT("%s Copy File To >> %s : %s"), *Src, *Dest, *(Result ? GTrue : GFalse).ToString()));
+						PRINT_LOG(FString::Printf(TEXT("%s Copy File To >> %s : %s"), *Src, *Dest, *(Result ? FCoreTexts::Get().True : FCoreTexts::Get().False).ToString()));
 						continue;
 					}
 
@@ -267,14 +270,17 @@ void SContextMenu::CopyPackageFiles(TSharedPtr<FProjectInfo> Info)
 							IFileManager::Get().MakeDirectory(*Directory, true);
 
 						bool Result = FPlatformFileManager::Get().GetPlatformFile().CopyDirectoryTree(*Dest, *Src, true);
-						PRINT_LOG(FString::Printf(TEXT("%s Copy Directory To >> %s : %s"), *Src, *Dest, *(Result ? GTrue : GFalse).ToString()));
+						PRINT_LOG(FString::Printf(TEXT("%s Copy Directory To >> %s : %s"), *Src, *Dest, *(Result ? FCoreTexts::Get().True : FCoreTexts::Get().False).ToString()));
 						continue;
 					}
 
 					PRINT_LOG(FString::Printf(TEXT("File or directory does not exist : %s"), *FileDir));
 				}
 			}
-			PRINT_ERROR(FString::Printf(TEXT("%s not exists"), *PackagePath));
+			else
+			{
+				PRINT_ERROR(FString::Printf(TEXT("%s not exists"), *PackagePath));
+			}
 		}
 	}
 	else

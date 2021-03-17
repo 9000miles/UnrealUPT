@@ -6,6 +6,7 @@
 #include "SlateBrush.h"
 #include "UPTDelegateCenter.h"
 #include "SNotificationList.h"
+#include "PrintHelper/Public/PrintHelper.h"
 
 struct FProjectInfo;
 
@@ -77,6 +78,10 @@ public:
 		NotificationListPtr = NotificationList;
 	}
 
+	void PrintLog(FString log)
+	{
+		PRINT_LOG(log);
+	}
 private:
 	TSharedPtr<FJsonObject> LoadProjectFile(const FString& FileName);
 	TSharedRef<SNotificationItem> AddNotification(FNotificationInfo Info);

@@ -22,7 +22,7 @@ public:
 private:
 	void HandleUatProcessCanceled();
 	void HandleUatProcessCompleted(int32 Result);
-	void HandleUatProcessOutput(FString Message);
+	static void HandleUatProcessOutput(FString Message);
 
 private:
 	TSharedPtr<FProjectInfo> ProjectInfo;
