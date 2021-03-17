@@ -65,315 +65,315 @@ void SCreateCodeFileWidget::Construct(const FArguments& InArgs)
 		[
 			SNew(SBorder)
 			.Padding(18)
-			.BorderImage(FUPTStyle::GetBrush("Docking.Tab.ContentAreaBrush"))
-			[
-				SNew(SVerticalBox)
-				
-				+ SVerticalBox::Slot()
-				[
-					SAssignNew(MainWizard, SWizard)
-					.ShowPageList(false)
-					
-					.ButtonStyle(FUPTStyle::Get(), "FlatButton.Default")
-					.CancelButtonStyle(FUPTStyle::Get(), "FlatButton.Default")
-					.FinishButtonStyle(FUPTStyle::Get(), "FlatButton.Success")
-					.ButtonTextStyle(FUPTStyle::Get(), "LargeText")
-					.ForegroundColor(FUPTStyle::Get().GetSlateColor("WhiteBrush"))
-					
-					.CanFinish(this, &SCreateCodeFileWidget::CanFinishButtonBeClicked)
-					.FinishButtonText(LOCTEXT("NewModule_FinishButtonText", "Create File"))
-					.FinishButtonToolTip(
-					LOCTEXT("NewModule_FinishButtonToolTip", "Creates the code files to add your new module.")
-					)
-					.OnCanceled(this, &SCreateCodeFileWidget::OnClickCancel)
-					.OnFinished(this, &SCreateCodeFileWidget::OnClickFinish)
-					.InitialPageIndex(0)
-					
-					// Error message at bottom
-					.PageFooter()
-					[
-						SNew(SBorder)
-						.Visibility(this, &SCreateCodeFileWidget::GetErrorLabelVisibility)
-						.BorderImage(FUPTStyle::GetBrush("NewClassDialog.ErrorLabelBorder"))
-						.Padding(FMargin(0, 5))
-						.Content()
-						[
-							SNew(SHorizontalBox)
-							
-							+ SHorizontalBox::Slot()
-							.VAlign(VAlign_Center)
-							.Padding(2.f)
-							.AutoWidth()
-							[
-								SNew(SImage)
-								.Image(FUPTStyle::GetBrush("MessageLog.Warning"))
-							]
-							
-							+ SHorizontalBox::Slot()
-							.VAlign(VAlign_Center)
-							[
-								SNew(STextBlock)
-								.Text(this, &SCreateCodeFileWidget::GetErrorLabelText)
-								.TextStyle(FUPTStyle::Get(), "NewClassDialog.ErrorLabelFont")
-							]
-						]
-					]
-					
-					+ SWizard::Page()
-					[
-						SNew(SVerticalBox)
-						
-						// Title
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						.Padding(0)
-						[
-							SNew(STextBlock)
-							.TextStyle(FUPTStyle::Get(), "NewClassDialog.PageTitle")
-							.Text(LOCTEXT("NewModule_Title", "New File"))
-						]
-						
-						// Title spacer
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						.Padding(0, 2, 0, 8)
-						[
-							SNew(SSeparator)
-						]
-						
-						// Page description and view options
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						.Padding(0, 10)
-						[
-							SNew(SHorizontalBox)
-							
-							+ SHorizontalBox::Slot()
-							.FillWidth(1.f)
-							.VAlign(VAlign_Center)
-							[
-								SNew(STextBlock)
-								.Text(
-								LOCTEXT("NewModule_PageDescription", "This will add a new file to your game project and update the .uproject or .uplugin file, respectively.")
-								)
-							]
-						]
-						
-						// First page: name module, module type, and loading phase
-						+ SVerticalBox::Slot()
-						.Padding(2, 2)
-						.AutoHeight()
-						.HAlign(EHorizontalAlignment::HAlign_Fill)//
-						[
-							SNew(SHorizontalBox)
-							+ SHorizontalBox::Slot()
-							.HAlign(EHorizontalAlignment::HAlign_Fill)//
-							.FillWidth(1.f)//
-							[
-								SNew(SVerticalBox)
-								
-								+ SVerticalBox::Slot()
-								.AutoHeight()
-								.VAlign(VAlign_Center)
-								[
-									// Gray details panel
-									SNew(SBorder)
-									.BorderImage(FUPTStyle::GetBrush("DetailsView.CategoryTop"))
-									.BorderBackgroundColor(FLinearColor(0.6f, 0.6f, 0.6f, 1.0f))
-									.Padding(FMargin(6.0f, 4.0f, 7.0f, 4.0f))
-									[
-										SNew(SVerticalBox)
-										
-										+ SVerticalBox::Slot()
-										.AutoHeight()
-										.Padding(0)
-										[
-											SNew(SGridPanel)
-											.FillColumn(1, 1.0f)
-											
-											// Name label
-											+ SGridPanel::Slot(0, 1)
-											.VAlign(VAlign_Center)
-											.Padding(0, 0, 12, 0)
-											[
-												SNew(STextBlock)
-												.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
-												.Text(LOCTEXT("CreateModule_NameLabel", "Parent"))
-											]
-											
-											// Name edit box
-											+ SGridPanel::Slot(1, 1)
-											.Padding(0.0f, 3.0f)
-											.VAlign(VAlign_Center)
-											[
-												SNew(SBox)
-												.HeightOverride(EditableTextHeight)
-												[
-													SAssignNew(ParentEditBox, SEditableTextBox)
-												]
-											]
-											// Host type and loading phase
-											+ SGridPanel::Slot(2, 1)
-											.Padding(0.0f, 3.0f)
-											.VAlign(VAlign_Center)
-											[
-												SNew(SBox)
-												.HeightOverride(EditableTextHeight)
-												[
-													SNew(SHorizontalBox)
-													// Host type
-													+ SHorizontalBox::Slot()
-													.AutoWidth()
-													.Padding(6.0f, 0.0f, 0.0f, 0.0f)
-													[
-														SAssignNew(SelectableHostTypesComboBox, SComboBox<TSharedPtr<ECodeTemplateType>>)
-														.Visibility(EVisibility::Visible)
-														.ToolTipText(LOCTEXT("CreateModule_ModuleHostTypeTip", "Choose your module's loading context"))
-														.OptionsSource(&ALL_MODULE_TYPES)
-														.InitiallySelectedItem(INITIALLY_SELECTED_HOST_TYPE)
-														.OnSelectionChanged(this, &SCreateCodeFileWidget::OnSelectedHostTypeChanged)
-														.OnGenerateWidget(this, &SCreateCodeFileWidget::MakeWidgetForSelectedHostType)
-														[
-															SNew(STextBlock)
-															.Text(this, &SCreateCodeFileWidget::GetSelectedHostTypeText)
-														]
-													]
-													
-													// Cpp Directory
-													+ SHorizontalBox::Slot()
-													.AutoWidth()
-													.Padding(6.0f, 0.0f, 0.0f, 0.0f)
-													[
-														SAssignNew(CppDirectoryComboBox, SComboBox<TSharedPtr<ECppDirectory>>)
-														.Visibility(EVisibility::Visible)
-														.ToolTipText(LOCTEXT("CreateModule_ModuleLoadingPhaseTip", "Choose your module's loading phase"))
-														.OptionsSource(&CppLocation)
-														.OnSelectionChanged(this, &SCreateCodeFileWidget::OnSelectedCppDirectoryChanged)
-														.OnGenerateWidget(this, &SCreateCodeFileWidget::MakeWidgetForSelectedLoadingPhase)
-														[
-															SNew(STextBlock)
-															.Text(this, &SCreateCodeFileWidget::GetSelectedCppDirectoryText)
-														]
-													]
-												]
-												
-											]
-											
-											// H Path label
-											+ SGridPanel::Slot(0, 2)
-											.VAlign(VAlign_Center)
-											.Padding(0, 0, 12, 0)
-											[
-												SNew(STextBlock)
-												.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
-												.Text(LOCTEXT("CreateModule_PathLabel", "H Path"))
-											]
-											// Path edit box
-											+ SGridPanel::Slot(1, 2)
-											.VAlign(VAlign_Center)
-											[
-												SNew(SVerticalBox)
-												+ SVerticalBox::Slot()
-												.Padding(0)
-												.AutoHeight()
-												[
-													SNew(SBox)
-													.HeightOverride(EditableTextHeight)
-													[
-														SNew(SHorizontalBox)
-														
-														+ SHorizontalBox::Slot()
-														.FillWidth(1.0f)
-														[
-															SAssignNew(HPathEditBox, SEditableTextBox)
-														]
-													]
-												]
-											]
-											// Choose folder button
-											+ SGridPanel::Slot(2, 2)
-											.Padding(0.0f, 3.0f)
-											.VAlign(VAlign_Center)
-											[
-												SNew(SBox)
-												.HeightOverride(EditableTextHeight)
-												[
-													SNew(SHorizontalBox)
-													+ SHorizontalBox::Slot()
-													.FillWidth(1.f)
-													.HAlign(HAlign_Fill)
-													.Padding(6.0f, 0.0f, 0.0f, 0.0f)
-													[
-														SNew(SButton)
-														.VAlign(VAlign_Center)
-														//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
-														.ToolTipText(LOCTEXT("CreateModule_ChooseFolderTooltip", "You can choose either the 'Source' folder in your project's root directory or of any plugin in the 'Plugins' folder."))
-														.Text(LOCTEXT("BrowseButtonText", "Choose folder"))
-													]
-												]
-											]
-											
-											//// CPP Path edit box
-											//+ SGridPanel::Slot(0, 3)
-											//	.VAlign(VAlign_Center)
-											//	.Padding(0, 0, 12, 0)
-											//	[
-												//		SNew(STextBlock)
-												//		.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
-												//	.Text(LOCTEXT("CreateModule_PathLabel_Cpp", "Cpp Path"))
-											//	]
-											//+ SGridPanel::Slot(1, 3)
-											//	.VAlign(VAlign_Center)
-											//	[
-												//		SNew(SVerticalBox)
-												//		+ SVerticalBox::Slot()
-												//	.Padding(0)
-												//	.AutoHeight()
-												//	[
-													//		SNew(SBox)
-													//		.HeightOverride(EditableTextHeight)
-													//	[
-														//		SNew(SHorizontalBox)
-														
-														//		+ SHorizontalBox::Slot()
-														//	.FillWidth(1.0f)
-														//	[
-															//		SAssignNew(CppPathEditBox, SEditableTextBox)
-														//	]
-													//	]
-												//	]
-											//	]
-											// Choose folder button
-											//+SGridPanel::Slot(2, 3)
-											//	.Padding(0.0f, 3.0f)
-											//	.VAlign(VAlign_Center)
-											//	[
-												//		SNew(SBox)
-												//		.HeightOverride(EditableTextHeight)
-												//	[
-													//		SNew(SHorizontalBox)
-													//		+ SHorizontalBox::Slot()
-													//	.FillWidth(1.f)
-													//	.HAlign(HAlign_Fill)
-													//	.Padding(6.0f, 0.0f, 0.0f, 0.0f)
-													//	[
-														//		SNew(SButton)
-														//		.VAlign(VAlign_Center)
-														//	//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
-														//	.ToolTipText(LOCTEXT("CreateModule_ChooseFolderTooltip", "You can choose either the 'Source' folder in your project's root directory or of any plugin in the 'Plugins' folder."))
-														//	.Text(LOCTEXT("BrowseButtonText", "Choose folder"))
-													//	]
-												//	]
-											//	]
+		.BorderImage(FUPTStyle::GetBrush("Docking.Tab.ContentAreaBrush"))
+		[
+			SNew(SVerticalBox)
+
+			+ SVerticalBox::Slot()
+		[
+			SAssignNew(MainWizard, SWizard)
+			.ShowPageList(false)
+
+		.ButtonStyle(FUPTStyle::Get(), "FlatButton.Default")
+		.CancelButtonStyle(FUPTStyle::Get(), "FlatButton.Default")
+		.FinishButtonStyle(FUPTStyle::Get(), "FlatButton.Success")
+		.ButtonTextStyle(FUPTStyle::Get(), "LargeText")
+		.ForegroundColor(FUPTStyle::Get().GetSlateColor("WhiteBrush"))
+
+		.CanFinish(this, &SCreateCodeFileWidget::CanFinishButtonBeClicked)
+		.FinishButtonText(LOCTEXT("NewModule_FinishButtonText", "Create File"))
+		.FinishButtonToolTip(
+			LOCTEXT("NewModule_FinishButtonToolTip", "Creates the code files to add your new module.")
+		)
+		.OnCanceled(this, &SCreateCodeFileWidget::OnClickCancel)
+		.OnFinished(this, &SCreateCodeFileWidget::OnClickFinish)
+		.InitialPageIndex(0)
+
+		// Error message at bottom
+		.PageFooter()
+		[
+			SNew(SBorder)
+			.Visibility(this, &SCreateCodeFileWidget::GetErrorLabelVisibility)
+		.BorderImage(FUPTStyle::GetBrush("NewClassDialog.ErrorLabelBorder"))
+		.Padding(FMargin(0, 5))
+		.Content()
+		[
+			SNew(SHorizontalBox)
+
+			+ SHorizontalBox::Slot()
+		.VAlign(VAlign_Center)
+		.Padding(2.f)
+		.AutoWidth()
+		[
+			SNew(SImage)
+			.Image(FUPTStyle::GetBrush("MessageLog.Warning"))
+		]
+
+	+ SHorizontalBox::Slot()
+		.VAlign(VAlign_Center)
+		[
+			SNew(STextBlock)
+			.Text(this, &SCreateCodeFileWidget::GetErrorLabelText)
+		.TextStyle(FUPTStyle::Get(), "NewClassDialog.ErrorLabelFont")
+		]
+		]
+		]
+
+	+ SWizard::Page()
+		[
+			SNew(SVerticalBox)
+
+			// Title
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0)
+		[
+			SNew(STextBlock)
+			.TextStyle(FUPTStyle::Get(), "NewClassDialog.PageTitle")
+		.Text(LOCTEXT("NewModule_Title", "New File"))
+		]
+
+	// Title spacer
+	+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0, 2, 0, 8)
+		[
+			SNew(SSeparator)
+		]
+
+	// Page description and view options
+	+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0, 10)
+		[
+			SNew(SHorizontalBox)
+
+			+ SHorizontalBox::Slot()
+		.FillWidth(1.f)
+		.VAlign(VAlign_Center)
+		[
+			SNew(STextBlock)
+			.Text(
+				LOCTEXT("NewModule_PageDescription", "This will add a new file to your game project and update the .uproject or .uplugin file, respectively.")
+			)
+		]
+		]
+
+	// First page: name module, module type, and loading phase
+	+ SVerticalBox::Slot()
+		.Padding(2, 2)
+		.AutoHeight()
+		.HAlign(EHorizontalAlignment::HAlign_Fill)//
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+		.HAlign(EHorizontalAlignment::HAlign_Fill)//
+		.FillWidth(1.f)//
+		[
+			SNew(SVerticalBox)
+
+			+ SVerticalBox::Slot()
+		.AutoHeight()
+		.VAlign(VAlign_Center)
+		[
+			// Gray details panel
+			SNew(SBorder)
+			.BorderImage(FUPTStyle::GetBrush("DetailsView.CategoryTop"))
+		.BorderBackgroundColor(FLinearColor(0.6f, 0.6f, 0.6f, 1.0f))
+		.Padding(FMargin(6.0f, 4.0f, 7.0f, 4.0f))
+		[
+			SNew(SVerticalBox)
+
+			+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0)
+		[
+			SNew(SGridPanel)
+			.FillColumn(1, 1.0f)
+
+		// Name label
+		+ SGridPanel::Slot(0, 1)
+		.VAlign(VAlign_Center)
+		.Padding(0, 0, 12, 0)
+		[
+			SNew(STextBlock)
+			.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
+		.Text(LOCTEXT("CreateModule_NameLabel", "Parent"))
+		]
+
+	// Name edit box
+	+ SGridPanel::Slot(1, 1)
+		.Padding(0.0f, 3.0f)
+		.VAlign(VAlign_Center)
+		[
+			SNew(SBox)
+			.HeightOverride(EditableTextHeight)
+		[
+			SAssignNew(ParentEditBox, SEditableTextBox)
+		]
+		]
+	// Host type and loading phase
+	+ SGridPanel::Slot(2, 1)
+		.Padding(0.0f, 3.0f)
+		.VAlign(VAlign_Center)
+		[
+			SNew(SBox)
+			.HeightOverride(EditableTextHeight)
+		[
+			SNew(SHorizontalBox)
+			// Host type
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(6.0f, 0.0f, 0.0f, 0.0f)
+		[
+			SAssignNew(SelectableHostTypesComboBox, SComboBox<TSharedPtr<ECodeTemplateType>>)
+			.Visibility(EVisibility::Visible)
+		.ToolTipText(LOCTEXT("CreateModule_ModuleHostTypeTip", "Choose your module's loading context"))
+		.OptionsSource(&ALL_MODULE_TYPES)
+		.InitiallySelectedItem(INITIALLY_SELECTED_HOST_TYPE)
+		.OnSelectionChanged(this, &SCreateCodeFileWidget::OnSelectedHostTypeChanged)
+		.OnGenerateWidget(this, &SCreateCodeFileWidget::MakeWidgetForSelectedHostType)
+		[
+			SNew(STextBlock)
+			.Text(this, &SCreateCodeFileWidget::GetSelectedHostTypeText)
+		]
+		]
+
+	// Cpp Directory
+	+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(6.0f, 0.0f, 0.0f, 0.0f)
+		[
+			SAssignNew(CppDirectoryComboBox, SComboBox<TSharedPtr<ECppDirectory>>)
+			.Visibility(EVisibility::Visible)
+		.ToolTipText(LOCTEXT("CreateModule_ModuleLoadingPhaseTip", "Choose your module's loading phase"))
+		.OptionsSource(&CppLocation)
+		.OnSelectionChanged(this, &SCreateCodeFileWidget::OnSelectedCppDirectoryChanged)
+		.OnGenerateWidget(this, &SCreateCodeFileWidget::MakeWidgetForSelectedLoadingPhase)
+		[
+			SNew(STextBlock)
+			.Text(this, &SCreateCodeFileWidget::GetSelectedCppDirectoryText)
+		]
+		]
+		]
+
+		]
+
+	// H Path label
+	+ SGridPanel::Slot(0, 2)
+		.VAlign(VAlign_Center)
+		.Padding(0, 0, 12, 0)
+		[
+			SNew(STextBlock)
+			.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
+		.Text(LOCTEXT("CreateModule_PathLabel", "H Path"))
+		]
+	// Path edit box
+	+ SGridPanel::Slot(1, 2)
+		.VAlign(VAlign_Center)
+		[
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+		.Padding(0)
+		.AutoHeight()
+		[
+			SNew(SBox)
+			.HeightOverride(EditableTextHeight)
+		[
+			SNew(SHorizontalBox)
+
+			+ SHorizontalBox::Slot()
+		.FillWidth(1.0f)
+		[
+			SAssignNew(HPathEditBox, SEditableTextBox)
+		]
+		]
+		]
+		]
+	// Choose folder button
+	+ SGridPanel::Slot(2, 2)
+		.Padding(0.0f, 3.0f)
+		.VAlign(VAlign_Center)
+		[
+			SNew(SBox)
+			.HeightOverride(EditableTextHeight)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+		.FillWidth(1.f)
+		.HAlign(HAlign_Fill)
+		.Padding(6.0f, 0.0f, 0.0f, 0.0f)
+		[
+			SNew(SButton)
+			.VAlign(VAlign_Center)
+		//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
+		.ToolTipText(LOCTEXT("CreateModule_ChooseFolderTooltip", "You can choose either the 'Source' folder in your project's root directory or of any plugin in the 'Plugins' folder."))
+		.Text(LOCTEXT("BrowseButtonText", "Choose folder"))
+		]
+		]
+		]
+
+	//// CPP Path edit box
+	//+ SGridPanel::Slot(0, 3)
+	//	.VAlign(VAlign_Center)
+	//	.Padding(0, 0, 12, 0)
+	//	[
+		//		SNew(STextBlock)
+		//		.TextStyle(FUPTStyle::Get(), "NewClassDialog.SelectedParentClassLabel")
+		//	.Text(LOCTEXT("CreateModule_PathLabel_Cpp", "Cpp Path"))
+	//	]
+	//+ SGridPanel::Slot(1, 3)
+	//	.VAlign(VAlign_Center)
+	//	[
+		//		SNew(SVerticalBox)
+		//		+ SVerticalBox::Slot()
+		//	.Padding(0)
+		//	.AutoHeight()
+		//	[
+			//		SNew(SBox)
+			//		.HeightOverride(EditableTextHeight)
+			//	[
+				//		SNew(SHorizontalBox)
+
+				//		+ SHorizontalBox::Slot()
+				//	.FillWidth(1.0f)
+				//	[
+					//		SAssignNew(CppPathEditBox, SEditableTextBox)
+				//	]
+			//	]
+		//	]
+	//	]
+	// Choose folder button
+	//+SGridPanel::Slot(2, 3)
+	//	.Padding(0.0f, 3.0f)
+	//	.VAlign(VAlign_Center)
+	//	[
+		//		SNew(SBox)
+		//		.HeightOverride(EditableTextHeight)
+		//	[
+			//		SNew(SHorizontalBox)
+			//		+ SHorizontalBox::Slot()
+			//	.FillWidth(1.f)
+			//	.HAlign(HAlign_Fill)
+			//	.Padding(6.0f, 0.0f, 0.0f, 0.0f)
+			//	[
+				//		SNew(SButton)
+				//		.VAlign(VAlign_Center)
+				//	//.OnClicked(this, &SCreateCodeFileWidget::HandleChooseFolderButtonClicked)
+				//	.ToolTipText(LOCTEXT("CreateModule_ChooseFolderTooltip", "You can choose either the 'Source' folder in your project's root directory or of any plugin in the 'Plugins' folder."))
+				//	.Text(LOCTEXT("BrowseButtonText", "Choose folder"))
+			//	]
+		//	]
+	//	]
 //	]
-									]
-								]
-							]
-						]
-					]
-				]
-			]
-			
+		]
+		]
+		]
+		]
+		]
+		]
+		]
+
 		]];
 
 	CppDirectoryComboBox->SetSelectedItem(MakeShareable(new ECppDirectory(ECppDirectory::Only_H)));
@@ -564,17 +564,26 @@ FText SCreateCodeFileWidget::GetSelectedHostTypeText() const
 
 void SCreateCodeFileWidget::OnSelectedCppDirectoryChanged(TSharedPtr<ECppDirectory> Value, ESelectInfo::Type SelectInfo)
 {
+	if (!Value.IsValid())
+		return;
+
 	SelectedCppDirectory = *Value.Get();
 	UpdateInput();
 }
 void SCreateCodeFileWidget::OnSelectedLoadingPhaseChanged(TSharedPtr<ECodeFileType> Value, ESelectInfo::Type SelectInfo)
 {
+	if (!Value.IsValid())
+		return;
+
 	SelectedLoadingPhase = *Value.Get();
 	UpdateInput();
 }
 
 TSharedRef<SWidget> SCreateCodeFileWidget::MakeWidgetForSelectedLoadingPhase(TSharedPtr<ECppDirectory> CppDirectory) const
 {
+	if (!CppDirectory.IsValid())
+		return SNullWidget::NullWidget;
+
 	const FText text = FText::Format(LOCTEXT("CreateModule_CppDirectoryComboText", "{0}"), FText::FromString(FCreateCodeManager::Get()->GetCppDirectoryByEnum(*CppDirectory.Get())));
 	return SNew(STextBlock)
 		.Text(text);
@@ -582,6 +591,9 @@ TSharedRef<SWidget> SCreateCodeFileWidget::MakeWidgetForSelectedLoadingPhase(TSh
 
 TSharedRef<SWidget> SCreateCodeFileWidget::MakeWidgetForSelectedLoadingPhase(TSharedPtr<ECodeFileType> ForLoadingPhase) const
 {
+	if (!ForLoadingPhase.IsValid())
+		return SNullWidget::NullWidget;
+
 	const FText text = FText::Format(LOCTEXT("CreateModule_SelectLoadingPhaseComboText", "{0}"), FText::FromString(FCreateCodeManager::Get()->GetCodeFileByEnum(*ForLoadingPhase.Get())));
 	return SNew(STextBlock)
 		.Text(text);

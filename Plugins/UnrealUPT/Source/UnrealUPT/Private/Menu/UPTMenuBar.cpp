@@ -37,6 +37,7 @@ void FUPTMenuBar::FillWindowsMenuBarEntries(FMenuBuilder& MenuBuilder)
 	MenuBuilder.AddMenuEntry(LOCTEXT("Settings", "Settings"), LOCTEXT("Settings Tip", "Settings"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("UPTSettings")); })));
 	MenuBuilder.AddMenuEntry(LOCTEXT("Engine information", "Engine information"), LOCTEXT("Engine information Tip", "Engine information"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("EngineInfomation")); })));
 	MenuBuilder.AddMenuEntry(LOCTEXT("Engine Projects", "Engine Projects"), LOCTEXT("Engine Projects Tip", "Engine Projects"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("UPTWindowTab")); })));
+	MenuBuilder.AddMenuEntry(LOCTEXT("Common Application", "Common Application"), LOCTEXT("Common Application Tip", "Common Application"), FSlateIcon(), FUIAction(FExecuteAction::CreateLambda([]() { FGlobalTabmanager::Get()->TryInvokeTab(FTabId("CommonApplication")); })));
 }
 
 void FUPTMenuBar::FillHelpMenuBarEntries(FMenuBuilder& MenuBuilder)

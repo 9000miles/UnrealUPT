@@ -15,6 +15,14 @@ public:
 
 public:
 	void Construct(const FArguments& InArgs, TSharedPtr<FProjectInfo> Info);
+	void LaunchGame(TSharedPtr<FProjectInfo> Info);
+	void PackageProject(TSharedPtr<FProjectInfo> Info);
+	void CopyPackageFiles(TSharedPtr<FProjectInfo> Info);
+
+private:
+	void HandleUatProcessCanceled();
+	void HandleUatProcessCompleted(int32 Result);
+	void HandleUatProcessOutput(FString Message);
 
 private:
 	TSharedPtr<FProjectInfo> ProjectInfo;

@@ -51,6 +51,7 @@ public class UnrealUPT : ModuleRules
                 "SlateReflector",
                 "EngineSettings",
                 "DesktopPlatform",
+                "DeveloperSettings",
 				// ... add private dependencies that you statically link with here ...
 			}
             );
