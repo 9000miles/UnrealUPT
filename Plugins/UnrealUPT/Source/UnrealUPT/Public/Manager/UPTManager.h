@@ -7,6 +7,7 @@
 #include "UPTDelegateCenter.h"
 #include "SNotificationList.h"
 #include "PrintHelper/Public/PrintHelper.h"
+#include "MonitoredProcess.h"
 
 struct FProjectInfo;
 
@@ -51,6 +52,8 @@ public:
 
 	bool LaunchGame(TSharedRef<FProjectInfo> Info);
 	bool OpenProject(TSharedRef<FProjectInfo> Info);
+	void PackageProject(TSharedRef<FProjectInfo> Info);
+	void HandleUatProcessCompleted(int32 Result);
 	bool OpenCodeIDE(TSharedRef<FProjectInfo> Info);
 	void GenerateSolution(TSharedRef<FProjectInfo> Info);
 	bool ShowInExplorer(TSharedRef<FProjectInfo> Info);
@@ -89,4 +92,5 @@ private:
 private:
 	TWeakPtr<FProjectInfo> CurrentSelectedProject;
 	TSharedPtr<SNotificationList> NotificationListPtr;
+	TSharedPtr<FMonitoredProcess> UatProcess;
 };

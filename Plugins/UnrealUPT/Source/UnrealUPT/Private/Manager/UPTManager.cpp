@@ -28,6 +28,8 @@
 #include "PrintHelper.h"
 #include <Async.h>
 #include "SNotificationList.h"
+#include "MonitoredProcess.h"
+#include "Settings/UPTSettings.h"
 //#include "Engine.h"
 
 #define LOCTEXT_NAMESPACE "FEPManager"
@@ -343,6 +345,79 @@ bool FUPTManager::OpenProject(TSharedRef<FProjectInfo> Info)
 	FPlatformProcess::CloseProc(Handle);
 #endif
 	return true;
+}
+
+void FUPTManager::PackageProject(TSharedRef<FProjectInfo> Info)
+{
+	FString EngineDir = Info->GetEnginePath();
+
+	FString RunUAT;
+	RunUAT = EngineDir + "/Engine/Build/BatchFiles/RunUAT.bat";
+
+	//判断RunUAT.bat是否存在
+	if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*RunUAT))
+	{
+		PRINT_ERROR(FString::Printf(TEXT("RunUAT.bat no exists  %s"), *RunUAT));
+		return;
+	}
+
+	FProjectSettings ProjectSettings = UUPTSettings::GetProjectSetting(Info->GetProjectPath());
+	if (FPaths::FileExists(ProjectSettings.ProjectPath))
+	{
+		FString CmdExe = TEXT("cmd.exe");
+		FString FullCommandLine = FString::Printf(TEXT("/c \"\"%s\" %s\""), *RunUAT, *ProjectSettings.PackingParameters);
+		PRINT_WARNING("FullCommandLine : " << FullCommandLine);
+		UatProcess = MakeShareable(new FMonitoredProcess(CmdExe, FullCommandLine, true));
+		//UatProcess->OnCanceled().BindRaw(this, &SContextMenu::HandleUatProcessCanceled);
+		UatProcess->OnCompleted().BindSP(this, &FUPTManager::HandleUatProcessCompleted);
+		UatProcess->OnOutput().BindLambda([](FString Log) {FUPTManager::Get()->PrintLog(Log); });
+		//UatProcess->OnOutput().BindStatic(&SContextMenu::HandleUatProcessOutput);
+
+		if (UatProcess->Launch())
+		{
+			FGlobalTabmanager::Get()->InvokeTab(FName(TEXT("OutputLogPlus")));
+			PRINT_LOG("UatProcess->Launch()");
+		}
+
+		//FProcHandle	ProcessHandle = FPlatformProcess::CreateProc(*CmdExe, *FullCommandLine, false, false, false, nullptr, 0, nullptr, nullptr);
+		//if (!ProcessHandle.IsValid())
+		//{
+		//	PRINT_LOG("if (!ProcessHandle.IsValid())");
+		//}
+		////FPlatformProcess::WaitForProc(ProcessHandle);
+		//FPlatformProcess::CloseProc(ProcessHandle);
+
+		int32* OutReturnCode = nullptr;
+		FString* OutStdOut = nullptr;
+		FString* OutStdErr = nullptr;
+
+		//FPlatformProcess::ExecProcess(*CmdExe, *FullCommandLine, OutReturnCode, OutStdOut, OutStdErr);
+		//PRINT_LOG(*OutStdOut << "" << *OutStdErr);
+	}
+
+#if PLATFORM_WINDOWS && 0
+	//使用CMD打开工程
+	FProjectSettings ProjectSettings = UUPTSettings::GetProjectSetting(Info->GetProjectPath());
+	if (FPaths::FileExists(ProjectSettings.ProjectPath))
+	{
+		FString CommandLine = FString::Printf(TEXT(" %s %s"), *RunUAT, *ProjectSettings.PackingParameters);
+		//FString CommandLine = FString::Printf(TEXT("%s"), *ProjectSettings.PackingParameters);
+		FProcHandle Handle = FPlatformProcess::CreateProc(TEXT("C:/Windows/system32/cmd.exe"), *CommandLine, true, false, false, NULL, 0, NULL, NULL);
+		if (!Handle.IsValid())
+		{
+			PRINT_ERROR("Failed to create process");
+			return;
+		}
+		FPlatformProcess::CloseProc(Handle);
+	}
+#endif
+}
+void FUPTManager::HandleUatProcessCompleted(int32 Result)
+{
+	FNotificationInfo Info(FText::Format(LOCTEXT("Package Completed Notification", "Package Completed {0}"), Result == 0 ? FCoreTexts::Get().True : FCoreTexts::Get().False));
+	Info.ExpireDuration = 5;
+	Info.bUseLargeFont = false;
+	//FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
 }
 
 bool FUPTManager::OpenCodeIDE(TSharedRef<FProjectInfo> Info)

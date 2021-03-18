@@ -175,6 +175,9 @@ void SContextMenu::LaunchGame(TSharedPtr<FProjectInfo> Info)
 
 void SContextMenu::PackageProject(TSharedPtr<FProjectInfo> Info)
 {
+	FUPTManager::Get()->PackageProject(Info.ToSharedRef());
+	return;
+
 	if (Info.IsValid() == false)
 		return;
 
@@ -195,7 +198,8 @@ void SContextMenu::PackageProject(TSharedPtr<FProjectInfo> Info)
 	{
 		FString CmdExe = TEXT("cmd.exe");
 		FString FullCommandLine = FString::Printf(TEXT("/c \"\"%s\" %s\""), *RunUAT, *ProjectSettings.PackingParameters);
-		TSharedPtr<FMonitoredProcess> UatProcess = MakeShareable(new FMonitoredProcess(CmdExe, FullCommandLine, true));
+		PRINT_WARNING("FullCommandLine : " << FullCommandLine);
+		TSharedPtr<FMonitoredProcess> UatProcess = MakeShareable(new FMonitoredProcess(CmdExe, FullCommandLine, false));
 		UatProcess->OnCanceled().BindRaw(this, &SContextMenu::HandleUatProcessCanceled);
 		UatProcess->OnCompleted().BindSP(this, &SContextMenu::HandleUatProcessCompleted);
 		UatProcess->OnOutput().BindLambda([](FString Log) {FUPTManager::Get()->PrintLog(Log); });
@@ -203,9 +207,24 @@ void SContextMenu::PackageProject(TSharedPtr<FProjectInfo> Info)
 
 		if (UatProcess->Launch())
 		{
-			//FGlobalTabmanager::Get()->InvokeTab(FName(TEXT("OutputLog")));
+			FGlobalTabmanager::Get()->InvokeTab(FName(TEXT("OutputLog")));
 			PRINT_LOG("UatProcess->Launch()");
 		}
+
+		//FProcHandle	ProcessHandle = FPlatformProcess::CreateProc(*CmdExe, *FullCommandLine, false, false, false, nullptr, 0, nullptr, nullptr);
+		//if (!ProcessHandle.IsValid())
+		//{
+		//	PRINT_LOG("if (!ProcessHandle.IsValid())");
+		//}
+		////FPlatformProcess::WaitForProc(ProcessHandle);
+		//FPlatformProcess::CloseProc(ProcessHandle);
+
+		int32* OutReturnCode = nullptr;
+		FString* OutStdOut = nullptr;
+		FString* OutStdErr = nullptr;
+
+		//FPlatformProcess::ExecProcess(*CmdExe, *FullCommandLine, OutReturnCode, OutStdOut, OutStdErr);
+		//PRINT_LOG(*OutStdOut << "" << *OutStdErr);
 	}
 
 #if PLATFORM_WINDOWS && 0
@@ -295,6 +314,10 @@ void SContextMenu::HandleUatProcessCanceled()
 
 void SContextMenu::HandleUatProcessCompleted(int32 Result)
 {
+	FNotificationInfo Info(FText::Format(LOCTEXT("Package Completed Notification", "Package Completed {0}"), Result == 0 ? FCoreTexts::Get().True : FCoreTexts::Get().False));
+	Info.ExpireDuration = 5;
+	Info.bUseLargeFont = false;
+	FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
 }
 
 void SContextMenu::HandleUatProcessOutput(FString Message)
