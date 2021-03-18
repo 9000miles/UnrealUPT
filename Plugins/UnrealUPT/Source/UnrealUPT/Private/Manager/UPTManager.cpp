@@ -30,6 +30,7 @@
 #include "SNotificationList.h"
 #include "MonitoredProcess.h"
 #include "Settings/UPTSettings.h"
+#include "NotificationManager.h"
 //#include "Engine.h"
 
 #define LOCTEXT_NAMESPACE "FEPManager"
@@ -378,45 +379,25 @@ void FUPTManager::PackageProject(TSharedRef<FProjectInfo> Info)
 			FGlobalTabmanager::Get()->InvokeTab(FName(TEXT("OutputLogPlus")));
 			PRINT_LOG("UatProcess->Launch()");
 		}
-
-		//FProcHandle	ProcessHandle = FPlatformProcess::CreateProc(*CmdExe, *FullCommandLine, false, false, false, nullptr, 0, nullptr, nullptr);
-		//if (!ProcessHandle.IsValid())
-		//{
-		//	PRINT_LOG("if (!ProcessHandle.IsValid())");
-		//}
-		////FPlatformProcess::WaitForProc(ProcessHandle);
-		//FPlatformProcess::CloseProc(ProcessHandle);
-
-		int32* OutReturnCode = nullptr;
-		FString* OutStdOut = nullptr;
-		FString* OutStdErr = nullptr;
-
-		//FPlatformProcess::ExecProcess(*CmdExe, *FullCommandLine, OutReturnCode, OutStdOut, OutStdErr);
-		//PRINT_LOG(*OutStdOut << "" << *OutStdErr);
 	}
-
-#if PLATFORM_WINDOWS && 0
-	//使用CMD打开工程
-	FProjectSettings ProjectSettings = UUPTSettings::GetProjectSetting(Info->GetProjectPath());
-	if (FPaths::FileExists(ProjectSettings.ProjectPath))
-	{
-		FString CommandLine = FString::Printf(TEXT(" %s %s"), *RunUAT, *ProjectSettings.PackingParameters);
-		//FString CommandLine = FString::Printf(TEXT("%s"), *ProjectSettings.PackingParameters);
-		FProcHandle Handle = FPlatformProcess::CreateProc(TEXT("C:/Windows/system32/cmd.exe"), *CommandLine, true, false, false, NULL, 0, NULL, NULL);
-		if (!Handle.IsValid())
-		{
-			PRINT_ERROR("Failed to create process");
-			return;
-		}
-		FPlatformProcess::CloseProc(Handle);
-	}
-#endif
 }
 void FUPTManager::HandleUatProcessCompleted(int32 Result)
 {
-	FNotificationInfo Info(FText::Format(LOCTEXT("Package Completed Notification", "Package Completed {0}"), Result == 0 ? FCoreTexts::Get().True : FCoreTexts::Get().False));
-	Info.ExpireDuration = 5;
-	Info.bUseLargeFont = false;
+	FNotificationInfo* Info = new FNotificationInfo(FText::Format(LOCTEXT("Package Completed Notification", "Package Completed {0}"), Result == 0 ? FCoreTexts::Get().True : FCoreTexts::Get().False));
+	Info->ExpireDuration = 5;
+	Info->bUseLargeFont = false;
+
+	FSlateNotificationManager::Get().QueueNotification(Info);
+
+	//TSharedPtr<SNotificationItem> NotificationItem = FSlateNotificationManager::Get().QueueNotification(Info);
+	//NotificationItemPtr = NotificationItem;
+
+	//const bool bSuccee = Result == 0;
+	//TGraphTask<FUPTNotificationTask>::CreateTask().ConstructAndDispatchWhenReady(
+	//	NotificationItemPtr,
+	//	bSuccee ? SNotificationItem::CS_Success : SNotificationItem::CS_Fail,
+	//	FText::Format(LOCTEXT("Package Completed Notification", "Package Completed {0}"), bSuccee ? FCoreTexts::Get().True : FCoreTexts::Get().False)
+	//);
 	//FUPTDelegateCenter::OnRequestAddNotification.Execute(Info);
 }
 
@@ -605,3 +586,5 @@ TSharedRef<SNotificationItem> FUPTManager::AddNotification(FNotificationInfo Inf
 }
 
 #undef LOCTEXT_NAMESPACE
+
+TWeakPtr<SNotificationItem> FUPTNotificationTask::ExpireNotificationItemPtr;

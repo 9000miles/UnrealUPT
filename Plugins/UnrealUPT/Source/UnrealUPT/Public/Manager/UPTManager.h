@@ -11,6 +11,100 @@
 
 struct FProjectInfo;
 
+class FUPTNotificationTask
+{
+public:
+
+	FUPTNotificationTask(TWeakPtr<SNotificationItem> InNotificationItemPtr, SNotificationItem::ECompletionState InCompletionState, const FText& InText, const FText& InLinkText = FText(), bool InExpireAndFadeout = true)
+		: CompletionState(InCompletionState)
+		, NotificationItemPtr(InNotificationItemPtr)
+		, Text(InText)
+		, LinkText(InLinkText)
+		, bExpireAndFadeout(InExpireAndFadeout)
+
+	{
+	}
+
+	static void HandleHyperlinkNavigate()
+	{
+		FMessageLog("PackagingResults").Open(EMessageSeverity::Error, true);
+	}
+
+	static void HandleDismissButtonClicked()
+	{
+		TSharedPtr<SNotificationItem> NotificationItem = ExpireNotificationItemPtr.Pin();
+		if (NotificationItem.IsValid())
+		{
+			NotificationItem->SetExpireDuration(0.0f);
+			NotificationItem->SetFadeOutDuration(0.0f);
+			NotificationItem->SetCompletionState(SNotificationItem::CS_Fail);
+			NotificationItem->ExpireAndFadeout();
+			ExpireNotificationItemPtr.Reset();
+		}
+	}
+
+	void DoTask(ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)
+	{
+		if (NotificationItemPtr.IsValid())
+		{
+			//if (CompletionState == SNotificationItem::CS_Fail)
+			//{
+			//	GEditor->PlayEditorSound(TEXT("/Engine/EditorSounds/Notifications/CompileFailed_Cue.CompileFailed_Cue"));
+			//}
+			//else
+			//{
+			//	GEditor->PlayEditorSound(TEXT("/Engine/EditorSounds/Notifications/CompileSuccess_Cue.CompileSuccess_Cue"));
+			//}
+
+			TSharedPtr<SNotificationItem> NotificationItem = NotificationItemPtr.Pin();
+			NotificationItem->SetText(Text);
+
+			if (!LinkText.IsEmpty())
+			{
+				FText VLinkText(LinkText);
+				const TAttribute<FText> Message = TAttribute<FText>::Create(TAttribute<FText>::FGetter::CreateLambda([VLinkText]()
+					{
+						return VLinkText;
+					}));
+
+				NotificationItem->SetHyperlink(FSimpleDelegate::CreateStatic(&HandleHyperlinkNavigate), Message);
+			}
+
+			if (bExpireAndFadeout)
+			{
+				ExpireNotificationItemPtr.Reset();
+				NotificationItem->SetExpireDuration(6.0f);
+				NotificationItem->SetFadeOutDuration(0.5f);
+				NotificationItem->SetCompletionState(CompletionState);
+				NotificationItem->ExpireAndFadeout();
+			}
+			else
+			{
+				// Handling the notification expiration in callback
+				ExpireNotificationItemPtr = NotificationItem;
+				NotificationItem->SetCompletionState(CompletionState);
+			}
+		}
+	}
+
+	static ESubsequentsMode::Type GetSubsequentsMode() { return ESubsequentsMode::TrackSubsequents; }
+	ENamedThreads::Type GetDesiredThread() { return ENamedThreads::GameThread; }
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(FUPTNotificationTask, STATGROUP_TaskGraphTasks);
+	}
+
+private:
+
+	static TWeakPtr<SNotificationItem> ExpireNotificationItemPtr;
+
+	SNotificationItem::ECompletionState CompletionState;
+	TWeakPtr<SNotificationItem> NotificationItemPtr;
+	FText Text;
+	FText LinkText;
+	bool bExpireAndFadeout;
+};
+
 class FUPTManager :public TSharedFromThis<FUPTManager>
 {
 public:
@@ -83,7 +177,7 @@ public:
 
 	void PrintLog(FString log)
 	{
-		PRINT_LOG(log);
+		GLog->Log(log);
 	}
 private:
 	TSharedPtr<FJsonObject> LoadProjectFile(const FString& FileName);
@@ -92,5 +186,6 @@ private:
 private:
 	TWeakPtr<FProjectInfo> CurrentSelectedProject;
 	TSharedPtr<SNotificationList> NotificationListPtr;
+	TWeakPtr<SNotificationItem> NotificationItemPtr;
 	TSharedPtr<FMonitoredProcess> UatProcess;
 };

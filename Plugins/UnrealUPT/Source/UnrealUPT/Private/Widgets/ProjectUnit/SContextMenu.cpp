@@ -16,6 +16,7 @@
 #include "MonitoredProcess.h"
 #include "TabManager.h"
 #include "Manager/UPTManager.h"
+#include "NotificationManager.h"
 
 #define LOCTEXT_NAMESPACE "SContextMenu"
 
@@ -211,20 +212,6 @@ void SContextMenu::PackageProject(TSharedPtr<FProjectInfo> Info)
 			PRINT_LOG("UatProcess->Launch()");
 		}
 
-		//FProcHandle	ProcessHandle = FPlatformProcess::CreateProc(*CmdExe, *FullCommandLine, false, false, false, nullptr, 0, nullptr, nullptr);
-		//if (!ProcessHandle.IsValid())
-		//{
-		//	PRINT_LOG("if (!ProcessHandle.IsValid())");
-		//}
-		////FPlatformProcess::WaitForProc(ProcessHandle);
-		//FPlatformProcess::CloseProc(ProcessHandle);
-
-		int32* OutReturnCode = nullptr;
-		FString* OutStdOut = nullptr;
-		FString* OutStdErr = nullptr;
-
-		//FPlatformProcess::ExecProcess(*CmdExe, *FullCommandLine, OutReturnCode, OutStdOut, OutStdErr);
-		//PRINT_LOG(*OutStdOut << "" << *OutStdErr);
 	}
 
 #if PLATFORM_WINDOWS && 0
@@ -239,9 +226,9 @@ void SContextMenu::PackageProject(TSharedPtr<FProjectInfo> Info)
 		{
 			PRINT_ERROR("Failed to create process");
 			return;
-		}
-		FPlatformProcess::CloseProc(Handle);
 	}
+		FPlatformProcess::CloseProc(Handle);
+}
 #endif
 }
 
