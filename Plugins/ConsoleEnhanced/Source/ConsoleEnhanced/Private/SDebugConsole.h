@@ -11,21 +11,20 @@ class SDebugConsole : public SCompoundWidget
 {
 public:
 
-	SLATE_BEGIN_ARGS( SDebugConsole )	
+	SLATE_BEGIN_ARGS(SDebugConsole)
 	{
 	}
 
 	SLATE_END_ARGS()
 
-	/** Constructs this widget */
-	void Construct( const FArguments& InArgs, const EDebugConsoleStyle::Type InStyle, class FConsoleEnhancedModule* OutputLogModule, const FDebugConsoleDelegates* DebugConsoleDelegates );
+		/** Constructs this widget */
+		void Construct(const FArguments& InArgs, const EDebugConsoleStyle::Type InStyle, class FConsoleEnhancedModule* OutputLogModule, const FDebugConsoleDelegates* DebugConsoleDelegates);
 
 	/** Call to set focus to this debug console's editable text box */
 	void SetFocusToEditableText();
 
 	/** Default constructor */
 	SDebugConsole();
-
 
 protected:
 	/** Returns EVisibility::Visible if style has log being shown, otherwise VIS_COLLAPSED */
@@ -51,4 +50,3 @@ private:
 	FCurveHandle AnimCurve;
 	FCurveHandle FlashCurve;
 };
-

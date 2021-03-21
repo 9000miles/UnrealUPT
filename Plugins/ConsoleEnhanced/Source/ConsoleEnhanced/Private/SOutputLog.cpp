@@ -66,8 +66,8 @@ public:
 			[
 				SAssignNew(EditableText, SConsoleEditableText)
 				.HintText(InArgs._HintText)
-			.OnTextChanged(InArgs._OnTextChanged)
-			.OnTextCommitted(InArgs._OnTextCommitted)
+				.OnTextChanged(InArgs._OnTextChanged)
+				.OnTextCommitted(InArgs._OnTextCommitted)
 			]);
 	}
 
@@ -163,30 +163,30 @@ void SConsoleInputBox::Construct(const FArguments& InArgs)
 		[
 			SAssignNew(SuggestionBox, SMenuAnchor)
 			.Placement(InArgs._SuggestionListPlacement)
-		[
-			SAssignNew(InputText, SConsoleEditableTextBox)
-			.OnTextCommitted(this, &SConsoleInputBox::OnTextCommitted)
-		.HintText(NSLOCTEXT("ConsoleInputBox", "TypeInConsoleHint", "Enter console command"))
-		.OnTextChanged(this, &SConsoleInputBox::OnTextChanged)
-		]
-	.MenuContent
-	(
-		SNew(SBorder)
-		.BorderImage(FConsoleEnhStyle::GetBrush("Menu.Background"))
-		.Padding(FMargin(2))
-		[
-			SNew(SBox)
-			.HeightOverride(250) // avoids flickering, ideally this would be adaptive to the content without flickering
-		[
-			SAssignNew(SuggestionListView, SListView< TSharedPtr<FString> >)
-			.ListItemsSource(&Suggestions)
-		.SelectionMode(ESelectionMode::Single)							// Ideally the mouse over would not highlight while keyboard controls the UI
-		.OnGenerateRow(this, &SConsoleInputBox::MakeSuggestionListItemWidget)
-		.OnSelectionChanged(this, &SConsoleInputBox::SuggestionSelectionChanged)
-		.ItemHeight(18)
-		]
-		]
-	)
+			[
+				SAssignNew(InputText, SConsoleEditableTextBox)
+				.OnTextCommitted(this, &SConsoleInputBox::OnTextCommitted)
+				.HintText(NSLOCTEXT("ConsoleInputBox", "TypeInConsoleHint", "Enter console command"))
+				.OnTextChanged(this, &SConsoleInputBox::OnTextChanged)
+			]
+			.MenuContent
+			(
+			SNew(SBorder)
+			.BorderImage(FConsoleEnhStyle::GetBrush("Menu.Background"))
+			.Padding(FMargin(2))
+			[
+				SNew(SBox)
+				.HeightOverride(250) // avoids flickering, ideally this would be adaptive to the content without flickering
+				[
+					SAssignNew(SuggestionListView, SListView< TSharedPtr<FString> >)
+					.ListItemsSource(&Suggestions)
+					.SelectionMode(ESelectionMode::Single)							// Ideally the mouse over would not highlight while keyboard controls the UI
+					.OnGenerateRow(this, &SConsoleInputBox::MakeSuggestionListItemWidget)
+					.OnSelectionChanged(this, &SConsoleInputBox::SuggestionSelectionChanged)
+					.ItemHeight(18)
+				]
+			]
+			)
 		];
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -257,12 +257,12 @@ TSharedRef<ITableRow> SConsoleInputBox::MakeSuggestionListItemWidget(TSharedPtr<
 		[
 			SNew(SBox)
 			.WidthOverride(300)			// to enforce some minimum width, ideally we define the minimum, not a fixed width
-		[
-			SNew(STextBlock)
-			.Text(FText::FromString(Combined))
-		//.TextStyle(Log.Normal::Get(), "Log.Normal")
-		.HighlightText(HighlightText)
-		]
+			[
+				SNew(STextBlock)
+				.Text(FText::FromString(Combined))
+				//.TextStyle(Log.Normal::Get(), "Log.Normal")
+				.HighlightText(HighlightText)
+			]
 		];
 }
 
@@ -932,9 +932,9 @@ FTextBlockStyle FOutputLogTextLayoutMarshaller::GetStyle(const TSharedPtr<FLogMe
 		bool isMatch = false;
 		if (logCategory.SearchAsRegex) {
 			//try {
-				regex searchPattern(TCHAR_TO_ANSI(*logCategory.CategorySearchString), regex_constants::nosubs | regex_constants::icase);
-				smatch matcher;
-				isMatch = regex_search(Message->CString, matcher, searchPattern);
+			regex searchPattern(TCHAR_TO_ANSI(*logCategory.CategorySearchString), regex_constants::nosubs | regex_constants::icase);
+			smatch matcher;
+			isMatch = regex_search(Message->CString, matcher, searchPattern);
 			//}
 			//catch (std::regex_error&) {
 			//	// just ignore the log category
@@ -1095,89 +1095,89 @@ void SOutputLog::Construct(const FArguments& InArgs)
 	ChildSlot
 		[
 			SNew(SVerticalBox)
-
+			
 			// Console output and filters
-		+ SVerticalBox::Slot()
-		[
-			SNew(SBorder)
-			.Padding(3)
-		.BorderImage(FConsoleEnhStyle::GetBrush("ToolPanel.GroupBorder"))
-		[
-			SNew(SVerticalBox)
-
-			// Output Log Filter
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(FMargin(0.0f, 0.0f, 0.0f, 4.0f))
-		[
-			SNew(SHorizontalBox)
-
-			+ SHorizontalBox::Slot()
-		.AutoWidth()
-		[
-			SNew(SComboButton)
-			//.ComboButtonStyle(FConsoleEnhStyle::Get(), "GenericFilters.ComboButtonStyle")
-		.ForegroundColor(FLinearColor::White)
-		.ContentPadding(0)
-		.ToolTipText(LOCTEXT("AddFilterToolTip", "Add an output log filter."))
-		.OnGetMenuContent(this, &SOutputLog::MakeAddFilterMenu)
-		.HasDownArrow(true)
-		.ContentPadding(FMargin(1, 0))
-		.ButtonContent()
-		[
-			SNew(SHorizontalBox)
-
-			+ SHorizontalBox::Slot()
-		.AutoWidth()
-		[
-			SNew(STextBlock)
-			.TextStyle(FConsoleEnhStyle::Get(), "GenericFilters.TextStyle")
-		//.Font(FConsoleEnhStyle::Get().GetFontStyle("FontAwesome.9"))
-		.Text(FText::FromString(FString(TEXT("\xf0b0"))) /*fa-filter*/)
-		]
-
-	+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(2, 0, 0, 0)
-		[
-			SNew(STextBlock)
-			.TextStyle(FConsoleEnhStyle::Get(), "GenericFilters.TextStyle")
-		.Text(LOCTEXT("Filters", "Filters"))
-		]
-		]
-		]
-
-	+ SHorizontalBox::Slot()
-		.Padding(4, 1, 0, 0)
-		[
-			SAssignNew(FilterTextBox, SSearchBox)
-			.HintText(LOCTEXT("SearchLogHint", "Search Log"))
-		.OnTextChanged(this, &SOutputLog::OnFilterTextChanged)
-		.OnTextCommitted(this, &SOutputLog::OnFilterTextCommitted)
-		.DelayChangeNotificationsWhileTyping(true)
-		]
-		]
-
-	// Output log area
-	+ SVerticalBox::Slot()
-		.FillHeight(1)
-		[
-			MessagesTextBox.ToSharedRef()
-		]
-		]
-		]
-
-	// The console input box
-	+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(FMargin(0.0f, 4.0f, 0.0f, 0.0f))
-		[
-			SNew(SConsoleInputBox)
-			.OnConsoleCommandExecuted(this, &SOutputLog::OnConsoleCommandExecuted)
-
-		// Always place suggestions above the input line for the output log widget
-		.SuggestionListPlacement(MenuPlacement_AboveAnchor)
-		]
+			+ SVerticalBox::Slot()
+			[
+				SNew(SBorder)
+				.Padding(3)
+				.BorderImage(FConsoleEnhStyle::GetBrush("ToolPanel.GroupBorder"))
+				[
+					SNew(SVerticalBox)
+					
+					// Output Log Filter
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.Padding(FMargin(0.0f, 0.0f, 0.0f, 4.0f))
+					[
+						SNew(SHorizontalBox)
+						
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						[
+							SNew(SComboButton)
+							//.ComboButtonStyle(FConsoleEnhStyle::Get(), "GenericFilters.ComboButtonStyle")
+							.ForegroundColor(FLinearColor::White)
+							.ContentPadding(0)
+							.ToolTipText(LOCTEXT("AddFilterToolTip", "Add an output log filter."))
+							.OnGetMenuContent(this, &SOutputLog::MakeAddFilterMenu)
+							.HasDownArrow(true)
+							.ContentPadding(FMargin(1, 0))
+							.ButtonContent()
+							[
+								SNew(SHorizontalBox)
+								
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								[
+									SNew(STextBlock)
+									.TextStyle(FConsoleEnhStyle::Get(), "GenericFilters.TextStyle")
+									//.Font(FConsoleEnhStyle::Get().GetFontStyle("FontAwesome.9"))
+									.Text(FText::FromString(FString(TEXT("\xf0b0"))) /*fa-filter*/)
+								]
+								
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								.Padding(2, 0, 0, 0)
+								[
+									SNew(STextBlock)
+									.TextStyle(FConsoleEnhStyle::Get(), "GenericFilters.TextStyle")
+									.Text(LOCTEXT("Filters", "Filters"))
+								]
+							]
+						]
+						
+						+ SHorizontalBox::Slot()
+						.Padding(4, 1, 0, 0)
+						[
+							SAssignNew(FilterTextBox, SSearchBox)
+							.HintText(LOCTEXT("SearchLogHint", "Search Log"))
+							.OnTextChanged(this, &SOutputLog::OnFilterTextChanged)
+							.OnTextCommitted(this, &SOutputLog::OnFilterTextCommitted)
+							.DelayChangeNotificationsWhileTyping(true)
+						]
+					]
+					
+					// Output log area
+					+ SVerticalBox::Slot()
+					.FillHeight(1)
+					[
+						MessagesTextBox.ToSharedRef()
+					]
+				]
+			]
+			
+			// The console input box
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(FMargin(0.0f, 4.0f, 0.0f, 0.0f))
+			[
+				SNew(SConsoleInputBox)
+				.OnConsoleCommandExecuted(this, &SOutputLog::OnConsoleCommandExecuted)
+				
+				// Always place suggestions above the input line for the output log widget
+				.SuggestionListPlacement(MenuPlacement_AboveAnchor)
+			]
 		];
 
 	GLog->AddOutputDevice(this);

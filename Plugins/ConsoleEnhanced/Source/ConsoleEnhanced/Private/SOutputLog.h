@@ -185,10 +185,10 @@ struct FLogFilter
 		if (bUseRegex) {
 			FString regexFilter = InFilterText.ToString();
 			//try {
-				searchRegex = std::regex(TCHAR_TO_ANSI(*regexFilter), std::regex_constants::nosubs |
-					std::regex_constants::icase | std::regex_constants::optimize);
-				bIsRegexValid = true;
-				lastValidRegex = searchRegex;
+			searchRegex = std::regex(TCHAR_TO_ANSI(*regexFilter), std::regex_constants::nosubs |
+				std::regex_constants::icase | std::regex_constants::optimize);
+			bIsRegexValid = true;
+			lastValidRegex = searchRegex;
 			//}
 			//catch (std::regex_error&) {
 			//	bIsRegexValid = false;

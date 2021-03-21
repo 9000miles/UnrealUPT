@@ -23,64 +23,64 @@ void SDebugConsole::Construct(const FArguments& InArgs, const EDebugConsoleStyle
 		[
 			SNew(SVerticalBox)
 			+ SVerticalBox::Slot()
-		.AutoHeight()
-		[
-			SNew(SVerticalBox)
-			.Visibility(this, &SDebugConsole::MakeVisibleIfLogIsShown)
-
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(10.0f)
-		[
-			SNew(SBox)
-			.HeightOverride(200.0f)
-		[
-			SNew(SBorder)
-			.BorderImage(FConsoleEnhStyle::GetBrush("ToolPanel.GroupBorder"))
-		.ColorAndOpacity(this, &SDebugConsole::GetAnimatedColorAndOpacity)
-		.BorderBackgroundColor(this, &SDebugConsole::GetAnimatedSlateColor)
-		[
-			SNew(SSpacer)
-		]
-		]
-		]
-		]
-
-	+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(10.0f)
-		[
-			SNew(SBox)
-			.HeightOverride(26.0f)
-		.HAlign(HAlign_Left)
-		[
-			SNew(SBorder)
-			.Padding(FMargin(2))
-		.BorderImage(FConsoleEnhStyle::GetBrush("DebugConsole.Background"))
-		.ColorAndOpacity(this, &SDebugConsole::GetAnimatedColorAndOpacity)
-		.BorderBackgroundColor(this, &SDebugConsole::GetAnimatedSlateColor)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(3.0f)
-		.VAlign(VAlign_Center)
-		[
-			SNew(STextBlock)
-			.Text(NSLOCTEXT("Console", "ConsoleLabel", "Console"))
-
-		]
-	+ SHorizontalBox::Slot()
-		.Padding(5.0f, 2.0f)
-		.VAlign(VAlign_Center)
-		.MaxWidth(400.0f)
-		[
-			SAssignNew(ConsoleInputBox, SConsoleInputBox)
-			.OnConsoleCommandExecuted(DebugConsoleDelegates->OnConsoleCommandExecuted)
-		]
-		]
-		]
-		]
+			.AutoHeight()
+			[
+				SNew(SVerticalBox)
+				.Visibility(this, &SDebugConsole::MakeVisibleIfLogIsShown)
+				
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(10.0f)
+				[
+					SNew(SBox)
+					.HeightOverride(200.0f)
+					[
+						SNew(SBorder)
+						.BorderImage(FConsoleEnhStyle::GetBrush("ToolPanel.GroupBorder"))
+						.ColorAndOpacity(this, &SDebugConsole::GetAnimatedColorAndOpacity)
+						.BorderBackgroundColor(this, &SDebugConsole::GetAnimatedSlateColor)
+						[
+							SNew(SSpacer)
+						]
+					]
+				]
+			]
+			
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(10.0f)
+			[
+				SNew(SBox)
+				.HeightOverride(26.0f)
+				.HAlign(HAlign_Left)
+				[
+					SNew(SBorder)
+					.Padding(FMargin(2))
+					.BorderImage(FConsoleEnhStyle::GetBrush("DebugConsole.Background"))
+					.ColorAndOpacity(this, &SDebugConsole::GetAnimatedColorAndOpacity)
+					.BorderBackgroundColor(this, &SDebugConsole::GetAnimatedSlateColor)
+					[
+						SNew(SHorizontalBox)
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.Padding(3.0f)
+						.VAlign(VAlign_Center)
+						[
+							SNew(STextBlock)
+							.Text(NSLOCTEXT("Console", "ConsoleLabel", "Console"))
+							
+						]
+						+ SHorizontalBox::Slot()
+						.Padding(5.0f, 2.0f)
+						.VAlign(VAlign_Center)
+						.MaxWidth(400.0f)
+						[
+							SAssignNew(ConsoleInputBox, SConsoleInputBox)
+							.OnConsoleCommandExecuted(DebugConsoleDelegates->OnConsoleCommandExecuted)
+						]
+					]
+				]
+			]
 		];
 
 	EditableTextBox = ConsoleInputBox->GetEditableTextBox();
