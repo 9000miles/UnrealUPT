@@ -8,13 +8,7 @@
 #include "Widgets/Input/SSearchBox.h"
 #include "Styling/SlateTypes.h"
 #include "AssetRegistryModule.h"
-#include "Kismet2/BlueprintEditorUtils.h"
-#include "BlueprintEditorModule.h"
-#include "BlueprintEditor.h"
-#include "SourceCodeNavigation.h"
-#include "EditorStyleSet.h"
-#include "Classes/EditorStyleSettings.h"
-#include "Subsystems/AssetEditorSubsystem.h"
+#include "ConsoleEnhStyle.h"
 
 using namespace std;
 
@@ -178,7 +172,7 @@ void SConsoleInputBox::Construct(const FArguments& InArgs)
 	.MenuContent
 	(
 		SNew(SBorder)
-		.BorderImage(FEditorStyle::GetBrush("Menu.Background"))
+		.BorderImage(FConsoleEnhStyle::GetBrush("Menu.Background"))
 		.Padding(FMargin(2))
 		[
 			SNew(SBox)
@@ -266,7 +260,7 @@ TSharedRef<ITableRow> SConsoleInputBox::MakeSuggestionListItemWidget(TSharedPtr<
 		[
 			SNew(STextBlock)
 			.Text(FText::FromString(Combined))
-		.TextStyle(FEditorStyle::Get(), "Log.Normal")
+		//.TextStyle(Log.Normal::Get(), "Log.Normal")
 		.HighlightText(HighlightText)
 		]
 		];
@@ -364,12 +358,12 @@ void SConsoleInputBox::OnTextCommitted(const FText& InText, ETextCommit::Type Co
 				UWorld* World = NULL;
 				UWorld* OldWorld = NULL;
 
-				// The play world needs to handle these commands if it exists
-				if (GIsEditor && GEditor->PlayWorld && !GIsPlayInEditorWorld)
-				{
-					World = GEditor->PlayWorld;
-					OldWorld = SetPlayInEditorWorld(GEditor->PlayWorld);
-				}
+				//// The play world needs to handle these commands if it exists
+				//if (GIsEditor && GEditor->PlayWorld && !GIsPlayInEditorWorld)
+				//{
+				//	World = GEditor->PlayWorld;
+				//	OldWorld = SetPlayInEditorWorld(GEditor->PlayWorld);
+				//}
 
 				ULocalPlayer* Player = GEngine->GetDebugLocalPlayer();
 				if (Player)
@@ -384,7 +378,7 @@ void SConsoleInputBox::OnTextCommitted(const FText& InText, ETextCommit::Type Co
 
 				if (!World)
 				{
-					World = GEditor->GetEditorWorldContext().World();
+					//World = GEditor->GetEditorWorldContext().World();
 				}
 				if (World)
 				{
@@ -406,7 +400,7 @@ void SConsoleInputBox::OnTextCommitted(const FText& InText, ETextCommit::Type Co
 					{
 						if (GIsEditor)
 						{
-							bWasHandled = GEditor->Exec(World, *ExecString, *GLog);
+							//bWasHandled = GEditor->Exec(World, *ExecString, *GLog);
 						}
 						else
 						{
@@ -417,7 +411,7 @@ void SConsoleInputBox::OnTextCommitted(const FText& InText, ETextCommit::Type Co
 				// Restore the old world of there was one
 				if (OldWorld)
 				{
-					RestoreEditorWorld(OldWorld);
+					//RestoreEditorWorld(OldWorld);
 				}
 			}
 		}
@@ -655,60 +649,60 @@ void FOutputLogTextLayoutMarshaller::AppendMessageToTextLayout(const TSharedPtr<
 	AppendMessagesToTextLayout(MessagesList);
 }
 
-struct RichTextHelper {
-	static void JumpToGraph(IBlueprintEditor& bpEditor, UEdGraph* Graph) {
-		bpEditor.JumpToHyperlink(Graph, false);
-	}
-
-	static void OpenBlueprint(const FSlateHyperlinkRun::FMetadata& Metadata, UBlueprint* Blueprint, UEdGraph* Graph)
-	{
-		if (Blueprint && Blueprint->IsValidLowLevel()) {
-			// check to see if the blueprint is already opened in one of the editors
-			UAssetEditorSubsystem* EditorSubsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>();
-			auto editors = EditorSubsystem->FindEditorsForAsset(Blueprint);
-			for (IAssetEditorInstance* editor : editors) {
-				FBlueprintEditor* bpEditor = static_cast<FBlueprintEditor*>(editor);
-				if (bpEditor && bpEditor->GetBlueprintObj() == Blueprint) {
-					bpEditor->BringToolkitToFront();
-					if (Graph && Graph->IsValidLowLevel()) {
-						JumpToGraph(*bpEditor, Graph);
-					}
-				}
-				return;
-			}
-
-			// open a new editor
-			FBlueprintEditorModule& BlueprintEditorModule = FModuleManager::LoadModuleChecked<FBlueprintEditorModule>("Kismet");
-			TSharedRef<IBlueprintEditor> NewKismetEditor = BlueprintEditorModule.CreateBlueprintEditor(EToolkitMode::Standalone, TSharedPtr<IToolkitHost>(), Blueprint);
-			if (Graph && Graph->IsValidLowLevel()) {
-				JumpToGraph(NewKismetEditor.Get(), Graph);
-			}
-		}
-		else {
-			// TODO: log that blueprint reference is no longer valid
-		}
-	}
-
-	static void OpenUrl(const FSlateHyperlinkRun::FMetadata& Metadata)
-	{
-		const FString* url = Metadata.Find(TEXT("href"));
-		if (url)
-		{
-			FPlatformProcess::LaunchURL(**url, nullptr, nullptr);
-		}
-	}
-
-	static void OpenPath(const FSlateHyperlinkRun::FMetadata& Metadata, FString Path, bool IsSourceFile)
-	{
-		const FString AbsolutePath = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*Path);
-		if (IsSourceFile && FSourceCodeNavigation::IsCompilerAvailable()) {
-			FSourceCodeNavigation::OpenSourceFile(AbsolutePath);
-		}
-		else {
-			FPlatformProcess::LaunchFileInDefaultExternalApplication(*AbsolutePath);
-		}
-	}
-};
+//struct RichTextHelper {
+//	static void JumpToGraph(IBlueprintEditor& bpEditor, UEdGraph* Graph) {
+//		bpEditor.JumpToHyperlink(Graph, false);
+//	}
+//
+//	static void OpenBlueprint(const FSlateHyperlinkRun::FMetadata& Metadata, UBlueprint* Blueprint, UEdGraph* Graph)
+//	{
+//		if (Blueprint && Blueprint->IsValidLowLevel()) {
+//			// check to see if the blueprint is already opened in one of the editors
+//			UAssetEditorSubsystem* EditorSubsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>();
+//			auto editors = EditorSubsystem->FindEditorsForAsset(Blueprint);
+//			for (IAssetEditorInstance* editor : editors) {
+//				FBlueprintEditor* bpEditor = static_cast<FBlueprintEditor*>(editor);
+//				if (bpEditor && bpEditor->GetBlueprintObj() == Blueprint) {
+//					bpEditor->BringToolkitToFront();
+//					if (Graph && Graph->IsValidLowLevel()) {
+//						JumpToGraph(*bpEditor, Graph);
+//					}
+//				}
+//				return;
+//			}
+//
+//			// open a new editor
+//			FBlueprintEditorModule& BlueprintEditorModule = FModuleManager::LoadModuleChecked<FBlueprintEditorModule>("Kismet");
+//			TSharedRef<IBlueprintEditor> NewKismetEditor = BlueprintEditorModule.CreateBlueprintEditor(EToolkitMode::Standalone, TSharedPtr<IToolkitHost>(), Blueprint);
+//			if (Graph && Graph->IsValidLowLevel()) {
+//				JumpToGraph(NewKismetEditor.Get(), Graph);
+//			}
+//		}
+//		else {
+//			// TODO: log that blueprint reference is no longer valid
+//		}
+//	}
+//
+//	static void OpenUrl(const FSlateHyperlinkRun::FMetadata& Metadata)
+//	{
+//		const FString* url = Metadata.Find(TEXT("href"));
+//		if (url)
+//		{
+//			FPlatformProcess::LaunchURL(**url, nullptr, nullptr);
+//		}
+//	}
+//
+//	static void OpenPath(const FSlateHyperlinkRun::FMetadata& Metadata, FString Path, bool IsSourceFile)
+//	{
+//		const FString AbsolutePath = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*Path);
+//		if (IsSourceFile && FSourceCodeNavigation::IsCompilerAvailable()) {
+//			FSourceCodeNavigation::OpenSourceFile(AbsolutePath);
+//		}
+//		else {
+//			FPlatformProcess::LaunchFileInDefaultExternalApplication(*AbsolutePath);
+//		}
+//	}
+//};
 
 void FOutputLogTextLayoutMarshaller::AppendMessagesToTextLayout(const TArray<TSharedPtr<FLogMessage>>& InMessages)
 {
@@ -801,17 +795,17 @@ void FOutputLogTextLayoutMarshaller::CreateUrlHyperlinks(TSharedRef<FString> Lin
 		FRunInfo RunInfo(TEXT("a"));
 		RunInfo.MetaData.Add(TEXT("href"), urlMatcher.GetCaptureGroup(0));
 
-		FSlateHyperlinkRun::FOnClick OnHyperlinkClicked = FSlateHyperlinkRun::FOnClick::CreateStatic(&RichTextHelper::OpenUrl);
-		TSharedRef<FSlateHyperlinkRun> HyperlinkRun = FSlateHyperlinkRun::Create(
-			RunInfo,
-			LineText,
-			linkStyle,
-			OnHyperlinkClicked,
-			FSlateHyperlinkRun::FOnGenerateTooltip(),
-			FSlateHyperlinkRun::FOnGetTooltipText(),
-			newRange
-		);
-		hyperlinkRuns.insert(make_pair(matchStart, HyperlinkRun));
+		//FSlateHyperlinkRun::FOnClick OnHyperlinkClicked = FSlateHyperlinkRun::FOnClick::CreateStatic(&RichTextHelper::OpenUrl);
+		//TSharedRef<FSlateHyperlinkRun> HyperlinkRun = FSlateHyperlinkRun::Create(
+		//	RunInfo,
+		//	LineText,
+		//	linkStyle,
+		//	OnHyperlinkClicked,
+		//	FSlateHyperlinkRun::FOnGenerateTooltip(),
+		//	FSlateHyperlinkRun::FOnGetTooltipText(),
+		//	newRange
+		//);
+		//hyperlinkRuns.insert(make_pair(matchStart, HyperlinkRun));
 		foundLinkRanges.Add(newRange);
 	}
 }
@@ -838,17 +832,17 @@ void FOutputLogTextLayoutMarshaller::CreateFilepathHyperlinks(TSharedRef<FString
 		FRunInfo RunInfo(TEXT("a"));
 		RunInfo.MetaData.Add(TEXT("href"), isSourceFile ? FString("Open source file") : FString("Open file or directory"));
 
-		FSlateHyperlinkRun::FOnClick OnHyperlinkClicked = FSlateHyperlinkRun::FOnClick::CreateStatic(&RichTextHelper::OpenPath, foundPath, isSourceFile);
-		TSharedRef<FSlateHyperlinkRun> HyperlinkRun = FSlateHyperlinkRun::Create(
-			RunInfo,
-			LineText,
-			linkStyle,
-			OnHyperlinkClicked,
-			FSlateHyperlinkRun::FOnGenerateTooltip(),
-			FSlateHyperlinkRun::FOnGetTooltipText(),
-			newRange
-		);
-		hyperlinkRuns.insert(make_pair(matchStart, HyperlinkRun));
+		//FSlateHyperlinkRun::FOnClick OnHyperlinkClicked = FSlateHyperlinkRun::FOnClick::CreateStatic(&RichTextHelper::OpenPath, foundPath, isSourceFile);
+		//TSharedRef<FSlateHyperlinkRun> HyperlinkRun = FSlateHyperlinkRun::Create(
+		//	RunInfo,
+		//	LineText,
+		//	linkStyle,
+		//	OnHyperlinkClicked,
+		//	FSlateHyperlinkRun::FOnGenerateTooltip(),
+		//	FSlateHyperlinkRun::FOnGetTooltipText(),
+		//	newRange
+		//);
+		//hyperlinkRuns.insert(make_pair(matchStart, HyperlinkRun));
 		foundLinkRanges.Add(newRange);
 	}
 }
@@ -897,17 +891,17 @@ void FOutputLogTextLayoutMarshaller::CreateBlueprintHyperlinks(const TArray<UBlu
 			FRunInfo RunInfo(TEXT("a"));
 			RunInfo.MetaData.Add(TEXT("href"), FString("Open in Blueprint Editor"));
 
-			FSlateHyperlinkRun::FOnClick OnHyperlinkClicked = FSlateHyperlinkRun::FOnClick::CreateStatic(&RichTextHelper::OpenBlueprint, bp, foundGraph);
-			TSharedRef<FSlateHyperlinkRun> HyperlinkRun = FSlateHyperlinkRun::Create(
-				RunInfo,
-				LineText,
-				linkStyle,
-				OnHyperlinkClicked,
-				FSlateHyperlinkRun::FOnGenerateTooltip(),
-				FSlateHyperlinkRun::FOnGetTooltipText(),
-				newRange
-			);
-			hyperlinkRuns.insert(make_pair(newRange.BeginIndex, HyperlinkRun));
+			//FSlateHyperlinkRun::FOnClick OnHyperlinkClicked = FSlateHyperlinkRun::FOnClick::CreateStatic(&RichTextHelper::OpenBlueprint, bp, foundGraph);
+			//TSharedRef<FSlateHyperlinkRun> HyperlinkRun = FSlateHyperlinkRun::Create(
+			//	RunInfo,
+			//	LineText,
+			//	linkStyle,
+			//	OnHyperlinkClicked,
+			//	FSlateHyperlinkRun::FOnGenerateTooltip(),
+			//	FSlateHyperlinkRun::FOnGetTooltipText(),
+			//	newRange
+			//);
+			//hyperlinkRuns.insert(make_pair(newRange.BeginIndex, HyperlinkRun));
 			foundLinkRanges.Add(newRange);
 		}
 	}
@@ -915,7 +909,8 @@ void FOutputLogTextLayoutMarshaller::CreateBlueprintHyperlinks(const TArray<UBlu
 
 FTextBlockStyle FOutputLogTextLayoutMarshaller::GetStyle(const TSharedPtr<FLogMessage>& Message, const ULogDisplaySettings* StyleSettings) const
 {
-	auto style = FTextBlockStyle(FEditorStyle::Get().GetWidgetStyle<FTextBlockStyle>(Message->Style));
+	auto style = FTextBlockStyle(FConsoleEnhStyle::Get().GetWidgetStyle<FTextBlockStyle>(Message->Style));
+	//auto style = FTextBlockStyle(FEditorStyle::Get().GetWidgetStyle<FTextBlockStyle>(Message->Style));
 	if (StyleSettings->bDisplayTextShadow) {
 		style
 			.SetShadowColorAndOpacity(StyleSettings->ShadowColor)
@@ -936,14 +931,14 @@ FTextBlockStyle FOutputLogTextLayoutMarshaller::GetStyle(const TSharedPtr<FLogMe
 		}
 		bool isMatch = false;
 		if (logCategory.SearchAsRegex) {
-			try {
+			//try {
 				regex searchPattern(TCHAR_TO_ANSI(*logCategory.CategorySearchString), regex_constants::nosubs | regex_constants::icase);
 				smatch matcher;
 				isMatch = regex_search(Message->CString, matcher, searchPattern);
-			}
-			catch (std::regex_error&) {
-				// just ignore the log category
-			}
+			//}
+			//catch (std::regex_error&) {
+			//	// just ignore the log category
+			//}
 		}
 		else {
 			FTextFilterExpressionEvaluator evaluator(ETextFilterExpressionEvaluatorMode::BasicString);
@@ -1087,8 +1082,8 @@ void SOutputLog::Construct(const FArguments& InArgs)
 	MessagesTextMarshaller = FOutputLogTextLayoutMarshaller::Create(InArgs._Messages, &Filter);
 
 	MessagesTextBox = SNew(SMultiLineEditableTextBox)
-		.Style(FEditorStyle::Get(), "Log.TextBox")
-		.TextStyle(FEditorStyle::Get(), "Log.Normal")
+		.Style(FConsoleEnhStyle::Get(), "Log.TextBox")
+		.TextStyle(FConsoleEnhStyle::Get(), "Log.Normal")
 		.ForegroundColor(FLinearColor::Gray)
 		.Marshaller(MessagesTextMarshaller)
 		.IsReadOnly(true)
@@ -1106,7 +1101,7 @@ void SOutputLog::Construct(const FArguments& InArgs)
 		[
 			SNew(SBorder)
 			.Padding(3)
-		.BorderImage(FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
+		.BorderImage(FConsoleEnhStyle::GetBrush("ToolPanel.GroupBorder"))
 		[
 			SNew(SVerticalBox)
 
@@ -1121,7 +1116,7 @@ void SOutputLog::Construct(const FArguments& InArgs)
 		.AutoWidth()
 		[
 			SNew(SComboButton)
-			.ComboButtonStyle(FEditorStyle::Get(), "GenericFilters.ComboButtonStyle")
+			//.ComboButtonStyle(FConsoleEnhStyle::Get(), "GenericFilters.ComboButtonStyle")
 		.ForegroundColor(FLinearColor::White)
 		.ContentPadding(0)
 		.ToolTipText(LOCTEXT("AddFilterToolTip", "Add an output log filter."))
@@ -1136,8 +1131,8 @@ void SOutputLog::Construct(const FArguments& InArgs)
 		.AutoWidth()
 		[
 			SNew(STextBlock)
-			.TextStyle(FEditorStyle::Get(), "GenericFilters.TextStyle")
-		.Font(FEditorStyle::Get().GetFontStyle("FontAwesome.9"))
+			.TextStyle(FConsoleEnhStyle::Get(), "GenericFilters.TextStyle")
+		//.Font(FConsoleEnhStyle::Get().GetFontStyle("FontAwesome.9"))
 		.Text(FText::FromString(FString(TEXT("\xf0b0"))) /*fa-filter*/)
 		]
 
@@ -1146,7 +1141,7 @@ void SOutputLog::Construct(const FArguments& InArgs)
 		.Padding(2, 0, 0, 0)
 		[
 			SNew(STextBlock)
-			.TextStyle(FEditorStyle::Get(), "GenericFilters.TextStyle")
+			.TextStyle(FConsoleEnhStyle::Get(), "GenericFilters.TextStyle")
 		.Text(LOCTEXT("Filters", "Filters"))
 		]
 		]
@@ -1231,7 +1226,7 @@ bool SOutputLog::CreateLogMessages(const TCHAR* message, ELogVerbosity::Type Ver
 	if (UObjectInitialized() && !GExitPurge)
 	{
 		// Logging can happen very late during shutdown, even after the UObject system has been torn down, hence the init check above
-		LogTimestampMode = GetDefault<UEditorStyleSettings>()->LogTimestampMode;
+		//LogTimestampMode = GetDefault<UEditorStyleSettings>()->LogTimestampMode;
 	}
 
 	const int32 OldNumMessages = OutMessages.Num();
